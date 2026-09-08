@@ -22,7 +22,7 @@ export default function AccountCard({ account, onEdit, onDelete }) {
     ? 'text-zinc-900 dark:text-text-dark-primary' // or muted red if we want
     : 'text-zinc-900 dark:text-text-dark-primary';
 
-  const handleCardClick = (e) => {
+  const handleCardClick = () => {
     // Navigate to transactions page with this account pre-selected
     // Assuming transactions page reads state or we can use a query param
     // The requirement says click to view account detail / transaction history
