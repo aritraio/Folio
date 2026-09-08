@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  Wallet,
-  ArrowDownLeft,
-  ArrowUpRight,
-  PiggyBank,
-  TrendingUp,
-} from 'lucide-react';
+import { Wallet, ArrowDownLeft, ArrowUpRight, PiggyBank, TrendingUp } from 'lucide-react';
 import { formatINR, formatPercent, formatChange, formatCompact } from '@/utils/formatCurrency';
 
 /**
@@ -14,10 +8,12 @@ import { formatINR, formatPercent, formatChange, formatCompact } from '@/utils/f
 function MetricBlock({ label, icon: Icon, iconBg, iconColor, value, subValue, subColor }) {
   return (
     <div className="flex items-start gap-3.5 py-4 px-1 min-w-0">
-      <div className={`
+      <div
+        className={`
         shrink-0 p-2.5 rounded-xl
         ${iconBg}
-      `}>
+      `}
+      >
         <Icon className={`w-4.5 h-4.5 ${iconColor}`} />
       </div>
       <div className="min-w-0">
@@ -28,7 +24,9 @@ function MetricBlock({ label, icon: Icon, iconBg, iconColor, value, subValue, su
           {value}
         </p>
         {subValue && (
-          <p className={`text-xs font-medium mt-0.5 ${subColor || 'text-text-tertiary dark:text-text-dark-tertiary'}`}>
+          <p
+            className={`text-xs font-medium mt-0.5 ${subColor || 'text-text-tertiary dark:text-text-dark-tertiary'}`}
+          >
             {subValue}
           </p>
         )}
@@ -61,9 +59,8 @@ export default function FinancialMetrics({
   investmentValue = 0,
   investmentReturn = 0,
 }) {
-  const netWorthChangePercent = netWorth - netWorthChange > 0
-    ? ((netWorthChange / (netWorth - netWorthChange)) * 100)
-    : 0;
+  const netWorthChangePercent =
+    netWorth - netWorthChange > 0 ? (netWorthChange / (netWorth - netWorthChange)) * 100 : 0;
 
   const metrics = [
     {
@@ -100,7 +97,8 @@ export default function FinancialMetrics({
       iconColor: 'text-blue-500',
       value: formatINR(savings),
       subValue: `${formatPercent(savingsRate)} rate`,
-      subColor: savingsRate >= 20 ? 'text-brand-emerald' : savingsRate >= 0 ? 'text-brand-amber' : 'text-brand-red',
+      subColor:
+        savingsRate >= 20 ? 'text-brand-emerald' : savingsRate >= 0 ? 'text-brand-amber' : 'text-brand-red',
     },
     {
       label: 'Investments',

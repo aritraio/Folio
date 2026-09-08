@@ -7,13 +7,7 @@ import React, { useState, useRef, useEffect } from 'react';
  * @param {'top'|'bottom'|'left'|'right'} position
  * @param {number} delay — show delay in ms (default 200)
  */
-export default function Tooltip({
-  children,
-  content,
-  position = 'top',
-  delay = 200,
-  className = '',
-}) {
+export default function Tooltip({ children, content, position = 'top', delay = 200, className = '' }) {
   const [visible, setVisible] = useState(false);
   const timeoutRef = useRef(null);
 
@@ -39,9 +33,11 @@ export default function Tooltip({
 
   const arrowClasses = {
     top: 'top-full left-1/2 -translate-x-1/2 border-t-zinc-800 dark:border-t-zinc-200 border-l-transparent border-r-transparent border-b-transparent',
-    bottom: 'bottom-full left-1/2 -translate-x-1/2 border-b-zinc-800 dark:border-b-zinc-200 border-l-transparent border-r-transparent border-t-transparent',
+    bottom:
+      'bottom-full left-1/2 -translate-x-1/2 border-b-zinc-800 dark:border-b-zinc-200 border-l-transparent border-r-transparent border-t-transparent',
     left: 'left-full top-1/2 -translate-y-1/2 border-l-zinc-800 dark:border-l-zinc-200 border-t-transparent border-b-transparent border-r-transparent',
-    right: 'right-full top-1/2 -translate-y-1/2 border-r-zinc-800 dark:border-r-zinc-200 border-t-transparent border-b-transparent border-l-transparent',
+    right:
+      'right-full top-1/2 -translate-y-1/2 border-r-zinc-800 dark:border-r-zinc-200 border-t-transparent border-b-transparent border-l-transparent',
   };
 
   if (!content) return children;
@@ -78,10 +74,7 @@ export default function Tooltip({
             {content}
           </div>
           {/* Arrow */}
-          <div
-            className={`absolute w-0 h-0 border-4 ${arrowClasses[position]}`}
-            aria-hidden="true"
-          />
+          <div className={`absolute w-0 h-0 border-4 ${arrowClasses[position]}`} aria-hidden="true" />
         </div>
       )}
     </div>

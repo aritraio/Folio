@@ -1,14 +1,5 @@
 import React from 'react';
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
-} from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { formatINR, formatCompact, formatChange } from '@/utils/formatCurrency';
 
 /**
@@ -17,24 +8,19 @@ import { formatINR, formatCompact, formatChange } from '@/utils/formatCurrency';
 function CashFlowTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="
+    <div
+      className="
       bg-white dark:bg-surface-dark-card
       border border-ivory-border dark:border-surface-dark-border
       rounded-lg shadow-elevated dark:shadow-dark-elevated
       px-4 py-3 space-y-1.5
-    ">
-      <p className="text-xs font-semibold text-text-secondary dark:text-text-dark-secondary">
-        {label}
-      </p>
+    "
+    >
+      <p className="text-xs font-semibold text-text-secondary dark:text-text-dark-secondary">{label}</p>
       {payload.map((entry) => (
         <div key={entry.name} className="flex items-center gap-2">
-          <span
-            className="w-2 h-2 rounded-full"
-            style={{ background: entry.color }}
-          />
-          <span className="text-xs text-text-secondary dark:text-text-dark-secondary">
-            {entry.name}:
-          </span>
+          <span className="w-2 h-2 rounded-full" style={{ background: entry.color }} />
+          <span className="text-xs text-text-secondary dark:text-text-dark-secondary">{entry.name}:</span>
           <span className="text-sm font-semibold mono text-zinc-900 dark:text-text-dark-primary">
             {formatINR(entry.value)}
           </span>
@@ -53,9 +39,7 @@ function SummaryCard({ label, value, color }) {
       <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-text-secondary dark:text-text-dark-secondary mb-1">
         {label}
       </p>
-      <p className={`text-base sm:text-lg font-bold mono ${color}`}>
-        {value}
-      </p>
+      <p className={`text-base sm:text-lg font-bold mono ${color}`}>{value}</p>
     </div>
   );
 }
@@ -84,9 +68,7 @@ export default function CashFlowChart({ data = [] }) {
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <div>
-          <h2 className="heading-sm text-zinc-900 dark:text-text-dark-primary">
-            Cash Flow
-          </h2>
+          <h2 className="heading-sm text-zinc-900 dark:text-text-dark-primary">Cash Flow</h2>
           <p className="text-xs text-text-secondary dark:text-text-dark-secondary mt-0.5">
             Income vs Expenses
           </p>
@@ -95,11 +77,7 @@ export default function CashFlowChart({ data = [] }) {
 
       {/* Summary cards */}
       <div className="grid grid-cols-3 gap-4 mb-6 pb-5 border-b border-ivory-border dark:border-surface-dark-border">
-        <SummaryCard
-          label="Income"
-          value={formatINR(current.income)}
-          color="text-brand-amber"
-        />
+        <SummaryCard label="Income" value={formatINR(current.income)} color="text-brand-amber" />
         <SummaryCard
           label="Expenses"
           value={formatINR(current.expenses)}
@@ -116,11 +94,7 @@ export default function CashFlowChart({ data = [] }) {
       <div className="h-[220px]">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={chartData} margin={{ top: 4, right: 4, left: -16, bottom: 0 }} barGap={4}>
-            <CartesianGrid
-              strokeDasharray="3 3"
-              vertical={false}
-              stroke="var(--color-border-subtle)"
-            />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-border-subtle)" />
             <XAxis
               dataKey="name"
               axisLine={false}
@@ -136,18 +110,8 @@ export default function CashFlowChart({ data = [] }) {
               dx={-4}
             />
             <Tooltip content={<CashFlowTooltip />} />
-            <Bar
-              dataKey="Income"
-              fill="#D97706"
-              radius={[4, 4, 0, 0]}
-              maxBarSize={32}
-            />
-            <Bar
-              dataKey="Expenses"
-              fill="#71717A"
-              radius={[4, 4, 0, 0]}
-              maxBarSize={32}
-            />
+            <Bar dataKey="Income" fill="#D97706" radius={[4, 4, 0, 0]} maxBarSize={32} />
+            <Bar dataKey="Expenses" fill="#71717A" radius={[4, 4, 0, 0]} maxBarSize={32} />
           </BarChart>
         </ResponsiveContainer>
       </div>

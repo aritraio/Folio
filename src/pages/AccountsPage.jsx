@@ -1,32 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Plus } from 'lucide-react';
 import Button from '../components/ui/Button';
+import ConfirmDialog from '../components/ui/ConfirmDialog';
+import Select from '../components/ui/Select';
 import AccountCard from '../components/accounts/AccountCard';
 import AccountModal from '../components/accounts/AccountModal';
-import {
-  getAccounts,
-  saveAccount,
-  updateAccount,
-  deleteAccount,
-} from '../services/storage';
+import { useData } from '../contexts/DataContext';
+import { saveAccount, updateAccount, deleteAccount, getAccountUsage } from '../services/storage';
 import { calcTotalAssets, calcTotalLiabilities, calcNetWorth } from '../utils/calculations';
-import { formatINR } from '../utils/formatCurrency';
+import { formatMoney } from '../utils/formatCurrency';
 
 export default function AccountsPage() {
-  const [accounts, setAccounts] = useState([]);
+  const { accounts, refresh } = useData();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingAccount, setEditingAccount] = useState(null);
-
-  useEffect(() => {
-    setAccounts(getAccounts());
-  }, []);
+  const [deleteState, setDeleteState] = useState({ open: false, account: null, usage: 0, reassignTo: '' });
+  const [deleteError, setDeleteError] = useState('');
 
   const totalAssets = calcTotalAssets(accounts);
   const totalLiabilities = calcTotalLiabilities(accounts);
   const netWorth = calcNetWorth(accounts);
 
-  const assetsAccounts = accounts.filter(a => a.type !== 'credit');
-  const liabilitiesAccounts = accounts.filter(a => a.type === 'credit');
+  const assetsAccounts = accounts.filter((a) => a.type !== 'credit');
+  const liabilitiesAccounts = accounts.filter((a) => a.type === 'credit');
 
   const handleAddClick = () => {
     setEditingAccount(null);
@@ -38,56 +34,101 @@ export default function AccountsPage() {
     setIsModalOpen(true);
   };
 
-  const handleDeleteClick = (id) => {
-    deleteAccount(id);
-    setAccounts(getAccounts());
+  const handleDeleteClick = (accountOrId) => {
+    const account =
+      typeof accountOrId === 'string' ? accounts.find((a) => a.id === accountOrId) : accountOrId;
+    if (!account) return;
+    const usage = getAccountUsage(account.id);
+    if (usage.hasTransactions) {
+      const fallback = accounts.find((a) => a.id !== account.id);
+      setDeleteState({ open: true, account, usage: usage.count, reassignTo: fallback ? fallback.id : '' });
+      setDeleteError('');
+    } else {
+      try {
+        deleteAccount(account.id);
+        refresh();
+      } catch (err) {
+        setDeleteError(err.message);
+      }
+    }
+  };
+
+  const confirmDelete = () => {
+    if (!deleteState.account) return;
+    try {
+      if (deleteState.usage > 0 && !deleteState.reassignTo) {
+        setDeleteError('Choose an account to move the transactions to, or cancel.');
+        return;
+      }
+      deleteAccount(
+        deleteState.account.id,
+        deleteState.usage > 0 ? { reassignTo: deleteState.reassignTo } : undefined
+      );
+      setDeleteState({ open: false, account: null, usage: 0, reassignTo: '' });
+      setDeleteError('');
+      refresh();
+    } catch (err) {
+      setDeleteError(err.message || 'Could not delete account.');
+    }
   };
 
   const handleSaveAccount = (data) => {
     if (editingAccount) {
-      updateAccount(data);
+      updateAccount({ ...data, id: editingAccount.id });
     } else {
       saveAccount(data);
     }
-    setAccounts(getAccounts());
+    refresh();
   };
+
+  const otherAccounts = accounts.filter((a) => deleteState.account && a.id !== deleteState.account.id);
 
   return (
     <div className="space-y-8">
-      {/* Header & Summary */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
           <p className="label mb-1 text-zinc-500">Finance</p>
           <h1 className="heading-lg text-zinc-900 dark:text-text-dark-primary mb-6">Accounts</h1>
-          
+
           <div className="flex flex-wrap gap-x-8 gap-y-4">
             <div>
-              <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-1 font-medium tracking-wide">TOTAL ASSETS</p>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-1 font-medium tracking-wide">
+                TOTAL ASSETS
+              </p>
               <p className="text-2xl font-mono text-zinc-900 dark:text-text-dark-primary">
-                {formatINR(totalAssets, { showSymbol: true })}
+                {formatMoney(totalAssets)}
               </p>
             </div>
             <div>
-              <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-1 font-medium tracking-wide">TOTAL LIABILITIES</p>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-1 font-medium tracking-wide">
+                TOTAL LIABILITIES
+              </p>
               <p className="text-2xl font-mono text-zinc-900 dark:text-text-dark-primary">
-                {formatINR(totalLiabilities, { showSymbol: true })}
+                {formatMoney(totalLiabilities)}
               </p>
             </div>
             <div className="pl-6 border-l border-ivory-border dark:border-surface-dark-border">
-              <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-1 font-medium tracking-wide">NET WORTH</p>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-1 font-medium tracking-wide">
+                NET WORTH
+              </p>
               <p className="text-2xl font-mono text-brand-emerald dark:text-emerald-400">
-                {formatINR(netWorth, { showSymbol: true })}
+                {formatMoney(netWorth)}
               </p>
             </div>
           </div>
         </div>
-        
+
         <Button variant="primary" icon={<Plus className="w-4 h-4" />} onClick={handleAddClick}>
           Add Account
         </Button>
       </div>
 
-      {/* Assets Section */}
+      {deleteError && !deleteState.open && (
+        <div className="p-3 rounded-lg text-sm bg-brand-red/10 text-brand-red" role="alert">
+          {deleteError}
+        </div>
+      )}
+
       <div>
         <h2 className="heading-sm text-zinc-800 dark:text-text-dark-primary mb-4 flex items-center gap-2">
           Assets
@@ -99,19 +140,18 @@ export default function AccountsPage() {
           <p className="text-sm text-zinc-500">No asset accounts found.</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {assetsAccounts.map(account => (
-              <AccountCard 
-                key={account.id} 
-                account={account} 
+            {assetsAccounts.map((account) => (
+              <AccountCard
+                key={account.id}
+                account={account}
                 onEdit={handleEditClick}
-                onDelete={handleDeleteClick}
+                onDelete={() => handleDeleteClick(account)}
               />
             ))}
           </div>
         )}
       </div>
 
-      {/* Liabilities Section */}
       <div>
         <h2 className="heading-sm text-zinc-800 dark:text-text-dark-primary mb-4 flex items-center gap-2">
           Liabilities
@@ -123,25 +163,49 @@ export default function AccountsPage() {
           <p className="text-sm text-zinc-500">No liability accounts found.</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {liabilitiesAccounts.map(account => (
-              <AccountCard 
-                key={account.id} 
-                account={account} 
+            {liabilitiesAccounts.map((account) => (
+              <AccountCard
+                key={account.id}
+                account={account}
                 onEdit={handleEditClick}
-                onDelete={handleDeleteClick}
+                onDelete={() => handleDeleteClick(account)}
               />
             ))}
           </div>
         )}
       </div>
 
-      {/* Modal */}
       <AccountModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         account={editingAccount}
         onSave={handleSaveAccount}
       />
+
+      <ConfirmDialog
+        isOpen={deleteState.open}
+        onClose={() => setDeleteState({ open: false, account: null, usage: 0, reassignTo: '' })}
+        onConfirm={confirmDelete}
+        title={`Delete ${deleteState.account?.name || 'account'}?`}
+        message={`This account is used by ${deleteState.usage} transaction(s). Choose where to move them — transactions are never silently orphaned.`}
+        confirmLabel="Move & Delete"
+      >
+        {otherAccounts.length > 0 && (
+          <div className="mt-4 text-left">
+            <Select
+              label="Move transactions to"
+              value={deleteState.reassignTo}
+              onChange={(e) => setDeleteState((s) => ({ ...s, reassignTo: e.target.value }))}
+              options={otherAccounts.map((a) => ({ value: a.id, label: a.name }))}
+            />
+            {deleteError && (
+              <p className="mt-2 text-sm text-brand-red" role="alert">
+                {deleteError}
+              </p>
+            )}
+          </div>
+        )}
+      </ConfirmDialog>
     </div>
   );
 }

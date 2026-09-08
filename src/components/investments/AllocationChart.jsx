@@ -1,23 +1,16 @@
 import React, { useState, useCallback } from 'react';
-import {
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip,
-  ResponsiveContainer,
-  Sector,
-} from 'recharts';
-import { formatINR, formatPercent } from '@/utils/formatCurrency';
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Sector } from 'recharts';
+import { formatINR } from '@/utils/formatCurrency';
 
 const ALLOCATION_COLORS = {
   'Mutual Fund': '#D97706',
-  'Stocks': '#0D9488',
-  'Gold': '#F59E0B',
+  Stocks: '#0D9488',
+  Gold: '#F59E0B',
   'Provident Fund': '#6366F1',
   'Fixed Deposit': '#3B82F6',
-  'Bonds': '#8B5CF6',
+  Bonds: '#8B5CF6',
   'Real Estate': '#EC4899',
-  'Other': '#6B7280',
+  Other: '#6B7280',
 };
 
 /**
@@ -27,21 +20,19 @@ function AllocationTooltip({ active, payload }) {
   if (!active || !payload?.length) return null;
   const { name, value, percentage, color } = payload[0].payload;
   return (
-    <div className="
+    <div
+      className="
       bg-white dark:bg-surface-dark-card
       border border-ivory-border dark:border-surface-dark-border
       rounded-lg shadow-elevated dark:shadow-dark-elevated
       px-4 py-3
-    ">
+    "
+    >
       <div className="flex items-center gap-2 mb-1">
         <span className="w-2.5 h-2.5 rounded-full" style={{ background: color }} />
-        <span className="text-xs font-semibold text-zinc-900 dark:text-text-dark-primary">
-          {name}
-        </span>
+        <span className="text-xs font-semibold text-zinc-900 dark:text-text-dark-primary">{name}</span>
       </div>
-      <p className="text-sm font-bold mono text-zinc-900 dark:text-text-dark-primary">
-        {formatINR(value)}
-      </p>
+      <p className="text-sm font-bold mono text-zinc-900 dark:text-text-dark-primary">{formatINR(value)}</p>
       <p className="text-xs text-text-secondary dark:text-text-dark-secondary">
         {percentage.toFixed(1)}% of portfolio
       </p>
@@ -119,9 +110,7 @@ export default function AllocationChart({ holdings = [] }) {
       style={{ animationDelay: '0.1s' }}
     >
       <div className="mb-5">
-        <h2 className="heading-sm text-zinc-900 dark:text-text-dark-primary">
-          Allocation
-        </h2>
+        <h2 className="heading-sm text-zinc-900 dark:text-text-dark-primary">Allocation</h2>
         <p className="text-xs text-text-secondary dark:text-text-dark-secondary mt-0.5">
           Portfolio distribution by asset class
         </p>
@@ -179,10 +168,7 @@ export default function AllocationChart({ holdings = [] }) {
               onMouseLeave={() => setActiveIndex(-1)}
             >
               <div className="flex items-center gap-2.5 min-w-0">
-                <span
-                  className="w-2.5 h-2.5 rounded-full shrink-0"
-                  style={{ background: item.color }}
-                />
+                <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: item.color }} />
                 <span className="text-sm text-zinc-700 dark:text-text-dark-secondary truncate">
                   {item.name}
                 </span>

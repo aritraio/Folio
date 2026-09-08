@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import {
   Wallet,
   LayoutDashboard,
@@ -12,12 +12,14 @@ import {
   Search,
   Bell,
   User,
-  LogOut,
+  Download,
   Moon,
   Sun,
 } from 'lucide-react';
 import MobileNav from './MobileNav';
 import { useTheme } from '../ThemeProvider';
+import { useData } from '../../contexts/DataContext';
+import { downloadBackup } from '../../services/storage';
 
 const NAV_ITEMS = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
@@ -44,9 +46,21 @@ const NAV_ITEMS = [
  */
 export default function Navbar({ onSearchClick }) {
   const location = useLocation();
+  const navigate = useNavigate();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
   const userMenuRef = useRef(null);
+  const notifRef = useRef(null);
   const { theme, preference, setPreference } = useTheme();
+  const { settings } = useData();
+  const userName = settings?.userName || 'User';
+  const userEmail = settings?.email || '';
+  const initials = (userName || 'U')
+    .split(' ')
+    .map((n) => n[0])
+    .join('')
+    .substring(0, 2)
+    .toUpperCase();
 
   // Cycle: light → dark → system → light …
   const cycleTheme = () => {
@@ -56,22 +70,26 @@ export default function Navbar({ onSearchClick }) {
 
   const themeLabel = preference === 'system' ? `System (${theme})` : preference === 'dark' ? 'Dark' : 'Light';
 
-  // Close user menu on outside click
+  // Close menus on outside click
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
         setUserMenuOpen(false);
       }
+      if (notifRef.current && !notifRef.current.contains(e.target)) {
+        setNotifOpen(false);
+      }
     };
-    if (userMenuOpen) {
+    if (userMenuOpen || notifOpen) {
       document.addEventListener('mousedown', handleClickOutside);
     }
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [userMenuOpen]);
+  }, [userMenuOpen, notifOpen]);
 
-  // Close user menu on route change
+  // Close menus on route change
   useEffect(() => {
     setUserMenuOpen(false);
+    setNotifOpen(false);
   }, [location.pathname]);
 
   return (
@@ -88,28 +106,29 @@ export default function Navbar({ onSearchClick }) {
     >
       <div className="max-w-[1400px] mx-auto px-6">
         <div className="flex items-center justify-between h-16">
-
           {/* ── Left: Mobile Hamburger + Logo ── */}
           <div className="flex items-center gap-2">
             <MobileNav />
             <NavLink
-            to="/"
-            className="flex items-center gap-2.5 shrink-0 group"
-            aria-label="Ledger — Go to dashboard"
-          >
-            <div className="
+              to="/"
+              className="flex items-center gap-2.5 shrink-0 group"
+              aria-label="Ledger — Go to dashboard"
+            >
+              <div
+                className="
               p-2 rounded-lg
               bg-amber-50 dark:bg-[rgba(245,158,11,0.12)]
               text-brand-amber
               group-hover:bg-amber-100 dark:group-hover:bg-[rgba(245,158,11,0.2)]
               transition-colors duration-150
-            ">
-              <Wallet className="w-5 h-5" />
-            </div>
-            <span className="font-serif-display text-xl font-bold tracking-tight text-zinc-900 dark:text-text-dark-primary">
-              Ledger
-            </span>
-          </NavLink>
+            "
+              >
+                <Wallet className="w-5 h-5" />
+              </div>
+              <span className="font-serif-display text-xl font-bold tracking-tight text-zinc-900 dark:text-text-dark-primary">
+                Ledger
+              </span>
+            </NavLink>
           </div>
 
           {/* ── Center: Navigation Links ── */}
@@ -179,29 +198,58 @@ export default function Navbar({ onSearchClick }) {
                 hover:bg-ivory-muted dark:hover:bg-surface-dark-elevated
                 transition-colors duration-150
               "
-              aria-label="Search"
+              aria-label="Search (Ctrl+K)"
+              title="Search (Ctrl+K)"
             >
               <Search className="w-[18px] h-[18px]" />
             </button>
 
             {/* Notifications */}
-            <button
-              className="
-                relative p-2.5 rounded-lg
-                text-zinc-500 dark:text-zinc-400
-                hover:text-zinc-900 dark:hover:text-text-dark-primary
-                hover:bg-ivory-muted dark:hover:bg-surface-dark-elevated
-                transition-colors duration-150
-              "
-              aria-label="Notifications"
-            >
-              <Bell className="w-[18px] h-[18px]" />
-              {/* Notification dot */}
-              <span
-                className="absolute top-2 right-2 w-1.5 h-1.5 bg-brand-red rounded-full"
-                aria-hidden="true"
-              />
-            </button>
+            <div className="relative" ref={notifRef}>
+              <button
+                onClick={() => setNotifOpen((v) => !v)}
+                className="
+                  relative p-2.5 rounded-lg
+                  text-zinc-500 dark:text-zinc-400
+                  hover:text-zinc-900 dark:hover:text-text-dark-primary
+                  hover:bg-ivory-muted dark:hover:bg-surface-dark-elevated
+                  transition-colors duration-150
+                "
+                aria-label="Notifications"
+                aria-expanded={notifOpen}
+                aria-haspopup="true"
+              >
+                <Bell className="w-[18px] h-[18px]" />
+                <span
+                  className="absolute top-2 right-2 w-1.5 h-1.5 bg-brand-red rounded-full"
+                  aria-hidden="true"
+                />
+              </button>
+              {notifOpen && (
+                <div
+                  className="absolute right-0 top-full mt-2 w-72 p-4 bg-white dark:bg-surface-dark-card border border-ivory-border dark:border-surface-dark-border rounded-xl shadow-elevated dark:shadow-dark-elevated z-50"
+                  role="menu"
+                  aria-label="Notifications"
+                >
+                  <p className="text-sm font-semibold text-zinc-900 dark:text-text-dark-primary mb-1">
+                    You&apos;re all caught up
+                  </p>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
+                    Local-first demo: budgets, insights and reminders update from your transactions on the
+                    Dashboard. No server notifications in v1.
+                  </p>
+                  <button
+                    onClick={() => {
+                      setNotifOpen(false);
+                      navigate('/');
+                    }}
+                    className="mt-3 text-xs font-medium text-brand-amber hover:underline"
+                  >
+                    View insights →
+                  </button>
+                </div>
+              )}
+            </div>
 
             {/* Divider */}
             <div className="w-px h-6 bg-ivory-border dark:bg-surface-dark-border mx-1.5" aria-hidden="true" />
@@ -219,17 +267,20 @@ export default function Navbar({ onSearchClick }) {
                 aria-expanded={userMenuOpen}
                 aria-haspopup="true"
               >
-                <div className="
+                <div
+                  className="
                   w-7 h-7 rounded-full
                   bg-gradient-to-br from-amber-400 to-orange-500
                   flex items-center justify-center
                   text-white text-xs font-bold
                   shadow-sm
-                ">
-                  A
+                "
+                  aria-hidden="true"
+                >
+                  {initials}
                 </div>
                 <span className="hidden sm:block text-sm font-medium text-zinc-700 dark:text-text-dark-secondary">
-                  Aritra
+                  {userName}
                 </span>
               </button>
 
@@ -249,8 +300,10 @@ export default function Navbar({ onSearchClick }) {
                 >
                   {/* User info */}
                   <div className="px-4 py-3 border-b border-ivory-border dark:border-surface-dark-border">
-                    <p className="text-sm font-semibold text-zinc-900 dark:text-text-dark-primary">Aritra</p>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-500">aritra@example.com</p>
+                    <p className="text-sm font-semibold text-zinc-900 dark:text-text-dark-primary">
+                      {userName}
+                    </p>
+                    {userEmail && <p className="text-xs text-zinc-500 dark:text-zinc-500">{userEmail}</p>}
                   </div>
 
                   <div className="py-1">
@@ -263,15 +316,34 @@ export default function Navbar({ onSearchClick }) {
                       <Settings className="w-4 h-4" />
                       Settings
                     </NavLink>
+                    <button
+                      className="flex items-center gap-2.5 w-full px-4 py-2 text-sm text-zinc-700 dark:text-text-dark-secondary hover:bg-ivory-muted dark:hover:bg-surface-dark-elevated transition-colors"
+                      role="menuitem"
+                      onClick={() => {
+                        setUserMenuOpen(false);
+                        try {
+                          downloadBackup();
+                        } catch {
+                          navigate('/settings');
+                        }
+                      }}
+                    >
+                      <Download className="w-4 h-4" />
+                      Export backup
+                    </button>
                   </div>
 
                   <div className="border-t border-ivory-border dark:border-surface-dark-border pt-1">
                     <button
-                      className="flex items-center gap-2.5 w-full px-4 py-2 text-sm text-brand-red hover:bg-brand-red-light dark:hover:bg-[rgba(251,113,133,0.1)] transition-colors"
+                      className="flex items-center gap-2.5 w-full px-4 py-2 text-sm text-zinc-500 dark:text-zinc-400 hover:bg-ivory-muted dark:hover:bg-surface-dark-elevated transition-colors"
                       role="menuitem"
+                      onClick={() => {
+                        setUserMenuOpen(false);
+                        navigate('/settings');
+                      }}
                     >
-                      <LogOut className="w-4 h-4" />
-                      Sign Out
+                      <User className="w-4 h-4" />
+                      Manage data
                     </button>
                   </div>
                 </div>

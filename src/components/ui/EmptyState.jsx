@@ -36,20 +36,14 @@ export default function EmptyState({
           mb-5
         "
       >
-        {icon || (
-          <Inbox className="w-7 h-7 text-zinc-400 dark:text-zinc-500" />
-        )}
+        {icon || <Inbox className="w-7 h-7 text-zinc-400 dark:text-zinc-500" />}
       </div>
 
       {/* Title */}
-      <h3 className="heading-sm text-zinc-800 dark:text-text-dark-primary mb-2">
-        {title}
-      </h3>
+      <h3 className="heading-sm text-zinc-800 dark:text-text-dark-primary mb-2">{title}</h3>
 
       {/* Description */}
-      <p className="body-sm max-w-sm mb-6">
-        {description}
-      </p>
+      <p className="body-sm max-w-sm mb-6">{description}</p>
 
       {/* CTA */}
       {actionLabel && onAction && (

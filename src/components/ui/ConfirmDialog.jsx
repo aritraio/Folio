@@ -26,6 +26,7 @@ export default function ConfirmDialog({
   cancelLabel = 'Cancel',
   variant = 'destructive',
   loading = false,
+  children,
 }) {
   const handleConfirm = () => {
     onConfirm();
@@ -55,31 +56,19 @@ export default function ConfirmDialog({
         </div>
 
         {/* Title */}
-        <h3 className="heading-sm text-zinc-900 dark:text-text-dark-primary mb-2">
-          {title}
-        </h3>
+        <h3 className="heading-sm text-zinc-900 dark:text-text-dark-primary mb-2">{title}</h3>
 
         {/* Message */}
         <p className="body-sm max-w-xs mb-6">{message}</p>
 
+        {children}
+
         {/* Actions */}
-        <div className="flex items-center gap-3 w-full">
-          <Button
-            variant="secondary"
-            size="md"
-            fullWidth
-            onClick={onClose}
-            disabled={loading}
-          >
+        <div className="flex items-center gap-3 w-full mt-6">
+          <Button variant="secondary" size="md" fullWidth onClick={onClose} disabled={loading}>
             {cancelLabel}
           </Button>
-          <Button
-            variant={variant}
-            size="md"
-            fullWidth
-            onClick={handleConfirm}
-            loading={loading}
-          >
+          <Button variant={variant} size="md" fullWidth onClick={handleConfirm} loading={loading}>
             {confirmLabel}
           </Button>
         </div>

@@ -16,7 +16,7 @@ export default function AccountCard({ account, onEdit, onDelete }) {
   const navigate = useNavigate();
 
   const IconComponent = ICON_MAP[account.icon] || Landmark;
-  
+
   const isCredit = account.type === 'credit';
   const balanceColor = isCredit
     ? 'text-zinc-900 dark:text-text-dark-primary' // or muted red if we want
@@ -41,18 +41,15 @@ export default function AccountCard({ account, onEdit, onDelete }) {
 
   return (
     <>
-      <div 
+      <div
         className="card p-5 group cursor-pointer hover:border-brand-amber/50 hover:shadow-md transition-all duration-200 relative overflow-hidden"
         onClick={handleCardClick}
       >
         {/* Decorative top border based on account color if provided */}
         {account.color && (
-          <div 
-            className="absolute top-0 left-0 w-full h-1" 
-            style={{ backgroundColor: account.color }} 
-          />
+          <div className="absolute top-0 left-0 w-full h-1" style={{ backgroundColor: account.color }} />
         )}
-        
+
         <div className="flex justify-between items-start mb-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-zinc-100 dark:bg-surface-dark-elevated flex items-center justify-center">
@@ -67,16 +64,16 @@ export default function AccountCard({ account, onEdit, onDelete }) {
               </p>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-            <button 
+            <button
               onClick={handleEdit}
               className="p-1.5 text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 dark:hover:text-zinc-200 dark:hover:bg-surface-dark-elevated rounded-md transition-colors"
               aria-label="Edit account"
             >
               <Pencil className="w-4 h-4" />
             </button>
-            <button 
+            <button
               onClick={handleDelete}
               className="p-1.5 text-zinc-400 hover:text-brand-red hover:bg-brand-red-light rounded-md transition-colors"
               aria-label="Delete account"

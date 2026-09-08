@@ -19,9 +19,7 @@ function HoldingCard({ holding, onEdit, onDelete }) {
           <p className="text-sm font-semibold text-zinc-900 dark:text-text-dark-primary truncate">
             {holding.name}
           </p>
-          <p className="text-xs text-text-secondary dark:text-text-dark-secondary">
-            {holding.category}
-          </p>
+          <p className="text-xs text-text-secondary dark:text-text-dark-secondary">{holding.category}</p>
         </div>
         <div className="flex items-center gap-1 shrink-0">
           <button
@@ -48,11 +46,15 @@ function HoldingCard({ holding, onEdit, onDelete }) {
         </div>
         <div>
           <span className="text-text-tertiary dark:text-text-dark-tertiary">Avg Price</span>
-          <p className="font-semibold mono text-zinc-900 dark:text-text-dark-primary">{formatINR(holding.avgPrice)}</p>
+          <p className="font-semibold mono text-zinc-900 dark:text-text-dark-primary">
+            {formatINR(holding.avgPrice)}
+          </p>
         </div>
         <div>
           <span className="text-text-tertiary dark:text-text-dark-tertiary">Invested</span>
-          <p className="font-semibold mono text-zinc-900 dark:text-text-dark-primary">{formatINR(invested)}</p>
+          <p className="font-semibold mono text-zinc-900 dark:text-text-dark-primary">
+            {formatINR(invested)}
+          </p>
         </div>
         <div>
           <span className="text-text-tertiary dark:text-text-dark-tertiary">Current</span>
@@ -68,8 +70,11 @@ function HoldingCard({ holding, onEdit, onDelete }) {
           ) : (
             <TrendingDown className="w-3.5 h-3.5 text-brand-red dark:text-rose-400" />
           )}
-          <span className={`text-sm font-bold mono ${isPositive ? 'text-brand-emerald dark:text-emerald-400' : 'text-brand-red dark:text-rose-400'}`}>
-            {isPositive ? '+' : '−'}{formatINR(Math.abs(returnAmt))} ({formatPercent(returnPct)})
+          <span
+            className={`text-sm font-bold mono ${isPositive ? 'text-brand-emerald dark:text-emerald-400' : 'text-brand-red dark:text-rose-400'}`}
+          >
+            {isPositive ? '+' : '−'}
+            {formatINR(Math.abs(returnAmt))} ({formatPercent(returnPct)})
           </span>
         </div>
       </div>
@@ -86,15 +91,9 @@ export default function HoldingsTable({ holdings = [], onEdit, onDelete }) {
   if (holdings.length === 0) return null;
 
   return (
-    <section
-      className="animate-fade-in-up"
-      aria-label="Holdings table"
-      style={{ animationDelay: '0.2s' }}
-    >
+    <section className="animate-fade-in-up" aria-label="Holdings table" style={{ animationDelay: '0.2s' }}>
       <div className="mb-4">
-        <h2 className="heading-sm text-zinc-900 dark:text-text-dark-primary">
-          Holdings
-        </h2>
+        <h2 className="heading-sm text-zinc-900 dark:text-text-dark-primary">Holdings</h2>
         <p className="text-xs text-text-secondary dark:text-text-dark-secondary mt-0.5">
           {holdings.length} {holdings.length === 1 ? 'asset' : 'assets'} in your portfolio
         </p>
@@ -171,10 +170,15 @@ export default function HoldingsTable({ holdings = [], onEdit, onDelete }) {
                     <td className="px-4 py-3.5 text-right mono font-semibold text-zinc-900 dark:text-text-dark-primary">
                       {formatINR(current)}
                     </td>
-                    <td className={`px-4 py-3.5 text-right mono font-semibold ${isPositive ? 'text-brand-emerald dark:text-emerald-400' : 'text-brand-red dark:text-rose-400'}`}>
-                      {isPositive ? '+' : '−'}{formatINR(Math.abs(returnAmt))}
+                    <td
+                      className={`px-4 py-3.5 text-right mono font-semibold ${isPositive ? 'text-brand-emerald dark:text-emerald-400' : 'text-brand-red dark:text-rose-400'}`}
+                    >
+                      {isPositive ? '+' : '−'}
+                      {formatINR(Math.abs(returnAmt))}
                     </td>
-                    <td className={`px-4 py-3.5 text-right mono font-semibold ${isPositive ? 'text-brand-emerald dark:text-emerald-400' : 'text-brand-red dark:text-rose-400'}`}>
+                    <td
+                      className={`px-4 py-3.5 text-right mono font-semibold ${isPositive ? 'text-brand-emerald dark:text-emerald-400' : 'text-brand-red dark:text-rose-400'}`}
+                    >
                       {formatPercent(returnPct)}
                     </td>
                     <td className="px-4 py-3.5">

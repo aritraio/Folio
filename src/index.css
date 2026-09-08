@@ -8,22 +8,22 @@
 
 /* ── Light Mode CSS Custom Properties ── */
 :root {
-  --color-bg-primary: #FDFBF7;
-  --color-bg-secondary: #FFFFFF;
-  --color-bg-tertiary: #F5F2EB;
-  --color-bg-hover: #F5F2EB;
-  --color-border: #E8E3D9;
-  --color-border-subtle: #F0EDE5;
-  --color-text-primary: #18181B;
-  --color-text-secondary: #71717A;
-  --color-text-tertiary: #A1A1AA;
-  --color-accent: #D97706;
-  --color-accent-hover: #B45309;
-  --color-accent-bg: #FEF3C7;
+  --color-bg-primary: #fdfbf7;
+  --color-bg-secondary: #ffffff;
+  --color-bg-tertiary: #f5f2eb;
+  --color-bg-hover: #f5f2eb;
+  --color-border: #e8e3d9;
+  --color-border-subtle: #f0ede5;
+  --color-text-primary: #18181b;
+  --color-text-secondary: #71717a;
+  --color-text-tertiary: #a1a1aa;
+  --color-accent: #d97706;
+  --color-accent-hover: #b45309;
+  --color-accent-bg: #fef3c7;
   --color-positive: #059669;
-  --color-positive-bg: #D1FAE5;
-  --color-negative: #E11D48;
-  --color-negative-bg: #FFE4E6;
+  --color-positive-bg: #d1fae5;
+  --color-negative: #e11d48;
+  --color-negative-bg: #ffe4e6;
   --color-card-shadow: rgba(0, 0, 0, 0.04);
   --color-overlay: rgba(0, 0, 0, 0.4);
 }
@@ -31,20 +31,20 @@
 /* ── Dark Mode CSS Custom Properties ── */
 .dark {
   --color-bg-primary: #141414;
-  --color-bg-secondary: #1E1E1E;
+  --color-bg-secondary: #1e1e1e;
   --color-bg-tertiary: #282828;
   --color-bg-hover: #333333;
   --color-border: #333333;
   --color-border-subtle: #282828;
-  --color-text-primary: #F5F5F5;
-  --color-text-secondary: #A1A1AA;
-  --color-text-tertiary: #71717A;
-  --color-accent: #F59E0B;
-  --color-accent-hover: #D97706;
+  --color-text-primary: #f5f5f5;
+  --color-text-secondary: #a1a1aa;
+  --color-text-tertiary: #71717a;
+  --color-accent: #f59e0b;
+  --color-accent-hover: #d97706;
   --color-accent-bg: rgba(245, 158, 11, 0.15);
-  --color-positive: #34D399;
+  --color-positive: #34d399;
   --color-positive-bg: rgba(52, 211, 153, 0.15);
-  --color-negative: #FB7185;
+  --color-negative: #fb7185;
   --color-negative-bg: rgba(251, 113, 133, 0.15);
   --color-card-shadow: rgba(0, 0, 0, 0.3);
   --color-overlay: rgba(0, 0, 0, 0.6);
@@ -153,7 +153,9 @@
   /* ── Card Surface ── */
   .card {
     @apply bg-white border border-ivory-border rounded-xl shadow-card;
-    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+    transition:
+      box-shadow 0.2s ease,
+      border-color 0.2s ease;
   }
   .card:hover {
     @apply shadow-card-hover;
@@ -170,5 +172,17 @@
     @apply fixed inset-0 z-40;
     background: var(--color-overlay);
     animation: backdrop-fade 0.15s ease-out;
+  }
+}
+
+/* Respect users who prefer reduced motion (WCAG 2.1). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

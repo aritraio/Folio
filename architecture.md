@@ -196,10 +196,10 @@ User action (add / edit / delete)
 
 | Concern | Approach |
 |---------|----------|
-| **Persisted data** (transactions, accounts, budgets, holdings) | `localStorage` via `services/storage.js`. Pages read on mount and after mutations. |
+| **Persisted data** (transactions, accounts, budgets, holdings) | `localStorage` via `services/storage.js`, consumed through `contexts/DataContext.jsx` (`useData()` + `refresh()`). Subscribes to `storage` + `ledger_data_updated` events for cross-tab sync. |
 | **Theme** | React Context (`ThemeContext`) — light / dark / system. Persisted in `localStorage`. |
-| **UI state** (modal open, active filters, search query) | Local component state (`useState`). |
-| **Derived financial data** (net worth, savings rate, etc.) | Computed on the fly via `utils/calculations.js` — no separate store. Memoised with `useMemo` where expensive. |
+| **UI state** (modal open, active filters, search query, pagination) | Local component state (`useState`). Filters synced to URL (`?search=`) where shareable. |
+| **Derived financial data** (net worth, savings rate, etc.) | Computed on the fly via `utils/calculations.js` — no separate store. Memoised with `useMemo` on stable context values. |
 
 > **Why no Redux / Zustand?**
 > The app is read-heavy with infrequent writes. Data lives in `localStorage` and is small enough to read synchronously. A context or simple prop-drilling approach keeps the architecture lean. If the app grows to need real-time sync or collaborative editing, a state manager can be introduced behind the same storage service interface.
@@ -224,42 +224,58 @@ All routes are rendered inside `AppLayout` which provides the `Navbar` and a max
 
 ## 6. Storage Service — Interface Contract
 
-The storage service (`services/storage.js`) exposes a **synchronous, promise-free API** over `localStorage`. This keeps the current implementation simple while allowing a future async backend swap.
+The storage service (`services/storage.js`) exposes a **synchronous API** over `localStorage`
+(schema v2, see `STORAGE_KEYS` + `SCHEMA_VERSION` in `constants/finance.js`). Mutations dispatch
+`ledger_data_updated` (consumed by `DataContext`) so all pages stay reactive without reloads.
 
 ```js
-// Transactions
-getTransactions()           → Transaction[]
-saveTransaction(tx)         → Transaction       // assigns id, persists
-updateTransaction(id, data) → Transaction
-deleteTransaction(id)       → void
+// Transactions (transfer = { type: 'transfer', accountId: from, toAccountId: to })
+getTransactions()                → Transaction[]
+saveTransaction(tx)              → Transaction       // crypto.randomUUID id, applies balances
+updateTransaction(tx)            → Transaction       // also updateTransaction(id, patch)
+updateTransaction(id, patch)     → Transaction       // atomic revert+apply, no balance clamp
+deleteTransaction(id)            → void              // reverts balance effect
 
-// Accounts
-getAccounts()               → Account[]
-saveAccount(account)        → Account
-updateAccount(id, data)     → Account
-deleteAccount(id)           → void
+// Accounts (delete is guarded — never orphans transactions)
+getAccounts()                    → Account[]
+saveAccount(account)             → Account
+updateAccount(acc)               → Account           // also updateAccount(id, patch)
+getAccountUsage(id)              → { count, hasTransactions }
+reassignTransactions(fromId, toId) → number moved
+deleteAccount(id, { reassignTo })→ void              // throws ACCOUNT_IN_USE if referenced
 
 // Budgets
-getBudgets()                → Budget[]
-saveBudget(budget)          → Budget
-updateBudget(id, data)      → Budget
-deleteBudget(id)            → void
+getBudgets()                     → Budget[]
+saveBudget(budget)               → Budget
+updateBudget(budget)             → Budget            // also updateBudget(id, patch)
+deleteBudget(id)                 → void
 
 // Investments
-getInvestments()            → Holding[]
-saveInvestment(holding)     → Holding
-updateInvestment(id, data)  → Holding
-deleteInvestment(id)        → void
+getInvestments()                 → Holding[]
+saveInvestment(holding)          → Holding
+updateInvestment(holding)        → Holding           // also updateInvestment(id, patch)
+deleteInvestment(id)             → void
 
 // Settings
-getSettings()               → Settings
-saveSettings(settings)      → void
+getSettings()                    → Settings          // merged over defaults
+saveSettings(patch)              → Settings
+
+// Net-worth history (stored snapshots; derived honestly when empty)
+getNetWorthHistory()             → History[]
+saveNetWorthHistory(arr)         → History[]
+saveNetWorthSnapshot({ monthKey, assets, liabilities, netWorth }) → entry
 
 // Data management
-exportAllData()             → JSON string
-importData(jsonString)      → void   // validates, overwrites
-clearAllData()              → void   // wipes all keys
-initializeIfNeeded()        → void   // seeds mock data on first run
+exportAllData()                  → JSON string (versioned)
+downloadBackup(filename?)        → filename          // Blob download, safe for large data
+createPreImportBackup()          → filename|null
+validateBackup(obj)              → { ok, errors }
+importData(jsonString)           → void              // strict validation, throws INVALID_BACKUP
+clearAllData()                   → void              // alias of resetToDemo (backward compat)
+resetToDemo()                    → void              // wipe + re-seed demo
+eraseAllData()                   → void              // wipe with NO re-seed (true empty state)
+subscribeToData(listener)        → unsubscribe
+generateId(prefix)               → string (crypto.randomUUID)
 ```
 
 ### Future Migration Path
@@ -279,14 +295,17 @@ To migrate to Supabase / Firebase:
 
 ```js
 {
-  id: "txn_1",              // string, auto-generated
+  id: "txn_1",              // string, crypto.randomUUID
   type: "expense",          // "expense" | "income" | "transfer"
-  description: "Swiggy",   // merchant / payee name
-  category: "Food",        // category string
+  merchant: "Swiggy",       // canonical merchant/description (description alias kept)
+  description: "Swiggy",   // alias of merchant for backward compat
+  category: "Food",        // category string ("Other" for transfers)
   amount: 420,             // positive number (sign determined by type)
-  account: "HDFC Savings", // account name reference
+  account: "HDFC Savings", // legacy display name (prefer accountId)
+  accountId: "acc_1",      // source account id
+  toAccountId: "acc_2",    // transfer destination (transfers only)
   date: "2026-08-10",      // ISO date string
-  notes: "",               // optional free text
+  notes: "",               // optional free text (≤500 chars)
   createdAt: "..."         // ISO timestamp
 }
 ```

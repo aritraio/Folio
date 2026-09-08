@@ -1,13 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import {
-  ArrowRight,
-  Landmark,
-  Building2,
-  CreditCard,
-  Wallet,
-  Banknote,
-} from 'lucide-react';
+import { ArrowRight, Landmark, Building2, CreditCard, Wallet, Banknote } from 'lucide-react';
 import { formatINR } from '@/utils/formatCurrency';
 import { calcTotalAssets, calcTotalLiabilities, calcNetWorth } from '@/utils/calculations';
 
@@ -30,12 +23,14 @@ function AccountRow({ account }) {
   const isLiability = account.type === 'credit';
 
   return (
-    <div className="
+    <div
+      className="
       flex items-center justify-between gap-3
       py-3 px-2 -mx-2 rounded-lg
       hover:bg-ivory-muted dark:hover:bg-surface-dark-elevated
       transition-colors duration-150
-    ">
+    "
+    >
       <div className="flex items-center gap-3 min-w-0">
         <div
           className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
@@ -52,11 +47,14 @@ function AccountRow({ account }) {
           </p>
         </div>
       </div>
-      <span className={`
+      <span
+        className={`
         text-sm font-semibold mono shrink-0
         ${isLiability ? 'text-brand-red' : 'text-zinc-900 dark:text-text-dark-primary'}
-      `}>
-        {isLiability ? '−' : ''}{formatINR(account.balance)}
+      `}
+      >
+        {isLiability ? '−' : ''}
+        {formatINR(account.balance)}
       </span>
     </div>
   );
@@ -83,9 +81,7 @@ export default function AccountOverview({ accounts = [] }) {
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <div>
-          <h2 className="heading-sm text-zinc-900 dark:text-text-dark-primary">
-            Accounts
-          </h2>
+          <h2 className="heading-sm text-zinc-900 dark:text-text-dark-primary">Accounts</h2>
           <p className="text-xs text-text-secondary dark:text-text-dark-secondary mt-0.5">
             Assets & Liabilities
           </p>
@@ -99,9 +95,7 @@ export default function AccountOverview({ accounts = [] }) {
             <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-brand-emerald">
               Assets
             </span>
-            <span className="text-xs font-semibold mono text-brand-emerald">
-              {formatINR(totalAssets)}
-            </span>
+            <span className="text-xs font-semibold mono text-brand-emerald">{formatINR(totalAssets)}</span>
           </div>
           <div className="divide-y divide-ivory-border dark:divide-surface-dark-border">
             {assets.map((acc) => (
@@ -118,9 +112,7 @@ export default function AccountOverview({ accounts = [] }) {
             <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-brand-red">
               Liabilities
             </span>
-            <span className="text-xs font-semibold mono text-brand-red">
-              {formatINR(totalLiabilities)}
-            </span>
+            <span className="text-xs font-semibold mono text-brand-red">{formatINR(totalLiabilities)}</span>
           </div>
           <div className="divide-y divide-ivory-border dark:divide-surface-dark-border">
             {liabilities.map((acc) => (
@@ -131,14 +123,14 @@ export default function AccountOverview({ accounts = [] }) {
       )}
 
       {/* Net Worth Summary */}
-      <div className="
+      <div
+        className="
         flex items-center justify-between
         pt-4 mt-1
         border-t-2 border-ivory-border dark:border-surface-dark-border
-      ">
-        <span className="text-sm font-semibold text-zinc-900 dark:text-text-dark-primary">
-          Net Worth
-        </span>
+      "
+      >
+        <span className="text-sm font-semibold text-zinc-900 dark:text-text-dark-primary">Net Worth</span>
         <span className="text-base font-bold mono text-zinc-900 dark:text-text-dark-primary">
           {formatINR(netWorth)}
         </span>

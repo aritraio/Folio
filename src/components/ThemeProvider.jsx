@@ -6,7 +6,7 @@ import { getSettings, saveSettings } from '../services/storage';
  * the user's preference ('light' | 'dark' | 'system'), and a setter.
  */
 const ThemeContext = createContext({
-  theme: 'light',       // resolved: 'light' | 'dark'
+  theme: 'light', // resolved: 'light' | 'dark'
   preference: 'system', // user setting: 'light' | 'dark' | 'system'
   setPreference: () => {},
 });
@@ -96,8 +96,6 @@ export default function ThemeProvider({ children }) {
   }, []);
 
   return (
-    <ThemeContext.Provider value={{ theme, preference, setPreference }}>
-      {children}
-    </ThemeContext.Provider>
+    <ThemeContext.Provider value={{ theme, preference, setPreference }}>{children}</ThemeContext.Provider>
   );
 }

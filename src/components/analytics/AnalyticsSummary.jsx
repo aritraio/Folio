@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  TrendingDown,
-  TrendingUp,
-  Percent,
-  ArrowUpDown,
-  CalendarDays,
-  Tag,
-} from 'lucide-react';
+import { TrendingDown, TrendingUp, Percent, ArrowUpDown, CalendarDays, Tag } from 'lucide-react';
 import { formatINR, formatPercent, formatChange } from '@/utils/formatCurrency';
 
 /**
@@ -24,11 +17,11 @@ function MetricCard({ icon: Icon, iconColor, label, value, subtext, subtextColor
         </div>
       </div>
       <div>
-        <p className="text-xl font-bold mono text-zinc-900 dark:text-text-dark-primary">
-          {value}
-        </p>
+        <p className="text-xl font-bold mono text-zinc-900 dark:text-text-dark-primary">{value}</p>
         {subtext && (
-          <p className={`text-xs mt-1 font-medium ${subtextColor || 'text-text-secondary dark:text-text-dark-secondary'}`}>
+          <p
+            className={`text-xs mt-1 font-medium ${subtextColor || 'text-text-secondary dark:text-text-dark-secondary'}`}
+          >
             {subtext}
           </p>
         )}
@@ -73,7 +66,9 @@ export default function AnalyticsSummary({
         label="Savings Rate"
         value={formatPercent(savingsRate)}
         subtext={savingsRate >= 20 ? 'Healthy' : savingsRate > 0 ? 'Could improve' : 'No savings'}
-        subtextColor={savingsRate >= 20 ? 'text-brand-emerald dark:text-emerald-400' : 'text-brand-red dark:text-rose-400'}
+        subtextColor={
+          savingsRate >= 20 ? 'text-brand-emerald dark:text-emerald-400' : 'text-brand-red dark:text-rose-400'
+        }
       />
       <MetricCard
         icon={ArrowUpDown}
@@ -81,7 +76,9 @@ export default function AnalyticsSummary({
         label="Net Cash Flow"
         value={formatChange(netCashFlow)}
         subtext={netCashFlow >= 0 ? 'Positive' : 'Negative'}
-        subtextColor={netCashFlow >= 0 ? 'text-brand-emerald dark:text-emerald-400' : 'text-brand-red dark:text-rose-400'}
+        subtextColor={
+          netCashFlow >= 0 ? 'text-brand-emerald dark:text-emerald-400' : 'text-brand-red dark:text-rose-400'
+        }
       />
       <MetricCard
         icon={CalendarDays}

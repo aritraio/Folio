@@ -2,12 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { format } from 'date-fns';
 import { BarChart3 } from 'lucide-react';
 
-// Services
-import {
-  getTransactions,
-  getAccounts,
-  getNetWorthHistory,
-} from '@/services/storage';
+import { useData } from '@/contexts/DataContext';
 
 // Calculations
 import {
@@ -43,24 +38,17 @@ const PERIOD_OPTIONS = [
 
 /**
  * AnalyticsPage — Comprehensive spending trends and financial analytics.
- * Displays summary metrics, multiple chart types, and category comparisons.
  */
 export default function AnalyticsPage() {
   const [period, setPeriod] = useState('6');
-
-  // Load data
-  const transactions = getTransactions();
-  const accounts = getAccounts();
-  const netWorthHistoryRaw = getNetWorthHistory();
+  const { transactions, accounts, netWorthHistory: netWorthHistoryRaw } = useData();
 
   const nMonths = parseInt(period, 10);
   const now = new Date();
   const currentMonth = format(now, 'yyyy-MM');
 
-  // Months array for the selected period
   const months = useMemo(() => getLastNMonths(nMonths), [nMonths]);
 
-  // Month selector options for summary metrics
   const [selectedMonth, setSelectedMonth] = useState(currentMonth);
 
   const monthOptions = useMemo(() => {
@@ -71,18 +59,17 @@ export default function AnalyticsPage() {
     return opts;
   }, [months]);
 
-  // Summary metrics for the selected month
   const summaryMetrics = useMemo(() => {
-    const income = calcMonthlyIncome(transactions, selectedMonth);
-    const expenses = calcMonthlyExpenses(transactions, selectedMonth);
+    const month = monthOptions.some((o) => o.value === selectedMonth) ? selectedMonth : currentMonth;
+    const income = calcMonthlyIncome(transactions, month);
+    const expenses = calcMonthlyExpenses(transactions, month);
     const savingsRate = calcSavingsRate(income, expenses);
     const netCashFlow = income - expenses;
-    const avgDaily = calcAverageDailySpending(transactions, selectedMonth);
-    const topCat = calcTopSpendingCategory(transactions, selectedMonth);
+    const avgDaily = calcAverageDailySpending(transactions, month);
+    const topCat = calcTopSpendingCategory(transactions, month);
 
-    // Find month label
-    const monthEntry = months.find((m) => m.monthKey === selectedMonth);
-    const monthLabel = monthEntry ? monthEntry.label : selectedMonth;
+    const monthEntry = months.find((m) => m.monthKey === month);
+    const monthLabel = monthEntry ? monthEntry.label : month;
 
     return {
       monthlySpending: expenses,
@@ -93,46 +80,40 @@ export default function AnalyticsPage() {
       topCategory: topCat,
       monthLabel,
     };
-  }, [transactions, selectedMonth, months]);
+  }, [transactions, selectedMonth, months, monthOptions, currentMonth]);
 
-  // Cash flow data for the period
   const cashFlowData = useMemo(() => {
     return calcMonthlyCashFlow(transactions, nMonths);
   }, [transactions, nMonths]);
 
-  // Net worth history
   const netWorthHistory = useMemo(() => {
-    const history = calcNetWorthHistory(netWorthHistoryRaw, transactions, accounts);
-    // Only return data for the selected period range
+    const history = calcNetWorthHistory(netWorthHistoryRaw, transactions, accounts, nMonths);
     return history.slice(-nMonths);
   }, [netWorthHistoryRaw, transactions, accounts, nMonths]);
 
-  // Check if there are any transactions at all
   const hasTransactions = transactions.length > 0;
 
   return (
     <div className="space-y-8 pb-12">
-      {/* ── Header ── */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
           <p className="label mb-1 text-zinc-500">Insights</p>
-          <h1 className="heading-lg text-zinc-900 dark:text-text-dark-primary">
-            Analytics
-          </h1>
+          <h1 className="heading-lg text-zinc-900 dark:text-text-dark-primary">Analytics</h1>
         </div>
 
-        {/* Filters */}
         <div className="flex items-center gap-3">
           <div className="w-40">
             <Select
+              aria-label="Summary month"
               options={monthOptions}
-              value={selectedMonth}
+              value={monthOptions.some((o) => o.value === selectedMonth) ? selectedMonth : currentMonth}
               onChange={(e) => setSelectedMonth(e.target.value)}
               placeholder={null}
             />
           </div>
           <div className="w-40">
             <Select
+              aria-label="Period"
               options={PERIOD_OPTIONS}
               value={period}
               onChange={(e) => setPeriod(e.target.value)}
@@ -142,7 +123,6 @@ export default function AnalyticsPage() {
         </div>
       </div>
 
-      {/* ── Empty state ── */}
       {!hasTransactions ? (
         <div className="card p-8 md:p-12">
           <EmptyState
@@ -150,24 +130,20 @@ export default function AnalyticsPage() {
             title="No analytics data yet"
             description="Add some transactions to see spending trends, income patterns, and financial analytics here."
             actionLabel="Go to Transactions"
-            onAction={() => window.location.href = '/transactions'}
+            onAction={() => (window.location.href = '/transactions')}
           />
         </div>
       ) : (
         <>
-          {/* ── Summary Metrics ── */}
           <AnalyticsSummary {...summaryMetrics} />
 
-          {/* ── Expenses & Income Charts (side-by-side) ── */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <MonthlyExpensesChart data={cashFlowData} />
             <MonthlyIncomeChart data={cashFlowData} />
           </div>
 
-          {/* ── Category Comparison (full width) ── */}
           <CategoryComparisonChart transactions={transactions} months={months} />
 
-          {/* ── Savings Rate & Net Worth Growth (side-by-side) ── */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <SavingsRateChart transactions={transactions} months={months} />
             <NetWorthGrowthChart data={netWorthHistory} />

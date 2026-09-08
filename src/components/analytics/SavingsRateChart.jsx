@@ -1,13 +1,5 @@
 import React, { useMemo } from 'react';
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { formatPercent } from '@/utils/formatCurrency';
 import { calcMonthlyIncome, calcMonthlyExpenses, calcSavingsRate } from '@/utils/calculations';
 
@@ -18,16 +10,18 @@ function SavingsRateTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null;
   const value = payload[0].value;
   return (
-    <div className="
+    <div
+      className="
       bg-white dark:bg-surface-dark-card
       border border-ivory-border dark:border-surface-dark-border
       rounded-lg shadow-elevated dark:shadow-dark-elevated
       px-4 py-3
-    ">
-      <p className="text-xs font-semibold text-text-secondary dark:text-text-dark-secondary mb-1">
-        {label}
-      </p>
-      <p className={`text-base font-bold mono ${value >= 0 ? 'text-brand-emerald dark:text-emerald-400' : 'text-brand-red dark:text-rose-400'}`}>
+    "
+    >
+      <p className="text-xs font-semibold text-text-secondary dark:text-text-dark-secondary mb-1">{label}</p>
+      <p
+        className={`text-base font-bold mono ${value >= 0 ? 'text-brand-emerald dark:text-emerald-400' : 'text-brand-red dark:text-rose-400'}`}
+      >
         {formatPercent(value)}
       </p>
     </div>
@@ -59,9 +53,7 @@ export default function SavingsRateChart({ transactions = [], months = [] }) {
       style={{ animationDelay: '0.25s' }}
     >
       <div className="mb-5">
-        <h2 className="heading-sm text-zinc-900 dark:text-text-dark-primary">
-          Savings Rate
-        </h2>
+        <h2 className="heading-sm text-zinc-900 dark:text-text-dark-primary">Savings Rate</h2>
         <p className="text-xs text-text-secondary dark:text-text-dark-secondary mt-0.5">
           Percentage of income saved each month
         </p>
@@ -76,11 +68,7 @@ export default function SavingsRateChart({ transactions = [], months = [] }) {
                 <stop offset="95%" stopColor="#059669" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid
-              strokeDasharray="3 3"
-              vertical={false}
-              stroke="var(--color-border-subtle)"
-            />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-border-subtle)" />
             <XAxis
               dataKey="name"
               axisLine={false}

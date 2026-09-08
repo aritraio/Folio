@@ -21,7 +21,7 @@ export default function AccountModal({ isOpen, onClose, account, onSave }) {
       if (account) {
         setFormData({
           ...account,
-          accountNumber: account.accountNumber === 'N/A' ? '' : (account.accountNumber || ''),
+          accountNumber: account.accountNumber === 'N/A' ? '' : account.accountNumber || '',
         });
       } else {
         setFormData(INITIAL_STATE);
@@ -58,7 +58,7 @@ export default function AccountModal({ isOpen, onClose, account, onSave }) {
       // Determine default icon and color based on type if not provided
       let icon = formData.icon;
       let color = formData.color;
-      
+
       if (!icon) {
         if (formData.type === 'savings' || formData.type === 'current') icon = 'Landmark';
         else if (formData.type === 'credit') icon = 'CreditCard';
@@ -78,12 +78,7 @@ export default function AccountModal({ isOpen, onClose, account, onSave }) {
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title={account ? 'Edit Account' : 'Add Account'}
-      size="md"
-    >
+    <Modal isOpen={isOpen} onClose={onClose} title={account ? 'Edit Account' : 'Add Account'} size="md">
       <form onSubmit={handleSubmit} className="space-y-4">
         <Input
           label="Account Name"
@@ -92,7 +87,7 @@ export default function AccountModal({ isOpen, onClose, account, onSave }) {
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           error={errors.name}
         />
-        
+
         <div className="grid grid-cols-2 gap-4">
           <Select
             label="Account Type"

@@ -1,5 +1,8 @@
-import { format, parseISO } from 'date-fns';
+import { format, getDaysInMonth } from 'date-fns';
 import { getLastNMonths, toDate } from './dateUtils.js';
+import { CATEGORY_COLORS, FALLBACK_CATEGORY_COLOR } from '../constants/finance.js';
+
+export { filterTransactionsByMonth };
 
 /**
  * Filter transactions by month key (e.g. '2026-08' or Date/Date string).
@@ -73,9 +76,7 @@ export function calcNetWorth(accounts = []) {
  */
 export function calcMonthlyIncome(transactions = [], targetMonthKey = null) {
   const filtered = filterTransactionsByMonth(transactions, targetMonthKey);
-  return filtered
-    .filter((tx) => tx.type === 'income')
-    .reduce((sum, tx) => sum + (Number(tx.amount) || 0), 0);
+  return filtered.filter((tx) => tx.type === 'income').reduce((sum, tx) => sum + (Number(tx.amount) || 0), 0);
 }
 
 /**
@@ -137,25 +138,14 @@ export function calcCategoryBreakdown(transactions = [], targetMonthKey = null) 
     totalExpenses += amount;
   });
 
-  const categoryColors = {
-    'Food & Dining': '#F59E0B',
-    Shopping: '#3B82F6',
-    'Bills & Utilities': '#10B981',
-    Entertainment: '#8B5CF6',
-    Transport: '#EC4899',
-    Healthcare: '#EF4444',
-    Travel: '#06B6D4',
-    Education: '#6366F1',
-    Investment: '#10B981',
-    Other: '#6B7280',
-  };
+  const categoryColors = CATEGORY_COLORS;
 
   return Object.entries(totalsByCategory)
     .map(([category, amount]) => ({
       category,
       amount,
       percentage: totalExpenses > 0 ? (amount / totalExpenses) * 100 : 0,
-      color: categoryColors[category] || '#6B7280',
+      color: categoryColors[category] || FALLBACK_CATEGORY_COLOR,
     }))
     .sort((a, b) => b.amount - a.amount);
 }
@@ -249,21 +239,42 @@ export function calcInvestmentReturn(holdings = []) {
 
 /**
  * Calculate average daily spending for a given month.
+ * Past months use days-in-month; the current month uses elapsed days;
+ * null/undefined means "current month to date".
  * @param {Array} transactions
  * @param {string|Date|null} targetMonthKey
  * @returns {number}
  */
-export function calcAverageDailySpending(transactions = [], targetMonthKey = '2026-08') {
+export function calcAverageDailySpending(transactions = [], targetMonthKey = null) {
   const expenses = calcMonthlyExpenses(transactions, targetMonthKey);
+  if (!Number.isFinite(expenses) || expenses <= 0) return 0;
   const now = new Date();
   const currentMonthStr = format(now, 'yyyy-MM');
 
-  let days = 30; // default month length
-  if (targetMonthKey === currentMonthStr || !targetMonthKey) {
-    days = Math.max(1, now.getDate());
+  let monthDate;
+  if (!targetMonthKey) {
+    monthDate = now;
+  } else if (targetMonthKey instanceof Date) {
+    monthDate = targetMonthKey;
+  } else if (typeof targetMonthKey === 'string' && targetMonthKey.length >= 7) {
+    monthDate = toDate(`${targetMonthKey.slice(0, 7)}-01`);
+  } else {
+    monthDate = now;
   }
 
-  return expenses / days;
+  const key = format(monthDate, 'yyyy-MM');
+  let days;
+  if (key === currentMonthStr) {
+    days = Math.max(1, now.getDate());
+  } else {
+    try {
+      days = getDaysInMonth(monthDate);
+    } catch {
+      days = 30;
+    }
+  }
+
+  return expenses / Math.max(1, days);
 }
 
 /**
@@ -282,27 +293,44 @@ export function calcTopSpendingCategory(transactions = [], targetMonthKey = null
 }
 
 /**
- * Derive net worth history from stored history or calculate baseline.
+ * Derive net worth history.
+ * - If stored history exists, return it as-is (sorted, sliced by caller).
+ * - Otherwise derive honestly from current net worth minus cumulative
+ *   monthly net savings walking backwards. Never fabricate growth factors.
+ * - Returns [] when there is no basis (no accounts + no history).
  * @param {Array} historyData
  * @param {Array} transactions
  * @param {Array} accounts
+ * @param {number} nMonths
  * @returns {Array}
  */
-export function calcNetWorthHistory(historyData = [], transactions = [], accounts = []) {
+export function calcNetWorthHistory(historyData = [], transactions = [], accounts = [], nMonths = 6) {
   if (historyData && historyData.length > 0) {
-    return historyData;
+    return [...historyData].sort((a, b) => String(a.monthKey).localeCompare(String(b.monthKey)));
   }
 
-  // Baseline fallback if no explicit history points
-  const months = getLastNMonths(6);
   const currentNW = calcNetWorth(accounts);
+  const hasAccounts = Array.isArray(accounts) && accounts.length > 0;
+  const hasTx = Array.isArray(transactions) && transactions.length > 0;
+  if (!hasAccounts && !hasTx) return [];
 
-  return months.map((m, idx) => {
-    const factor = 1 - (months.length - 1 - idx) * 0.035;
-    return {
-      monthKey: m.monthKey,
-      label: m.shortLabel,
-      netWorth: Math.round(currentNW * factor),
-    };
-  });
+  const months = getLastNMonths(nMonths);
+  // Monthly net = income - expenses (transfers excluded by construction).
+  const nets = months.map(
+    (m) => calcMonthlyIncome(transactions, m.monthKey) - calcMonthlyExpenses(transactions, m.monthKey)
+  );
+
+  // Walk backwards from current net worth.
+  let running = currentNW;
+  const out = [];
+  for (let i = months.length - 1; i >= 0; i--) {
+    out.unshift({
+      monthKey: months[i].monthKey,
+      label: months[i].shortLabel,
+      shortLabel: months[i].shortLabel,
+      netWorth: Math.round(running),
+    });
+    running -= nets[i] || 0;
+  }
+  return out;
 }

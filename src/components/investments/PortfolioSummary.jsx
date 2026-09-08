@@ -49,7 +49,9 @@ export default function PortfolioSummary({
           <span className="display-xl text-zinc-900 dark:text-text-dark-primary">
             {formatINR(totalCurrent)}
           </span>
-          <span className={`text-sm font-semibold mono ${isPositiveReturn ? 'text-brand-emerald dark:text-emerald-400' : 'text-brand-red dark:text-rose-400'}`}>
+          <span
+            className={`text-sm font-semibold mono ${isPositiveReturn ? 'text-brand-emerald dark:text-emerald-400' : 'text-brand-red dark:text-rose-400'}`}
+          >
             {formatChange(totalReturn)} ({formatPercent(returnPercentage)})
           </span>
         </div>
@@ -74,14 +76,20 @@ export default function PortfolioSummary({
           iconBg={`${isPositiveReturn ? 'bg-emerald-50 dark:bg-emerald-500/10 text-brand-emerald dark:text-emerald-400' : 'bg-rose-50 dark:bg-rose-500/10 text-brand-red dark:text-rose-400'}`}
           label="Total Return"
           value={formatChange(totalReturn)}
-          valueColor={isPositiveReturn ? 'text-brand-emerald dark:text-emerald-400' : 'text-brand-red dark:text-rose-400'}
+          valueColor={
+            isPositiveReturn
+              ? 'text-brand-emerald dark:text-emerald-400'
+              : 'text-brand-red dark:text-rose-400'
+          }
         />
         <StatCard
           icon={isPositiveToday ? TrendingUp : TrendingDown}
           iconBg={`${isPositiveToday ? 'bg-emerald-50 dark:bg-emerald-500/10 text-brand-emerald dark:text-emerald-400' : 'bg-rose-50 dark:bg-rose-500/10 text-brand-red dark:text-rose-400'}`}
           label="Today"
           value={formatChange(todayChange)}
-          valueColor={isPositiveToday ? 'text-brand-emerald dark:text-emerald-400' : 'text-brand-red dark:text-rose-400'}
+          valueColor={
+            isPositiveToday ? 'text-brand-emerald dark:text-emerald-400' : 'text-brand-red dark:text-rose-400'
+          }
         />
       </div>
     </section>

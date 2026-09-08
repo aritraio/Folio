@@ -48,17 +48,17 @@ export default function BudgetModal({ isOpen, onClose, budget, onSave, existingB
     } else {
       // Check for duplicates if creating a new budget
       if (!budget) {
-        const exists = existingBudgets.some(b => b.category === formData.category);
+        const exists = existingBudgets.some((b) => b.category === formData.category);
         if (exists) {
           newErrors.category = 'A budget for this category already exists';
         }
       }
     }
-    
+
     if (formData.limit === '' || isNaN(Number(formData.limit)) || Number(formData.limit) <= 0) {
       newErrors.limit = 'Valid monthly limit is required';
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -75,12 +75,7 @@ export default function BudgetModal({ isOpen, onClose, budget, onSave, existingB
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title={budget ? 'Edit Budget' : 'Create Budget'}
-      size="sm"
-    >
+    <Modal isOpen={isOpen} onClose={onClose} title={budget ? 'Edit Budget' : 'Create Budget'} size="sm">
       <form onSubmit={handleSubmit} className="space-y-4 mt-2">
         <Select
           label="Category"
@@ -91,7 +86,7 @@ export default function BudgetModal({ isOpen, onClose, budget, onSave, existingB
           disabled={!!budget} // Cannot change category when editing
           hint={budget ? 'Category cannot be changed after creation' : ''}
         />
-        
+
         <Input
           label="Monthly Limit"
           type="number"

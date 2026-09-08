@@ -63,7 +63,11 @@ export default function HoldingModal({ isOpen, onClose, holding, onSave }) {
     if (formData.avgPrice === '' || isNaN(Number(formData.avgPrice)) || Number(formData.avgPrice) <= 0) {
       newErrors.avgPrice = 'Valid average price is required';
     }
-    if (formData.currentPrice === '' || isNaN(Number(formData.currentPrice)) || Number(formData.currentPrice) <= 0) {
+    if (
+      formData.currentPrice === '' ||
+      isNaN(Number(formData.currentPrice)) ||
+      Number(formData.currentPrice) <= 0
+    ) {
       newErrors.currentPrice = 'Valid current price is required';
     }
 
@@ -95,12 +99,7 @@ export default function HoldingModal({ isOpen, onClose, holding, onSave }) {
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title={holding ? 'Edit Holding' : 'Add Holding'}
-      size="md"
-    >
+    <Modal isOpen={isOpen} onClose={onClose} title={holding ? 'Edit Holding' : 'Add Holding'} size="md">
       <form onSubmit={handleSubmit} className="space-y-4 mt-2">
         <Input
           label="Asset Name"
@@ -179,7 +178,9 @@ export default function HoldingModal({ isOpen, onClose, holding, onSave }) {
               return (
                 <div className="flex justify-between text-sm pt-1 border-t border-ivory-border dark:border-surface-dark-border">
                   <span className="text-text-secondary dark:text-text-dark-secondary">P&L</span>
-                  <span className={`mono font-bold ${isPos ? 'text-brand-emerald dark:text-emerald-400' : 'text-brand-red dark:text-rose-400'}`}>
+                  <span
+                    className={`mono font-bold ${isPos ? 'text-brand-emerald dark:text-emerald-400' : 'text-brand-red dark:text-rose-400'}`}
+                  >
                     {isPos ? '+' : '−'}₹{Math.abs(ret).toLocaleString('en-IN')}
                   </span>
                 </div>

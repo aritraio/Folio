@@ -26,6 +26,7 @@ export default function TransactionFilters({
     { value: 'all', label: 'All Types' },
     { value: 'expense', label: 'Expense' },
     { value: 'income', label: 'Income' },
+    { value: 'transfer', label: 'Transfer' },
   ];
 
   const monthOptions = [
@@ -37,10 +38,11 @@ export default function TransactionFilters({
     <div className="card p-4 md:p-6 mb-6">
       <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
         {/* Search */}
-        <div className="md:col-span-4">
+        <div className="md:col-span-3">
           <Input
             icon={<Search className="w-4 h-4" />}
             placeholder="Search merchants or notes..."
+            aria-label="Search transactions"
             value={filters.search}
             onChange={(e) => onFilterChange('search', e.target.value)}
             fullWidth
@@ -50,6 +52,7 @@ export default function TransactionFilters({
         {/* Month */}
         <div className="md:col-span-2">
           <Select
+            aria-label="Filter by month"
             options={monthOptions}
             value={filters.month}
             onChange={(e) => onFilterChange('month', e.target.value)}
@@ -61,6 +64,7 @@ export default function TransactionFilters({
         {/* Type */}
         <div className="md:col-span-2">
           <Select
+            aria-label="Filter by type"
             options={typeOptions}
             value={filters.type}
             onChange={(e) => onFilterChange('type', e.target.value)}
@@ -72,6 +76,7 @@ export default function TransactionFilters({
         {/* Category */}
         <div className="md:col-span-2">
           <Select
+            aria-label="Filter by category"
             options={categoryOptions}
             value={filters.category}
             onChange={(e) => onFilterChange('category', e.target.value)}
@@ -80,8 +85,20 @@ export default function TransactionFilters({
           />
         </div>
 
+        {/* Account */}
+        <div className="md:col-span-2">
+          <Select
+            aria-label="Filter by account"
+            options={accountOptions}
+            value={filters.accountId}
+            onChange={(e) => onFilterChange('accountId', e.target.value)}
+            fullWidth
+            placeholder={null}
+          />
+        </div>
+
         {/* Clear Filters (Desktop right-aligned) */}
-        <div className="md:col-span-2 flex justify-end">
+        <div className="md:col-span-1 flex justify-end">
           <Button variant="ghost" onClick={onClear} fullWidth icon={<X className="w-4 h-4" />}>
             Clear
           </Button>

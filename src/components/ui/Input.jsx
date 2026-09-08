@@ -11,17 +11,7 @@ import React, { forwardRef } from 'react';
  * @param {boolean} fullWidth
  */
 const Input = forwardRef(function Input(
-  {
-    label,
-    error,
-    hint,
-    type = 'text',
-    icon,
-    fullWidth = true,
-    className = '',
-    id,
-    ...props
-  },
+  { label, error, hint, type = 'text', icon, fullWidth = true, className = '', id, ...props },
   ref
 ) {
   const inputId = id || `input-${label?.toLowerCase().replace(/\s+/g, '-') || 'field'}`;

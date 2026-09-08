@@ -214,22 +214,22 @@ export default function MobileNav() {
             {/* Drawer Footer */}
             <div className="px-5 py-4 border-t border-ivory-border dark:border-surface-dark-border">
               <div className="flex items-center gap-3">
-                <div className="
+                <div
+                  className="
                   w-8 h-8 rounded-full
                   bg-gradient-to-br from-amber-400 to-orange-500
                   flex items-center justify-center
                   text-white text-xs font-bold
                   shadow-sm
-                ">
+                "
+                >
                   A
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-zinc-900 dark:text-text-dark-primary truncate">
                     Aritra
                   </p>
-                  <p className="text-xs text-zinc-500 truncate">
-                    aritra@example.com
-                  </p>
+                  <p className="text-xs text-zinc-500 truncate">aritra@example.com</p>
                 </div>
               </div>
             </div>

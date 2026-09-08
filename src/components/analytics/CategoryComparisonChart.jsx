@@ -1,14 +1,5 @@
 import React, { useMemo } from 'react';
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
-} from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { formatINR, formatCompact } from '@/utils/formatCurrency';
 import { calcCategoryBreakdown } from '@/utils/calculations';
 
@@ -18,24 +9,19 @@ import { calcCategoryBreakdown } from '@/utils/calculations';
 function CategoryComparisonTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="
+    <div
+      className="
       bg-white dark:bg-surface-dark-card
       border border-ivory-border dark:border-surface-dark-border
       rounded-lg shadow-elevated dark:shadow-dark-elevated
       px-4 py-3 space-y-1.5
-    ">
-      <p className="text-xs font-semibold text-text-secondary dark:text-text-dark-secondary">
-        {label}
-      </p>
+    "
+    >
+      <p className="text-xs font-semibold text-text-secondary dark:text-text-dark-secondary">{label}</p>
       {payload.map((entry) => (
         <div key={entry.name} className="flex items-center gap-2">
-          <span
-            className="w-2 h-2 rounded-full"
-            style={{ background: entry.color }}
-          />
-          <span className="text-xs text-text-secondary dark:text-text-dark-secondary">
-            {entry.name}:
-          </span>
+          <span className="w-2 h-2 rounded-full" style={{ background: entry.color }} />
+          <span className="text-xs text-text-secondary dark:text-text-dark-secondary">{entry.name}:</span>
           <span className="text-sm font-semibold mono text-zinc-900 dark:text-text-dark-primary">
             {formatINR(entry.value)}
           </span>
@@ -106,9 +92,7 @@ export default function CategoryComparisonChart({ transactions = [], months = []
       style={{ animationDelay: '0.2s' }}
     >
       <div className="mb-5">
-        <h2 className="heading-sm text-zinc-900 dark:text-text-dark-primary">
-          Category Comparison
-        </h2>
+        <h2 className="heading-sm text-zinc-900 dark:text-text-dark-primary">Category Comparison</h2>
         <p className="text-xs text-text-secondary dark:text-text-dark-secondary mt-0.5">
           Spending by category across months
         </p>
@@ -117,11 +101,7 @@ export default function CategoryComparisonChart({ transactions = [], months = []
       <div className="h-[300px]">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={chartData} margin={{ top: 4, right: 4, left: -16, bottom: 0 }} barGap={2}>
-            <CartesianGrid
-              strokeDasharray="3 3"
-              vertical={false}
-              stroke="var(--color-border-subtle)"
-            />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-border-subtle)" />
             <XAxis
               dataKey="name"
               axisLine={false}
@@ -159,9 +139,7 @@ export default function CategoryComparisonChart({ transactions = [], months = []
               className="w-2.5 h-2.5 rounded-sm shrink-0"
               style={{ background: CATEGORY_COLORS[idx % CATEGORY_COLORS.length] }}
             />
-            <span className="text-xs text-text-secondary dark:text-text-dark-secondary">
-              {cat}
-            </span>
+            <span className="text-xs text-text-secondary dark:text-text-dark-secondary">{cat}</span>
           </div>
         ))}
       </div>

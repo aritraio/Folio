@@ -1,12 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import {
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip,
-  ResponsiveContainer,
-  Sector,
-} from 'recharts';
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Sector } from 'recharts';
 import { formatINR, formatPercent } from '@/utils/formatCurrency';
 
 /**
@@ -16,21 +9,19 @@ function DonutTooltip({ active, payload }) {
   if (!active || !payload?.length) return null;
   const { category, amount, percentage, color } = payload[0].payload;
   return (
-    <div className="
+    <div
+      className="
       bg-white dark:bg-surface-dark-card
       border border-ivory-border dark:border-surface-dark-border
       rounded-lg shadow-elevated dark:shadow-dark-elevated
       px-4 py-3
-    ">
+    "
+    >
       <div className="flex items-center gap-2 mb-1">
         <span className="w-2.5 h-2.5 rounded-full" style={{ background: color }} />
-        <span className="text-xs font-semibold text-zinc-900 dark:text-text-dark-primary">
-          {category}
-        </span>
+        <span className="text-xs font-semibold text-zinc-900 dark:text-text-dark-primary">{category}</span>
       </div>
-      <p className="text-sm font-bold mono text-zinc-900 dark:text-text-dark-primary">
-        {formatINR(amount)}
-      </p>
+      <p className="text-sm font-bold mono text-zinc-900 dark:text-text-dark-primary">{formatINR(amount)}</p>
       <p className="text-xs text-text-secondary dark:text-text-dark-secondary">
         {percentage.toFixed(1)}% of total
       </p>
@@ -42,9 +33,7 @@ function DonutTooltip({ active, payload }) {
  * Render the active shape with subtle highlight.
  */
 function renderActiveShape(props) {
-  const {
-    cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill,
-  } = props;
+  const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill } = props;
 
   return (
     <g>
@@ -81,9 +70,7 @@ export default function SpendingBreakdown({ data = [], totalExpenses = 0 }) {
   if (data.length === 0) {
     return (
       <section className="card p-6 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-        <h2 className="heading-sm text-zinc-900 dark:text-text-dark-primary mb-2">
-          Spending Breakdown
-        </h2>
+        <h2 className="heading-sm text-zinc-900 dark:text-text-dark-primary mb-2">Spending Breakdown</h2>
         <p className="text-sm text-text-secondary dark:text-text-dark-secondary">
           No spending data available for this month.
         </p>
@@ -99,9 +86,7 @@ export default function SpendingBreakdown({ data = [], totalExpenses = 0 }) {
     >
       {/* Header */}
       <div className="mb-5">
-        <h2 className="heading-sm text-zinc-900 dark:text-text-dark-primary">
-          Spending Breakdown
-        </h2>
+        <h2 className="heading-sm text-zinc-900 dark:text-text-dark-primary">Spending Breakdown</h2>
         <p className="text-xs text-text-secondary dark:text-text-dark-secondary mt-0.5">
           Category-wise this month
         </p>
@@ -159,10 +144,7 @@ export default function SpendingBreakdown({ data = [], totalExpenses = 0 }) {
               onMouseLeave={() => setActiveIndex(-1)}
             >
               <div className="flex items-center gap-2.5 min-w-0">
-                <span
-                  className="w-2.5 h-2.5 rounded-full shrink-0"
-                  style={{ background: item.color }}
-                />
+                <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: item.color }} />
                 <span className="text-sm text-zinc-700 dark:text-text-dark-secondary truncate">
                   {item.category}
                 </span>

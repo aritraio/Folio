@@ -24,23 +24,25 @@ import { format, subMonths } from 'date-fns';
  */
 function InsightCard({ icon: Icon, iconBg, iconColor, title, description }) {
   return (
-    <div className="
+    <div
+      className="
       flex items-start gap-3.5
       p-3.5 rounded-xl
       bg-ivory-muted/50 dark:bg-surface-dark-elevated/50
       hover:bg-ivory-muted dark:hover:bg-surface-dark-elevated
       transition-colors duration-150
-    ">
-      <div className={`
+    "
+    >
+      <div
+        className={`
         shrink-0 p-2 rounded-lg
         ${iconBg}
-      `}>
+      `}
+      >
         <Icon className={`w-4 h-4 ${iconColor}`} />
       </div>
       <div className="min-w-0">
-        <p className="text-sm font-medium text-zinc-800 dark:text-text-dark-primary mb-0.5">
-          {title}
-        </p>
+        <p className="text-sm font-medium text-zinc-800 dark:text-text-dark-primary mb-0.5">{title}</p>
         <p className="text-xs text-text-secondary dark:text-text-dark-secondary leading-relaxed">
           {description}
         </p>
@@ -58,11 +60,7 @@ function InsightCard({ icon: Icon, iconBg, iconColor, title, description }) {
  *   prevNetWorth: number,
  * }} props
  */
-export default function FinancialInsights({
-  transactions = [],
-  netWorth = 0,
-  prevNetWorth = 0,
-}) {
+export default function FinancialInsights({ transactions = [], netWorth = 0, prevNetWorth = 0 }) {
   const insights = useMemo(() => {
     const now = new Date();
     const currentMonth = format(now, 'yyyy-MM');
@@ -74,9 +72,7 @@ export default function FinancialInsights({
     const savingsRate = calcSavingsRate(currentIncome, currentExpenses);
     const topCategory = calcTopSpendingCategory(transactions, currentMonth);
 
-    const expenseChange = lastExpenses > 0
-      ? ((currentExpenses - lastExpenses) / lastExpenses) * 100
-      : 0;
+    const expenseChange = lastExpenses > 0 ? ((currentExpenses - lastExpenses) / lastExpenses) * 100 : 0;
 
     const netWorthChange = netWorth - prevNetWorth;
 
@@ -88,9 +84,10 @@ export default function FinancialInsights({
       const absChange = Math.abs(expenseChange);
       result.push({
         icon: expenseChange > 0 ? ArrowUpRight : ArrowDownRight,
-        iconBg: expenseChange > 0
-          ? 'bg-brand-red-light dark:bg-[rgba(251,113,133,0.12)]'
-          : 'bg-brand-emerald-light dark:bg-[rgba(52,211,153,0.12)]',
+        iconBg:
+          expenseChange > 0
+            ? 'bg-brand-red-light dark:bg-[rgba(251,113,133,0.12)]'
+            : 'bg-brand-emerald-light dark:bg-[rgba(52,211,153,0.12)]',
         iconColor: expenseChange > 0 ? 'text-brand-red' : 'text-brand-emerald',
         title: `Spending ${direction} ${absChange.toFixed(1)}%`,
         description: `Your expenses ${direction} from ${formatINR(lastExpenses)} last month to ${formatINR(currentExpenses)} this month.`,
@@ -99,18 +96,14 @@ export default function FinancialInsights({
 
     // 2. Savings rate
     if (currentIncome > 0) {
-      const rateLabel = savingsRate >= 30
-        ? 'Excellent'
-        : savingsRate >= 20
-        ? 'Good'
-        : savingsRate >= 10
-        ? 'Fair'
-        : 'Low';
+      const rateLabel =
+        savingsRate >= 30 ? 'Excellent' : savingsRate >= 20 ? 'Good' : savingsRate >= 10 ? 'Fair' : 'Low';
       result.push({
         icon: PiggyBank,
-        iconBg: savingsRate >= 20
-          ? 'bg-brand-emerald-light dark:bg-[rgba(52,211,153,0.12)]'
-          : 'bg-amber-50 dark:bg-[rgba(245,158,11,0.12)]',
+        iconBg:
+          savingsRate >= 20
+            ? 'bg-brand-emerald-light dark:bg-[rgba(52,211,153,0.12)]'
+            : 'bg-amber-50 dark:bg-[rgba(245,158,11,0.12)]',
         iconColor: savingsRate >= 20 ? 'text-brand-emerald' : 'text-brand-amber',
         title: `${rateLabel} savings rate: ${formatPercent(savingsRate)}`,
         description: `You saved ${formatINR(currentIncome - currentExpenses)} of ${formatINR(currentIncome)} income this month.`,
@@ -134,7 +127,7 @@ export default function FinancialInsights({
 
     // 4. Net worth trajectory
     if (prevNetWorth > 0) {
-      const nwPercent = ((netWorthChange / prevNetWorth) * 100);
+      const nwPercent = (netWorthChange / prevNetWorth) * 100;
       const growing = netWorthChange > 0;
       result.push({
         icon: growing ? TrendingUp : TrendingDown,
@@ -161,9 +154,7 @@ export default function FinancialInsights({
       {/* Header */}
       <div className="flex items-center gap-2 mb-5">
         <Lightbulb className="w-4 h-4 text-brand-amber" />
-        <h2 className="heading-sm text-zinc-900 dark:text-text-dark-primary">
-          Insights
-        </h2>
+        <h2 className="heading-sm text-zinc-900 dark:text-text-dark-primary">Insights</h2>
       </div>
 
       {/* Insight cards */}

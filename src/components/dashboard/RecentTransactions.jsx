@@ -31,28 +31,25 @@ function TransactionRow({ tx, accounts }) {
   const dotColor = CATEGORY_COLORS[tx.category] || '#6B7280';
 
   return (
-    <div className="
+    <div
+      className="
       flex items-center justify-between gap-3
       py-3.5 px-2 -mx-2
       rounded-lg
       hover:bg-ivory-muted dark:hover:bg-surface-dark-elevated
       transition-colors duration-150
       group
-    ">
+    "
+    >
       {/* Left: dot + merchant + meta */}
       <div className="flex items-center gap-3 min-w-0">
-        <span
-          className="w-2 h-2 rounded-full shrink-0"
-          style={{ background: dotColor }}
-        />
+        <span className="w-2 h-2 rounded-full shrink-0" style={{ background: dotColor }} />
         <div className="min-w-0">
           <p className="text-sm font-medium text-zinc-800 dark:text-text-dark-primary truncate">
             {tx.merchant}
           </p>
           <div className="flex items-center gap-2 mt-0.5">
-            <span className="text-[11px] text-text-tertiary dark:text-text-dark-tertiary">
-              {tx.category}
-            </span>
+            <span className="text-[11px] text-text-tertiary dark:text-text-dark-tertiary">{tx.category}</span>
             <span className="text-text-tertiary dark:text-text-dark-tertiary text-[9px]">•</span>
             <span className="text-[11px] text-text-tertiary dark:text-text-dark-tertiary">
               {formatDate(tx.date, 'MMM d')}
@@ -70,11 +67,14 @@ function TransactionRow({ tx, accounts }) {
       </div>
 
       {/* Right: amount */}
-      <span className={`
+      <span
+        className={`
         text-sm font-semibold mono shrink-0
         ${isIncome ? 'text-brand-emerald' : 'text-zinc-700 dark:text-text-dark-secondary'}
-      `}>
-        {isIncome ? '+' : '−'}{formatINR(Math.abs(tx.amount))}
+      `}
+      >
+        {isIncome ? '+' : '−'}
+        {formatINR(Math.abs(tx.amount))}
       </span>
     </div>
   );
@@ -87,9 +87,7 @@ function TransactionRow({ tx, accounts }) {
  */
 export default function RecentTransactions({ transactions = [], accounts = [] }) {
   // Sort by date descending and take first 8
-  const recent = [...transactions]
-    .sort((a, b) => new Date(b.date) - new Date(a.date))
-    .slice(0, 8);
+  const recent = [...transactions].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 8);
 
   return (
     <section
@@ -100,12 +98,8 @@ export default function RecentTransactions({ transactions = [], accounts = [] })
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h2 className="heading-sm text-zinc-900 dark:text-text-dark-primary">
-            Recent Transactions
-          </h2>
-          <p className="text-xs text-text-secondary dark:text-text-dark-secondary mt-0.5">
-            Latest activity
-          </p>
+          <h2 className="heading-sm text-zinc-900 dark:text-text-dark-primary">Recent Transactions</h2>
+          <p className="text-xs text-text-secondary dark:text-text-dark-secondary mt-0.5">Latest activity</p>
         </div>
       </div>
 

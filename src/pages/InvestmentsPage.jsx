@@ -1,23 +1,14 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Plus, TrendingUp } from 'lucide-react';
 
-// Services
-import {
-  getInvestments,
-  saveInvestment,
-  updateInvestment,
-  deleteInvestment,
-} from '@/services/storage';
-
-// Calculations
+import { useData } from '@/contexts/DataContext';
+import { saveInvestment, updateInvestment, deleteInvestment } from '@/services/storage';
 import { calcInvestmentReturn } from '@/utils/calculations';
 
-// UI
 import Button from '@/components/ui/Button';
 import EmptyState from '@/components/ui/EmptyState';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 
-// Investment components
 import PortfolioSummary from '@/components/investments/PortfolioSummary';
 import AllocationChart from '@/components/investments/AllocationChart';
 import PortfolioValueChart from '@/components/investments/PortfolioValueChart';
@@ -28,22 +19,15 @@ import HoldingModal from '@/components/investments/HoldingModal';
  * InvestmentsPage — Portfolio tracker with summary, allocation, value chart, and holdings table.
  */
 export default function InvestmentsPage() {
-  const [holdings, setHoldings] = useState([]);
+  const { investments: holdings, refresh } = useData();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingHolding, setEditingHolding] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState({ open: false, id: null });
 
-  // Load data
-  useEffect(() => {
-    setHoldings(getInvestments());
-  }, []);
-
-  // Computed portfolio metrics
   const portfolio = useMemo(() => {
     const result = calcInvestmentReturn(holdings);
-    // Simulate "today change" as ~0.3-1.2% of current value
-    // In a real app, this would come from actual market data
-    const todayChangePct = 0.0047; // ~0.47%
+    // Labelled as estimate in UI — live prices are out of scope for local-first v1.
+    const todayChangePct = 0.0047;
     const todayChange = Math.round(result.totalCurrent * todayChangePct);
     return {
       ...result,
@@ -51,7 +35,6 @@ export default function InvestmentsPage() {
     };
   }, [holdings]);
 
-  // Handlers
   const handleAddClick = () => {
     setEditingHolding(null);
     setIsModalOpen(true);
@@ -69,7 +52,7 @@ export default function InvestmentsPage() {
   const confirmDelete = () => {
     if (deleteConfirm.id) {
       deleteInvestment(deleteConfirm.id);
-      setHoldings(getInvestments());
+      refresh();
     }
     setDeleteConfirm({ open: false, id: null });
   };
@@ -80,32 +63,24 @@ export default function InvestmentsPage() {
     } else {
       saveInvestment(data);
     }
-    setHoldings(getInvestments());
+    refresh();
   };
 
   const hasHoldings = holdings.length > 0;
 
   return (
     <div className="space-y-8 pb-12">
-      {/* ── Header ── */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
           <p className="label mb-1 text-zinc-500">Portfolio</p>
-          <h1 className="heading-lg text-zinc-900 dark:text-text-dark-primary">
-            Investments
-          </h1>
+          <h1 className="heading-lg text-zinc-900 dark:text-text-dark-primary">Investments</h1>
         </div>
 
-        <Button
-          variant="primary"
-          icon={<Plus className="w-4 h-4" />}
-          onClick={handleAddClick}
-        >
+        <Button variant="primary" icon={<Plus className="w-4 h-4" />} onClick={handleAddClick}>
           Add Holding
         </Button>
       </div>
 
-      {/* ── Empty State ── */}
       {!hasHoldings ? (
         <div className="card p-8 md:p-12">
           <EmptyState
@@ -118,7 +93,6 @@ export default function InvestmentsPage() {
         </div>
       ) : (
         <>
-          {/* ── Portfolio Summary ── */}
           <PortfolioSummary
             totalInvested={portfolio.totalInvested}
             totalCurrent={portfolio.totalCurrent}
@@ -127,22 +101,15 @@ export default function InvestmentsPage() {
             todayChange={portfolio.todayChange}
           />
 
-          {/* ── Allocation + Portfolio Value (side-by-side) ── */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <AllocationChart holdings={holdings} />
             <PortfolioValueChart totalCurrent={portfolio.totalCurrent} />
           </div>
 
-          {/* ── Holdings Table ── */}
-          <HoldingsTable
-            holdings={holdings}
-            onEdit={handleEditClick}
-            onDelete={handleDeleteClick}
-          />
+          <HoldingsTable holdings={holdings} onEdit={handleEditClick} onDelete={handleDeleteClick} />
         </>
       )}
 
-      {/* ── Modals ── */}
       <HoldingModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

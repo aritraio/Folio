@@ -1,13 +1,8 @@
 import React, { useMemo } from 'react';
 import { format, subMonths } from 'date-fns';
 
-// Services
-import {
-  getTransactions,
-  getAccounts,
-  getInvestments,
-  getNetWorthHistory,
-} from '@/services/storage';
+// Reactive store (localStorage + cross-tab sync)
+import { useData } from '@/contexts/DataContext';
 
 // Calculations
 import {
@@ -34,19 +29,16 @@ import FinancialInsights from '@/components/dashboard/FinancialInsights';
 
 /**
  * DashboardPage — Primary landing page.
- * Composes all dashboard widgets into an editorial-style financial overview.
+ * Reads from DataContext (reactive) instead of localStorage in render,
+ * so edits anywhere update the dashboard without reload.
  */
 export default function DashboardPage() {
-  // ─── Load data from storage ───
-  const transactions = getTransactions();
-  const accounts = getAccounts();
-  const investments = getInvestments();
-  const netWorthHistoryRaw = getNetWorthHistory();
+  const { transactions, accounts, investments, netWorthHistory: netWorthHistoryRaw } = useData();
 
-  // ─── Derived calculations ───
   const now = new Date();
   const currentMonth = format(now, 'yyyy-MM');
   const lastMonth = format(subMonths(now, 1), 'yyyy-MM');
+  void lastMonth;
 
   const computed = useMemo(() => {
     const netWorth = calcNetWorth(accounts);
@@ -57,13 +49,10 @@ export default function DashboardPage() {
     const categoryBreakdown = calcCategoryBreakdown(transactions, currentMonth);
     const cashFlow = calcMonthlyCashFlow(transactions, 6);
     const investmentReturns = calcInvestmentReturn(investments);
-    const netWorthHistory = calcNetWorthHistory(netWorthHistoryRaw, transactions, accounts);
+    const netWorthHistory = calcNetWorthHistory(netWorthHistoryRaw, transactions, accounts, 12);
 
-    // Previous month net worth for comparison
-    const prevEntry = netWorthHistory.length >= 2
-      ? netWorthHistory[netWorthHistory.length - 2]
-      : null;
-    const prevNetWorth = prevEntry?.netWorth || 0;
+    const prevEntry = netWorthHistory.length >= 2 ? netWorthHistory[netWorthHistory.length - 2] : null;
+    const prevNetWorth = prevEntry?.netWorth ?? 0;
     const netWorthChange = netWorth - prevNetWorth;
 
     return {
@@ -83,13 +72,8 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-8 pb-12">
-      {/* ── 1. Hero: Greeting + Net Worth ── */}
-      <HeroSection
-        netWorth={computed.netWorth}
-        prevNetWorth={computed.prevNetWorth}
-      />
+      <HeroSection netWorth={computed.netWorth} prevNetWorth={computed.prevNetWorth} />
 
-      {/* ── 2. Financial Metrics Strip ── */}
       <FinancialMetrics
         netWorth={computed.netWorth}
         netWorthChange={computed.netWorthChange}
@@ -101,25 +85,16 @@ export default function DashboardPage() {
         investmentReturn={computed.investmentReturns.returnPercentage}
       />
 
-      {/* ── 3. Net Worth Chart (full width) ── */}
       <NetWorthChart data={computed.netWorthHistory} />
 
-      {/* ── 4. Cash Flow + Spending Breakdown (side-by-side on desktop) ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <CashFlowChart data={computed.cashFlow} />
-        <SpendingBreakdown
-          data={computed.categoryBreakdown}
-          totalExpenses={computed.expenses}
-        />
+        <SpendingBreakdown data={computed.categoryBreakdown} totalExpenses={computed.expenses} />
       </div>
 
-      {/* ── 5. Recent Transactions + Accounts + Insights (lower grid) ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <RecentTransactions
-            transactions={transactions}
-            accounts={accounts}
-          />
+          <RecentTransactions transactions={transactions} accounts={accounts} />
         </div>
         <div className="space-y-6">
           <AccountOverview accounts={accounts} />

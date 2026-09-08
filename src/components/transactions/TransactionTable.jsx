@@ -35,7 +35,8 @@ export default function TransactionTable({ transactions, onEdit, onDelete, accou
   });
 
   const SortIcon = ({ columnKey }) => {
-    if (sortConfig.key !== columnKey) return <ArrowUpDown className="w-3 h-3 text-zinc-300 dark:text-zinc-600" />;
+    if (sortConfig.key !== columnKey)
+      return <ArrowUpDown className="w-3 h-3 text-zinc-300 dark:text-zinc-600" />;
     return sortConfig.direction === 'asc' ? (
       <ArrowUp className="w-3 h-3 text-brand-amber" />
     ) : (

@@ -1,79 +1,123 @@
 /**
- * Currency formatting utilities for Ledger (INR)
+ * Currency formatting utilities for Ledger.
+ * INR-first, but currency-aware via settings (INR/USD/EUR).
  */
+import { CURRENCIES } from '../constants/finance.js';
+
+function readSettingsCurrency() {
+  try {
+    if (typeof localStorage !== 'undefined') {
+      const raw = localStorage.getItem('ledger_settings');
+      if (raw) {
+        const s = JSON.parse(raw);
+        if (s && typeof s.currency === 'string' && CURRENCIES[s.currency]) return s.currency;
+      }
+    }
+  } catch {
+    /* ignore — fall back to INR */
+  }
+  return 'INR';
+}
+
+export function resolveCurrency(explicit) {
+  if (explicit && CURRENCIES[explicit]) return explicit;
+  return readSettingsCurrency();
+}
+
+export function getCurrencySymbol(currency) {
+  const code = resolveCurrency(currency);
+  return CURRENCIES[code].symbol;
+}
+
+export function getCurrencyLocale(currency) {
+  const code = resolveCurrency(currency);
+  return CURRENCIES[code].locale;
+}
 
 /**
- * Format a number as standard Indian Rupee (INR) currency.
- * Example: 142500 -> "₹1,42,500"
- *
- * @param {number} amount
- * @param {object} options
- * @returns {string}
+ * Format a number as standard currency.
+ * Example INR: 142500 -> "₹1,42,500"
+ * Pass { currency: 'USD' } to override settings.
  */
-export function formatINR(amount, options = {}) {
+export function formatMoney(amount, options = {}) {
+  const currency = resolveCurrency(options.currency);
   const { showSymbol = true, maximumFractionDigits = 0 } = options;
 
-  if (amount === undefined || amount === null || isNaN(amount)) {
-    return showSymbol ? '₹0' : '0';
+  if (amount === undefined || amount === null || Number.isNaN(Number(amount))) {
+    return showSymbol ? `${CURRENCIES[currency].symbol}0` : '0';
   }
 
-  const formatted = new Intl.NumberFormat('en-IN', {
+  const locale = CURRENCIES[currency].locale;
+  const formatted = new Intl.NumberFormat(locale, {
     maximumFractionDigits,
     minimumFractionDigits: maximumFractionDigits,
-  }).format(Math.abs(amount));
+  }).format(Math.abs(Number(amount)));
 
-  const sign = amount < 0 ? '−' : '';
-  const symbol = showSymbol ? '₹' : '';
+  const sign = Number(amount) < 0 ? '−' : '';
+  const symbol = showSymbol ? CURRENCIES[currency].symbol : '';
 
   return `${sign}${symbol}${formatted}`;
 }
 
 /**
- * Format large numbers in compact Indian notation (K, L, Cr).
- * Example: 842350 -> "₹8.42L", 12500000 -> "₹1.25Cr", 45000 -> "₹45K"
- *
- * @param {number} amount
- * @returns {string}
+ * Format a number as standard Indian Rupee (INR) currency.
+ * Kept for backward compat — delegates to formatMoney.
+ * Pass { currency: 'USD'|'EUR' } to honor settings/override.
  */
-export function formatCompact(amount) {
-  if (amount === undefined || amount === null || isNaN(amount)) {
-    return '₹0';
+export function formatINR(amount, options = {}) {
+  if (options.currency) return formatMoney(amount, options);
+  // Default: honor user settings so the Settings currency switch works.
+  // Callers needing strict INR can pass { currency: 'INR' }.
+  return formatMoney(amount, { ...options, currency: resolveCurrency() });
+}
+
+/**
+ * Format large numbers compactly.
+ * INR: 842350 -> "₹8.42L", 12500000 -> "₹1.25Cr", 45000 -> "₹45K"
+ * USD/EUR: uses Intl compact notation ($1.2M, €842K).
+ */
+export function formatCompact(amount, options = {}) {
+  const currency = resolveCurrency(options.currency);
+  if (amount === undefined || amount === null || Number.isNaN(Number(amount))) {
+    return `${CURRENCIES[currency].symbol}0`;
   }
 
-  const absAmount = Math.abs(amount);
-  const sign = amount < 0 ? '−' : '';
+  const num = Number(amount);
+  const absAmount = Math.abs(num);
+  const sign = num < 0 ? '−' : '';
+  const symbol = CURRENCIES[currency].symbol;
 
-  if (absAmount >= 10000000) {
-    // 1 Crore = 10,000,000
-    const inCr = (absAmount / 10000000).toFixed(2);
-    return `${sign}₹${parseFloat(inCr)}Cr`;
+  if (currency === 'INR') {
+    if (absAmount >= 10000000) {
+      const inCr = (absAmount / 10000000).toFixed(2);
+      return `${sign}${symbol}${parseFloat(inCr)}Cr`;
+    }
+    if (absAmount >= 100000) {
+      const inLakh = (absAmount / 100000).toFixed(2);
+      return `${sign}${symbol}${parseFloat(inLakh)}L`;
+    }
+    if (absAmount >= 1000) {
+      const inK = (absAmount / 1000).toFixed(1);
+      return `${sign}${symbol}${parseFloat(inK)}K`;
+    }
+    return formatMoney(amount, { currency });
   }
 
-  if (absAmount >= 100000) {
-    // 1 Lakh = 100,000
-    const inLakh = (absAmount / 100000).toFixed(2);
-    return `${sign}₹${parseFloat(inLakh)}L`;
+  if (absAmount >= 1000000) {
+    return `${sign}${symbol}${parseFloat((absAmount / 1000000).toFixed(2))}M`;
   }
-
   if (absAmount >= 1000) {
-    // 1 Thousand = 1,000
-    const inK = (absAmount / 1000).toFixed(1);
-    return `${sign}₹${parseFloat(inK)}K`;
+    return `${sign}${symbol}${parseFloat((absAmount / 1000).toFixed(1))}K`;
   }
-
-  return formatINR(amount);
+  return formatMoney(amount, { currency });
 }
 
 /**
  * Format a number as percentage string with sign.
  * Example: 4.312 -> "+4.31%", -1.2 -> "-1.20%"
- *
- * @param {number} value
- * @param {number} decimals
- * @returns {string}
  */
 export function formatPercent(value, decimals = 2) {
-  if (value === undefined || value === null || isNaN(value)) {
+  if (value === undefined || value === null || Number.isNaN(Number(value))) {
     return '0.00%';
   }
 
@@ -85,18 +129,16 @@ export function formatPercent(value, decimals = 2) {
 /**
  * Format monetary change with explicit prefix sign (+ or -).
  * Example: 34820 -> "+₹34,820", -2499 -> "−₹2,499"
- *
- * @param {number} amount
- * @returns {string}
  */
-export function formatChange(amount) {
-  if (amount === undefined || amount === null || isNaN(amount)) {
-    return '₹0';
+export function formatChange(amount, options = {}) {
+  const currency = resolveCurrency(options.currency);
+  if (amount === undefined || amount === null || Number.isNaN(Number(amount))) {
+    return `${CURRENCIES[currency].symbol}0`;
   }
 
-  if (amount === 0) return '₹0';
+  if (Number(amount) === 0) return `${CURRENCIES[currency].symbol}0`;
 
-  const sign = amount > 0 ? '+' : '−';
-  const formatted = formatINR(Math.abs(amount));
+  const sign = Number(amount) > 0 ? '+' : '−';
+  const formatted = formatMoney(Math.abs(Number(amount)), { currency });
   return `${sign}${formatted}`;
 }

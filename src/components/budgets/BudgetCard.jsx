@@ -12,7 +12,7 @@ export default function BudgetCard({ budget, onEdit, onDelete }) {
   // Derive styling from status
   let statusColor = 'text-brand-emerald dark:text-emerald-400';
   let StatusIcon = null;
-  
+
   if (status === 'warning') {
     statusColor = 'text-brand-amber dark:text-amber-400';
   } else if (status === 'exceeded') {
@@ -33,12 +33,9 @@ export default function BudgetCard({ budget, onEdit, onDelete }) {
   return (
     <>
       <div className="card p-5 group relative overflow-hidden transition-all duration-200 hover:shadow-md hover:border-zinc-300 dark:hover:border-zinc-600">
-        
         {/* Decorative left border for over-budget */}
-        {status === 'exceeded' && (
-          <div className="absolute top-0 left-0 w-1 h-full bg-brand-red" />
-        )}
-        
+        {status === 'exceeded' && <div className="absolute top-0 left-0 w-1 h-full bg-brand-red" />}
+
         <div className="flex justify-between items-start mb-6">
           <div className="flex items-center gap-2">
             <h3 className="text-sm font-medium text-zinc-900 dark:text-text-dark-primary flex items-center gap-1.5">
@@ -46,16 +43,16 @@ export default function BudgetCard({ budget, onEdit, onDelete }) {
               {StatusIcon && <StatusIcon className="w-4 h-4 text-brand-red" />}
             </h3>
           </div>
-          
+
           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-            <button 
+            <button
               onClick={handleEdit}
               className="p-1.5 text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 dark:hover:text-zinc-200 dark:hover:bg-surface-dark-elevated rounded-md transition-colors"
               aria-label="Edit budget"
             >
               <Pencil className="w-4 h-4" />
             </button>
-            <button 
+            <button
               onClick={handleDelete}
               className="p-1.5 text-zinc-400 hover:text-brand-red hover:bg-brand-red-light rounded-md transition-colors"
               aria-label="Delete budget"
@@ -76,9 +73,7 @@ export default function BudgetCard({ budget, onEdit, onDelete }) {
               </p>
             </div>
             <div className="text-right">
-              <p className={`text-xs font-semibold ${statusColor}`}>
-                {formatPercent(percentage, 1)}
-              </p>
+              <p className={`text-xs font-semibold ${statusColor}`}>{formatPercent(percentage, 1)}</p>
               <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
                 {status === 'exceeded' ? 'Over budget by ' : 'Remaining: '}
                 <span className="font-mono font-medium text-zinc-900 dark:text-zinc-300">
@@ -87,7 +82,7 @@ export default function BudgetCard({ budget, onEdit, onDelete }) {
               </p>
             </div>
           </div>
-          
+
           <BudgetProgress percentage={percentage} status={status} />
         </div>
       </div>
