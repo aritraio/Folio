@@ -1,6 +1,6 @@
 import React from 'react';
 import { Wallet, ArrowDownLeft, ArrowUpRight, PiggyBank, TrendingUp } from 'lucide-react';
-import { formatINR, formatPercent, formatChange, formatCompact } from '@/utils/formatCurrency';
+import { formatINR, formatPercent, formatCompact } from '@/utils/formatCurrency';
 
 /**
  * Single metric card used inside the metrics strip.

@@ -4,7 +4,6 @@ import {
   TrendingDown,
   PiggyBank,
   ShoppingBag,
-  Activity,
   ArrowDownRight,
   ArrowUpRight,
   Lightbulb,

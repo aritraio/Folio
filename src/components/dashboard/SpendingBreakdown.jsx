@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Sector } from 'recharts';
-import { formatINR, formatPercent } from '@/utils/formatCurrency';
+import { formatINR } from '@/utils/formatCurrency';
 
 /**
  * Custom tooltip for the donut chart.

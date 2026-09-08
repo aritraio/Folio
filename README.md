@@ -1,85 +1,140 @@
-# Ledger — Personal Finance Tracker
+# Folio — Personal Wealth & Finance Tracker
 
-A local-first personal finance dashboard built with React, Vite, Tailwind CSS, Recharts, and Lucide React.
-Editorial / private-wealth aesthetic. No backend — all data stays in your browser (`localStorage`) with
-versioned JSON backup export/import.
+> **Editorial clarity for personal wealth.** A private, local-first finance dashboard built with React 18, Vite, Tailwind CSS, and Recharts.
 
-## Features
+[![React](https://img.shields.io/badge/React-18.3-61dafb?style=flat-square&logo=react)](https://react.dev/)
+[![Vite](https://img.shields.io/badge/Vite-5.4-646cff?style=flat-square&logo=vite)](https://vitejs.dev/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38bdf8?style=flat-square&logo=tailwindcss)](https://tailwindcss.com/)
+[![Vitest](https://img.shields.io/badge/Tests-45%20Passed-22c55e?style=flat-square&logo=vitest)](https://vitest.dev/)
+[![ESLint](https://img.shields.io/badge/ESLint-0%20Warnings-4b32c3?style=flat-square&logo=eslint)](https://eslint.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-amber.svg?style=flat-square)](LICENSE)
 
-- **Dashboard** — net worth hero, metrics strip, net-worth + cash-flow charts, spending donut, recent transactions, insights
-- **Transactions** — search, month/type/category/account filters, sorting, pagination, full CRUD incl. **transfers**
-- **Accounts** — assets vs liabilities, guarded delete (reassign, never orphan)
-- **Budgets** — monthly limits with warning/exceeded states
-- **Analytics** — period + month views, savings-rate and net-worth trends
-- **Investments** — allocation donut, holdings table, estimated value trend (labelled as estimate)
-- **Settings** — profile, INR/USD/EUR currency (applies instantly), theme, versioned backup export/import, reset-to-demo vs erase
-- **Global search** (`Ctrl/⌘+K`) across transactions, accounts, budgets, investments
-- **Dark mode** (light/dark/system), responsive mobile → desktop, reduced-motion support
+---
 
-## Tech Stack
+## Highlights
 
-- **Framework**: React 18 + Vite 5
-- **Styling**: Tailwind CSS v3 (design tokens, `dark:` class strategy)
-- **Routing**: React Router v6 (lazy routes, `*` 404, scroll restoration)
-- **Charts**: Recharts 2.x (code-split `charts` chunk)
-- **Icons**: Lucide React · **Dates**: date-fns 3.x
-- **State**: `DataContext` over a versioned `localStorage` service (no Redux needed)
-- **Quality**: Vitest + Testing Library, ESLint, Prettier, GitHub Actions CI
+- 🔒 **100% Local-First & Private**: All data lives strictly in your browser's `localStorage`. No cloud database, no tracking, no telemetry.
+- 🏛️ **Editorial Design System**: Crafted with a print-journal private wealth aesthetic—warm ivory surfaces, Playfair Display serifs, tabular monetary figures, and OLED dark mode.
+- ⚖️ **Double-Entry Balance Integrity**: Account balances update atomically upon transaction save, update, or deletion. Inter-account transfers credit destination accounts while being excluded from income/expense totals.
+- 🛡️ **Guarded Accounts**: Prevents deletion of accounts with existing transaction history without explicit reassignment, preserving ledger integrity.
+- ⚡ **Lightning Fast & Lightweight**: Zero runtime state management overhead; routes, charts, and date utilities are split into optimized Rollup chunks.
+- ⌨️ **Global Command Palette (`⌘K` / `Ctrl+K`)**: Rapid search across transactions, accounts, budgets, and investments from anywhere in the app.
+
+---
+
+## Core Features
+
+- **Dashboard**: Net worth hero with count-up animations, 5-metric summary strip, net-worth timeline, income vs. expense cash flow, category donut, and recent activity.
+- **Transactions**: Full CRUD with instant search, multi-field filters (date, type, category, account), column sorting, pagination, and transfer support.
+- **Accounts**: Assets vs. liabilities breakdown, balance tracking, and safe deletion with transaction re-mapping.
+- **Budgets**: Monthly category spending limits with visual progress meters and dynamic warning/over-budget states.
+- **Analytics**: Cash flow charts, savings-rate trends, category spend comparisons, and historical growth insights.
+- **Investments**: Portfolio valuation summary, asset-class distribution donut, and holdings tracker.
+- **Settings**: Multi-currency display (`INR ₹`, `USD $`, `EUR €`), theme customization (`light`, `dark`, `system`), versioned JSON backup export/import, and demo reset.
+
+---
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js 20 recommended (`cat .nvmrc`), 18+ minimum, plus `npm`
+- **Node.js**: `v18.0.0` or higher (`v20.x` recommended, see `.nvmrc`)
+- **npm**: `v9.0.0` or higher
 
-### Installation
+### Quickstart
 
 ```bash
+# Clone repository
+git clone https://github.com/aritraio/Folio.git
+cd Folio
+
+# Install dependencies
 npm install
-npm run dev        # Vite dev server
-npm run test       # Vitest (45+ unit tests: utils + storage)
-npm run lint       # ESLint (0 errors required)
-npm run build      # Production build to /dist
-npm run preview    # Preview production build
+
+# Start development server
+npm run dev
 ```
 
-## Data & Backups
+Visit [http://localhost:5173](http://localhost:5173) in your browser.
 
-- Keys: `ledger_transactions`, `ledger_accounts`, `ledger_budgets`, `ledger_investments`,
-  `ledger_settings`, `ledger_networth_history`, `ledger_schema_version` (currently v2).
-- **Export** downloads a versioned JSON file (Blob, safe for large data).
-- **Import** validates schema first and auto-downloads a pre-import backup.
-- **Reset to demo** restores seed data; **Erase everything** truly empties (empty states, no fake charts).
-- Transfers (`accountId` → `toAccountId`) move balances and are excluded from income/expense totals.
+---
 
-## Folder Structure
+## Quality Gates & Verification
 
-```
-src/
-├── components/
-│   ├── layout/       # AppLayout, Navbar, GlobalSearch, ErrorBoundary, ScrollToTop
-│   ├── dashboard/    # Hero, metrics, charts, insights
-│   ├── transactions/ # Table, filters, modal (expense/income/transfer)
-│   ├── budgets/      # Cards, progress, modal
-│   ├── analytics/    # Summary + trend charts
-│   ├── investments/  # Summary, allocation, holdings
-│   └── ui/           # Button, Modal, Input, Select, Badge, EmptyState, ConfirmDialog
-├── contexts/         # DataContext (reactive store over localStorage)
-├── constants/        # finance.js — types, categories, colors, currencies, schema
-├── pages/            # Dashboard, Transactions, Accounts, Budgets, Analytics, Investments, Settings, 404
-├── data/             # mockData.js (demo seed)
-├── utils/            # calculations, formatCurrency (INR/USD/EUR), dateUtils, useCountUp
-└── services/         # storage.js — versioned CRUD, validation, backup/restore
+```bash
+npm run test       # Run 45 unit test suites via Vitest
+npm run lint       # Verify zero ESLint errors or warnings
+npm run format     # Check formatting across src/ and docs/
+npm run build      # Compile production bundle to /dist
+npm run preview    # Preview production build locally
 ```
 
-See `architecture.md` for system design, `techstack.md` for rationale,
-`improvements.md` for the audit trail, and `todo.md` for history.
+---
+
+## 📚 Documentation Section
+
+Detailed technical guides, architectural patterns, and specifications are located in [`docs/`](docs/README.md):
+
+| Guide | Description |
+| :--- | :--- |
+| **[Architecture](docs/architecture.md)** | High-level system architecture, component hierarchy, reactive `DataContext`, and styling token philosophy. |
+| **[Data Models & Storage](docs/data-models.md)** | LocalStorage key schema (v2), atomic balance updates, transfer mechanics, and JSON backup export/import validation. |
+| **[Technology Stack](docs/techstack.md)** | Technical decisions and rationale behind React 18, Vite 5, Tailwind CSS, Recharts, Lucide, and Vitest. |
+| **[Development Guide](docs/development-guide.md)** | Local development workflows, npm scripts, code standards, and testing conventions. |
+| **[Roadmap & Audit](docs/roadmap.md)** | Engineering audit scorecard, completed milestones (Phases 0–16), and future capabilities. |
+
+---
+
+## Repository Structure
+
+```
+Folio/
+├── .github/              # CI workflows (GitHub Actions)
+├── docs/                 # Engineering documentation suite
+│   ├── README.md         # Documentation index & navigation hub
+│   ├── architecture.md   # System architecture & data flow
+│   ├── data-models.md    # LocalStorage schemas & transfer logic
+│   ├── development-guide.md # Setup, testing, and contribution guide
+│   ├── roadmap.md        # Audit scorecard, completed phases & roadmap
+│   └── techstack.md      # Tooling & library rationale
+├── public/               # Static assets & brand favicon.svg
+├── src/
+│   ├── components/       # UI primitives, layout, and domain components
+│   │   ├── accounts/     # Account cards and balance forms
+│   │   ├── analytics/    # Deep-dive financial analysis charts
+│   │   ├── budgets/      # Category limit cards & progress bars
+│   │   ├── dashboard/    # Hero, metrics, charts, insights
+│   │   ├── investments/  # Portfolio allocation and holdings table
+│   │   ├── layout/       # AppLayout, Navbar, MobileNav, GlobalSearch
+│   │   ├── transactions/ # Table, filters, modal forms
+│   │   └── ui/           # Button, Modal, Input, Select, Badge, EmptyState
+│   ├── constants/        # Financial categories, colors, currencies, schema
+│   ├── contexts/         # DataContext reactive store & ThemeProvider
+│   ├── data/             # Demo seed data (mockData.js)
+│   ├── pages/            # Top-level code-split route pages
+│   ├── services/         # Storage service with atomic balance logic
+│   ├── utils/            # Pure calculation algorithms & currency formatters
+│   ├── App.jsx           # Top-level route configuration & Suspense
+│   ├── index.css         # Tailwind tokens & dark-mode CSS variables
+│   └── main.jsx          # React DOM entrypoint
+├── eslint.config.js      # ESLint 9+ flat configuration
+├── package.json          # Package manifest & scripts
+├── tailwind.config.js    # Theme typography, spacing, and color tokens
+├── vercel.json           # Vercel SPA routing and caching headers
+└── vite.config.js        # Vite configuration & Rollup chunking
+```
+
+---
 
 ## Deployment
 
-Vercel-ready (`vercel.json` rewrites SPA routes, immutable asset caching, security headers).
-Any static host works: `npm run build` → serve `dist/`.
+Folio is designed for zero-config static hosting:
+
+- **Vercel**: Includes `vercel.json` with SPA routing rewrites (`/*` → `/index.html`), immutable asset caching, and security headers.
+- **Static Hosting**: Run `npm run build` to generate the standalone `/dist` folder. Can be served via Netlify, Cloudflare Pages, GitHub Pages, or any static HTTP server.
+
+---
 
 ## License
 
-MIT — see `LICENSE`.
+This project is licensed under the [MIT License](LICENSE).
