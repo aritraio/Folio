@@ -6,8 +6,11 @@ import { formatINR, formatPercent } from '@/utils/formatCurrency';
  * Mobile card view of a single holding.
  */
 function HoldingCard({ holding, onEdit, onDelete }) {
-  const invested = Number(holding.investedValue) || 0;
-  const current = Number(holding.currentValue) || 0;
+  const invested =
+    Number(holding.investedValue) || (Number(holding.units) || 1) * (Number(holding.avgPrice) || 0);
+  const current =
+    Number(holding.currentValue) ||
+    (Number(holding.units) || 1) * (Number(holding.currentPrice) || Number(holding.avgPrice) || 0);
   const returnAmt = current - invested;
   const returnPct = invested > 0 ? (returnAmt / invested) * 100 : 0;
   const isPositive = returnAmt >= 0;
@@ -134,8 +137,11 @@ export default function HoldingsTable({ holdings = [], onEdit, onDelete }) {
             </thead>
             <tbody>
               {holdings.map((h) => {
-                const invested = Number(h.investedValue) || 0;
-                const current = Number(h.currentValue) || 0;
+                const invested =
+                  Number(h.investedValue) || (Number(h.units) || 1) * (Number(h.avgPrice) || 0);
+                const current =
+                  Number(h.currentValue) ||
+                  (Number(h.units) || 1) * (Number(h.currentPrice) || Number(h.avgPrice) || 0);
                 const returnAmt = current - invested;
                 const returnPct = invested > 0 ? (returnAmt / invested) * 100 : 0;
                 const isPositive = returnAmt >= 0;

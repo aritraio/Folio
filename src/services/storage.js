@@ -271,6 +271,94 @@ export function saveTransaction(transaction) {
 }
 
 /**
+ * Save an array of transactions in bulk with atomic account balance updates.
+ * Ideal for imported statements.
+ * @param {Array<Object>} transactionsList
+ * @returns {Array<Object>} saved transactions
+ */
+export function saveTransactionsBatch(transactionsList = []) {
+  if (!Array.isArray(transactionsList) || transactionsList.length === 0) return [];
+  const normalized = transactionsList.map(normalizeTransaction);
+  const currentTransactions = getTransactions();
+  const updatedTransactions = [...normalized, ...currentTransactions];
+  setItem(KEYS.TRANSACTIONS, updatedTransactions);
+
+  // Apply balances for all transactions atomically
+  const accounts = getAccounts();
+  let touched = false;
+  normalized.forEach((tx) => {
+    const applyDelta = (accountId, delta) => {
+      if (!accountId || !delta) return;
+      const idx = accounts.findIndex((a) => a.id === accountId);
+      if (idx === -1) return;
+      accounts[idx] = { ...accounts[idx], balance: Number(accounts[idx].balance || 0) + delta };
+      touched = true;
+    };
+
+    if (tx.type === 'transfer') {
+      applyDelta(tx.accountId, deltaForAccount(tx, tx.accountId));
+      applyDelta(tx.toAccountId, deltaForAccount(tx, tx.toAccountId));
+    } else if (tx.accountId) {
+      applyDelta(tx.accountId, deltaForAccount(tx, tx.accountId));
+    }
+  });
+
+  if (touched) writeAccounts(accounts);
+  notifyDataUpdated();
+  return normalized;
+}
+
+/**
+ * Identify potential duplicate transactions from a parsed statement.
+ * Checks for matching amount (within 1 cent) and near date (within 3 days).
+ *
+ * @param {Array<Object>} candidates
+ * @param {Array<Object>} [existingTransactions]
+ * @returns {Array<Object>} candidates with isDuplicate and duplicateReason flags
+ */
+export function findPotentialDuplicates(candidates = [], existingTransactions = null) {
+  const existing = existingTransactions || getTransactions();
+  const list = Array.isArray(candidates) ? candidates : candidates ? [candidates] : [];
+  const results = list.map((cand) => {
+    const candAmt = Math.abs(Number(cand.amount) || 0);
+    const candDateStr = cand.date ? String(cand.date).slice(0, 10) : '';
+    const candMerchant = (cand.merchant || cand.description || '').toLowerCase().trim();
+
+    const matched = existing.find((ex) => {
+      const exAmt = Math.abs(Number(ex.amount) || 0);
+      if (Math.abs(candAmt - exAmt) > 0.01) return false;
+
+      // Check date proximity
+      const exDateStr = ex.date ? String(ex.date).slice(0, 10) : '';
+      if (candDateStr && exDateStr) {
+        const d1 = new Date(candDateStr).getTime();
+        const d2 = new Date(exDateStr).getTime();
+        const diffDays = Math.abs(d1 - d2) / (1000 * 60 * 60 * 24);
+        if (diffDays > 3) return false;
+      }
+
+      // Check merchant similarity
+      const exMerchant = (ex.merchant || ex.description || '').toLowerCase().trim();
+      if (candMerchant && exMerchant) {
+        if (candMerchant === exMerchant) return true;
+        if (candMerchant.includes(exMerchant) || exMerchant.includes(candMerchant)) return true;
+      }
+      return candDateStr === exDateStr;
+    });
+
+    return {
+      ...cand,
+      isDuplicate: Boolean(matched),
+      duplicateReason: matched
+        ? `Matches ₹${matched.amount} on ${matched.date} (${matched.merchant || matched.description})`
+        : null,
+      matchedExisting: matched || null,
+    };
+  });
+  return Array.isArray(candidates) ? results : results[0] || null;
+}
+
+/**
  * Update a transaction. Supports both signatures:
  *   updateTransaction(updatedTx)        (current callers)
  *   updateTransaction(id, patch)        (documented API)

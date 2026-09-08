@@ -13,6 +13,8 @@ import {
   exportAllData,
   validateBackup,
   eraseAllData,
+  saveTransactionsBatch,
+  findPotentialDuplicates,
 } from '../services/storage.js';
 
 beforeEach(() => {
@@ -140,5 +142,68 @@ describe('backup validation', () => {
     expect(getTransactions()).toHaveLength(0);
     expect(importData(json)).toBe(true);
     expect(getTransactions()).toHaveLength(1);
+  });
+});
+
+describe('batch saving and duplicate detection', () => {
+  it('saves multiple transactions atomically and updates account balance correctly', () => {
+    const acc = saveAccount({ name: 'HDFC Savings', type: 'savings', balance: 50000 });
+    const batch = [
+      {
+        type: 'expense',
+        amount: 1200,
+        accountId: acc.id,
+        date: '2026-09-02',
+        merchant: 'Swiggy',
+        category: 'Food & Dining',
+      },
+      {
+        type: 'expense',
+        amount: 800,
+        accountId: acc.id,
+        date: '2026-09-03',
+        merchant: 'Uber',
+        category: 'Transportation',
+      },
+      {
+        type: 'income',
+        amount: 5000,
+        accountId: acc.id,
+        date: '2026-09-04',
+        merchant: 'Cashback',
+        category: 'Other',
+      },
+    ];
+    const saved = saveTransactionsBatch(batch);
+    expect(saved).toHaveLength(3);
+    expect(getTransactions()).toHaveLength(3);
+
+    // Initial 50000 - 1200 - 800 + 5000 = 53000
+    const updatedAcc = getAccounts().find((a) => a.id === acc.id);
+    expect(updatedAcc.balance).toBe(53000);
+  });
+
+  it('detects potential duplicates based on date, amount, and merchant similarity', () => {
+    const existing = [
+      { id: 'ex1', date: '2026-09-02', amount: 1200, merchant: 'Swiggy' },
+      { id: 'ex2', date: '2026-09-03', amount: 500, merchant: 'Starbucks' },
+    ];
+
+    // Same date, same amount, matching merchant
+    const candidate1 = { date: '2026-09-02', amount: 1200, merchant: 'Swiggy' };
+    const dup1 = findPotentialDuplicates(candidate1, existing);
+    expect(dup1.isDuplicate).toBe(true);
+    expect(dup1.matchedExisting?.id).toBe('ex1');
+
+    // Different amount
+    const candidate2 = { date: '2026-09-02', amount: 1250, merchant: 'Swiggy' };
+    const res2 = findPotentialDuplicates(candidate2, existing);
+    expect(res2.isDuplicate).toBe(false);
+
+    // Array batch check
+    const batchRes = findPotentialDuplicates([candidate1, candidate2], existing);
+    expect(batchRes).toHaveLength(2);
+    expect(batchRes[0].isDuplicate).toBe(true);
+    expect(batchRes[1].isDuplicate).toBe(false);
   });
 });

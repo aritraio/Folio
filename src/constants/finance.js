@@ -69,3 +69,68 @@ export const STORAGE_KEYS = Object.freeze({
 
 export const DATA_UPDATED_EVENT = 'ledger_data_updated';
 export const SETTINGS_UPDATED_EVENT = 'ledger_settings_updated';
+
+export const INVESTMENT_TYPES = Object.freeze({
+  STOCK: 'stock',
+  MUTUAL_FUND: 'mutual_fund',
+  FIXED_DEPOSIT: 'fixed_deposit',
+  BOND: 'bond',
+  GOLD: 'gold',
+  OTHER: 'other',
+});
+
+export const FD_COMPOUNDING_FREQUENCIES = Object.freeze({
+  QUARTERLY: 'quarterly',
+  MONTHLY: 'monthly',
+  ANNUAL: 'annual',
+  CUMULATIVE: 'cumulative',
+});
+
+export const INDIAN_BANK_PASSWORD_HINTS = Object.freeze([
+  {
+    bank: 'HDFC Bank (Savings)',
+    pattern: 'Customer ID (all digits) OR Name (first 4 lowercase) + DOB (DDMM)',
+    example: 'Cust ID or arit1508',
+  },
+  {
+    bank: 'HDFC Bank (Credit Card)',
+    pattern: 'Name (first 4 chars lowercase) + Card (last 4 digits)',
+    example: 'arit4321',
+  },
+  {
+    bank: 'ICICI Bank (Savings)',
+    pattern: 'DOB (DDMMYYYY) or lowercase Name (first 4) + DOB (DDMM)',
+    example: '15081995 or arit1508',
+  },
+  {
+    bank: 'ICICI Bank (Credit Card)',
+    pattern: 'Name (first 4 letters) + DOB (DDMM)',
+    example: 'ARIT1508',
+  },
+  {
+    bank: 'SBI (State Bank of India)',
+    pattern: 'DOB (DDMMYYYY) or registered mobile number or User ID',
+    example: '15081995',
+  },
+  {
+    bank: 'Axis Bank',
+    pattern: 'Customer ID or First 4 letters of Name + Last 4 digits of Account',
+    example: 'ARIT1234',
+  },
+  {
+    bank: 'Kotak Mahindra Bank',
+    pattern: 'CRN number (or DOB in DDMMYYYY format)',
+    example: '12345678',
+  },
+  {
+    bank: 'Cred / Other Credit Cards',
+    pattern: 'First 4 letters of Name + Last 4 digits of Card number',
+    example: 'ARIT5678',
+  },
+]);
+
+export const DEFAULT_AI_SETTINGS = Object.freeze({
+  model: 'gemini-1.5-flash',
+  temperature: 0.1,
+  enabled: true,
+});

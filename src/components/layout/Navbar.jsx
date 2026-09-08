@@ -15,11 +15,13 @@ import {
   Download,
   Moon,
   Sun,
+  Sparkles,
 } from 'lucide-react';
 import MobileNav from './MobileNav';
 import { useTheme } from '../ThemeProvider';
 import { useData } from '../../contexts/DataContext';
 import { downloadBackup } from '../../services/storage';
+import StatementUploadModal from '../statements/StatementUploadModal';
 
 const NAV_ITEMS = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
@@ -49,6 +51,7 @@ export default function Navbar({ onSearchClick }) {
   const navigate = useNavigate();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
+  const [isStatementModalOpen, setIsStatementModalOpen] = useState(false);
   const userMenuRef = useRef(null);
   const notifRef = useRef(null);
   const { theme, preference, setPreference } = useTheme();
@@ -165,9 +168,25 @@ export default function Navbar({ onSearchClick }) {
             ))}
           </div>
 
-          {/* ── Right: Actions ── */}
-          <div className="flex items-center gap-1">
-            {/* Theme Toggle */}
+          {/* ── Right: Theme, Search, Notifications, Avatar ── */}
+          <div className="flex items-center gap-2">
+            {/* AI Statement Ingestion Button */}
+            <button
+              onClick={() => setIsStatementModalOpen(true)}
+              className="
+                flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold
+                bg-amber-50 dark:bg-amber-950/40 text-brand-amber
+                hover:bg-amber-100 dark:hover:bg-amber-900/40
+                border border-amber-200/60 dark:border-amber-800/40
+                transition-all cursor-pointer
+              "
+              title="Import Bank or Credit Card Statement with AI"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Import Statement</span>
+            </button>
+
+            {/* Theme toggle */}
             <button
               onClick={cycleTheme}
               className="
@@ -354,6 +373,7 @@ export default function Navbar({ onSearchClick }) {
       </div>
 
       {/* Removed the global style for nav links since we now use a component-level span */}
+      <StatementUploadModal isOpen={isStatementModalOpen} onClose={() => setIsStatementModalOpen(false)} />
     </nav>
   );
 }

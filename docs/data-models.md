@@ -91,17 +91,27 @@ interface Budget {
 
 ### 2.4 Investment Holding
 
-Portfolio positions across equities, index funds, crypto, and commodities.
+Portfolio positions across equities, mutual funds, Indian Fixed Deposits, and bonds.
 
 ```typescript
 interface Holding {
   id: string; // UUID string (e.g. "inv_1")
-  name: string; // Asset name (e.g. "Vanguard Total World ETF")
-  symbol: string; // Ticker symbol (e.g. "VT")
-  type: 'stock' | 'mutual_fund' | 'crypto' | 'gold' | 'other';
-  units: number; // Quantity of units held
-  avgPrice: number; // Average purchase price per unit
-  currentPrice: number; // Latest estimated price per unit
+  name: string; // Asset name (e.g. "HDFC Nifty 50 Index Fund")
+  symbol?: string; // Ticker symbol or AMFI scheme code (e.g. "120716")
+  type: 'stock' | 'mutual_fund' | 'fixed_deposit' | 'bond' | 'crypto' | 'gold' | 'other';
+  units?: number; // Quantity of units held (stocks, mutual funds, bonds)
+  avgPrice?: number; // Average purchase price per unit
+  currentPrice?: number; // Latest estimated price per unit / live NAV
+  // Fixed Deposit Specific Fields
+  principal?: number; // Initial FD deposit amount in ₹
+  interestRate?: number; // Annual interest percentage (e.g. 7.1)
+  startDate?: string; // FD inception date (YYYY-MM-DD)
+  tenureMonths?: number; // Total tenure in months (e.g. 12, 36)
+  compoundingFrequency?: 'quarterly' | 'monthly' | 'annual' | 'cumulative';
+  // Bond Specific Fields
+  faceValue?: number; // Face value per unit (e.g. ₹1000)
+  couponRatePct?: number; // Annual coupon interest percentage (e.g. 2.5)
+  maturityDate?: string; // Maturity date (YYYY-MM-DD)
   notes?: string; // Optional notes
   createdAt: string; // ISO timestamp
 }
@@ -111,7 +121,7 @@ interface Holding {
 
 ### 2.5 Settings
 
-Global user preferences and localization settings.
+Global user preferences, AI keys, and localization settings.
 
 ```typescript
 interface Settings {
@@ -120,6 +130,8 @@ interface Settings {
   currency: 'INR' | 'USD' | 'EUR'; // Selected display currency
   theme: 'light' | 'dark' | 'system'; // Visual theme preference
   defaultCategory: string; // Default category for new transactions
+  geminiApiKey?: string; // User-provided Google Gemini API key
+  geminiModel?: string; // Model identifier (defaults to "gemini-1.5-flash")
   schemaVersion: number; // Current schema version (2)
 }
 ```

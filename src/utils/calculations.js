@@ -334,3 +334,257 @@ export function calcNetWorthHistory(historyData = [], transactions = [], account
   }
   return out;
 }
+
+/**
+ * Calculate Fixed Deposit (FD) maturity, interest, and real-time accrued value.
+ * Standard Indian banking uses quarterly compounding (n = 4).
+ *
+ * @param {number} principal - Initial deposit in ₹
+ * @param {number} annualRatePct - Annual interest rate in percent (e.g. 7.1)
+ * @param {string|Date} startDate - Start date (YYYY-MM-DD)
+ * @param {number} tenureMonths - Total tenure in months (e.g. 12, 36)
+ * @param {string} compoundingFrequency - 'quarterly' | 'monthly' | 'annual' | 'cumulative'
+ * @param {Date} [asOfDate=new Date()] - As-of date for calculating accrued value
+ */
+export function calcFdMaturityAndInterest(
+  principal = 0,
+  annualRatePct = 0,
+  startDate,
+  tenureMonths = 12,
+  compoundingFrequency = 'quarterly',
+  asOfDate = new Date()
+) {
+  const p = Math.max(0, Number(principal) || 0);
+  const r = (Number(annualRatePct) || 0) / 100;
+  const tYears = Math.max(0, Number(tenureMonths) || 0) / 12;
+
+  let n = 4; // default quarterly compounding (Indian standard)
+  if (compoundingFrequency === 'monthly') n = 12;
+  else if (compoundingFrequency === 'annual') n = 1;
+
+  // Maturity Amount: A = P * (1 + r/n)^(n * t)
+  const maturityAmount = p > 0 && r > 0 ? p * Math.pow(1 + r / n, n * tYears) : p;
+  const totalInterest = Math.max(0, maturityAmount - p);
+
+  // Compute maturity date and accrued progress
+  const start = toDate(startDate || new Date());
+  const maturityDate = new Date(start);
+  maturityDate.setMonth(maturityDate.getMonth() + (Number(tenureMonths) || 12));
+
+  const asOf = toDate(asOfDate);
+  const totalDurationMs = Math.max(1, maturityDate.getTime() - start.getTime());
+  const elapsedMs = Math.max(0, asOf.getTime() - start.getTime());
+
+  const progressPct = Math.min(100, Math.max(0, (elapsedMs / totalDurationMs) * 100));
+  const isMatured = asOf >= maturityDate;
+
+  // Accrued interest to date: compound over elapsed years
+  const elapsedYears = Math.min(tYears, elapsedMs / (365.25 * 24 * 60 * 60 * 1000));
+  const currentValue = isMatured
+    ? maturityAmount
+    : p > 0 && r > 0
+      ? p * Math.pow(1 + r / n, n * elapsedYears)
+      : p;
+  const accruedInterest = Math.max(0, currentValue - p);
+  const daysRemaining = isMatured
+    ? 0
+    : Math.ceil((maturityDate.getTime() - asOf.getTime()) / (1000 * 60 * 60 * 24));
+
+  return {
+    principal: Math.round(p),
+    maturityAmount: Math.round(maturityAmount),
+    totalInterest: Math.round(totalInterest),
+    currentValue: Math.round(currentValue),
+    accruedInterest: Math.round(accruedInterest),
+    maturityDate: format(maturityDate, 'yyyy-MM-dd'),
+    startDate: format(start, 'yyyy-MM-dd'),
+    tenureMonths,
+    annualRatePct,
+    daysRemaining,
+    progressPct: Math.round(progressPct),
+    isMatured,
+  };
+}
+
+/**
+ * Calculate Bond / Sovereign Gold Bond yield and coupon distribution.
+ *
+ * @param {number} faceValue - Face value per unit (e.g. ₹1000 or gold grams)
+ * @param {number} couponRatePct - Annual coupon interest rate (e.g. 2.5% for SGBs, 7.5% for corporate)
+ * @param {number} purchasePrice - Actual purchase price paid per unit
+ * @param {number} units - Quantity of bonds held
+ * @param {string|Date} maturityDate - Maturity date
+ */
+export function calcBondYieldAndAccrued(
+  faceValue = 1000,
+  couponRatePct = 0,
+  purchasePrice = 1000,
+  units = 1,
+  maturityDate
+) {
+  const fv = Math.max(0, Number(faceValue) || 0);
+  const rate = (Number(couponRatePct) || 0) / 100;
+  const pp = Math.max(0, Number(purchasePrice) || fv);
+  const qty = Math.max(0, Number(units) || 1);
+
+  const totalFaceValue = fv * qty;
+  const totalInvestment = pp * qty;
+  const annualCouponIncome = totalFaceValue * rate;
+  const currentYieldPct = totalInvestment > 0 ? (annualCouponIncome / totalInvestment) * 100 : 0;
+
+  let isMatured = false;
+  let daysRemaining = null;
+  if (maturityDate) {
+    const mat = toDate(maturityDate);
+    const now = new Date();
+    isMatured = now >= mat;
+    daysRemaining = isMatured ? 0 : Math.ceil((mat.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+  }
+
+  return {
+    totalFaceValue: Math.round(totalFaceValue),
+    totalInvestment: Math.round(totalInvestment),
+    annualCouponIncome: Math.round(annualCouponIncome),
+    currentYieldPct: Number(currentYieldPct.toFixed(2)),
+    isMatured,
+    daysRemaining,
+  };
+}
+
+/**
+ * Segregate spending into Liquid Savings Account Outflows vs. Credit Card Outflows.
+ * Correctly identifies and separates credit card bill payments (transfers from savings to credit card)
+ * to ensure that expenses are not double-counted.
+ *
+ * @param {Array} transactions
+ * @param {Array} accounts
+ * @param {string|Date} targetMonthKey - Optional month key (YYYY-MM)
+ */
+export function calcSavingsVsCreditSpending(transactions = [], accounts = [], targetMonthKey = null) {
+  const monthTx = filterTransactionsByMonth(transactions, targetMonthKey);
+
+  // Map account types for rapid lookup
+  const accountMap = new Map();
+  (accounts || []).forEach((acc) => {
+    accountMap.set(acc.id, acc);
+  });
+
+  let savingsExpenseTotal = 0;
+  let creditExpenseTotal = 0;
+  let creditCardBillPaymentTotal = 0;
+  const savingsTransactions = [];
+  const creditTransactions = [];
+  const billPaymentTransactions = [];
+
+  monthTx.forEach((tx) => {
+    const fromAcc = accountMap.get(tx.accountId);
+    const toAcc = tx.toAccountId ? accountMap.get(tx.toAccountId) : null;
+    const amount = Math.abs(Number(tx.amount) || 0);
+
+    // Case 1: Inter-account Transfer (e.g. paying credit card bill from savings account)
+    if (tx.type === 'transfer') {
+      const isPayingCreditCard = toAcc && toAcc.type === 'credit';
+      if (isPayingCreditCard) {
+        creditCardBillPaymentTotal += amount;
+        billPaymentTransactions.push(tx);
+      }
+      return; // Transfers never count directly as expenses
+    }
+
+    // Case 2: Only expenses are analyzed
+    if (tx.type !== 'expense') return;
+
+    // Check if charged to a credit card
+    const isCredit = fromAcc && fromAcc.type === 'credit';
+    if (isCredit) {
+      creditExpenseTotal += amount;
+      creditTransactions.push(tx);
+    } else {
+      // Savings, current, cash, or wallet
+      savingsExpenseTotal += amount;
+      savingsTransactions.push(tx);
+    }
+  });
+
+  const totalSpend = savingsExpenseTotal + creditExpenseTotal;
+  const savingsPct = totalSpend > 0 ? (savingsExpenseTotal / totalSpend) * 100 : 0;
+  const creditPct = totalSpend > 0 ? (creditExpenseTotal / totalSpend) * 100 : 0;
+
+  return {
+    totalSpend: Math.round(totalSpend),
+    savingsExpenseTotal: Math.round(savingsExpenseTotal),
+    creditExpenseTotal: Math.round(creditExpenseTotal),
+    creditCardBillPaymentTotal: Math.round(creditCardBillPaymentTotal),
+    savingsPct: Math.round(savingsPct),
+    creditPct: Math.round(creditPct),
+    savingsTxCount: savingsTransactions.length,
+    creditTxCount: creditTransactions.length,
+    billPaymentTxCount: billPaymentTransactions.length,
+  };
+}
+
+/**
+ * Group investment holdings by asset type (stocks, mutual funds, fixed deposits, bonds).
+ * Computes portfolio distribution and valuation metrics per category.
+ *
+ * @param {Array} holdings
+ * @returns {Object}
+ */
+export function calcInvestmentHoldingsByType(holdings = []) {
+  const groups = {
+    stocks: { items: [], invested: 0, current: 0, count: 0 },
+    mutual_funds: { items: [], invested: 0, current: 0, count: 0 },
+    fixed_deposits: { items: [], invested: 0, current: 0, count: 0 },
+    bonds: { items: [], invested: 0, current: 0, count: 0 },
+    other: { items: [], invested: 0, current: 0, count: 0 },
+  };
+
+  (holdings || []).forEach((h) => {
+    const type = (h.type || '').toLowerCase();
+    let target = groups.other;
+    if (type === 'stock' || type === 'equity') target = groups.stocks;
+    else if (type === 'mutual_fund' || type === 'mf') target = groups.mutual_funds;
+    else if (type === 'fixed_deposit' || type === 'fd') target = groups.fixed_deposits;
+    else if (type === 'bond' || type === 'sgb') target = groups.bonds;
+
+    let invested = 0;
+    let current = 0;
+
+    if (type === 'fixed_deposit' || type === 'fd') {
+      const fdCalc = calcFdMaturityAndInterest(
+        h.principal || h.investedAmount || h.avgPrice,
+        h.interestRate || h.annualRatePct,
+        h.startDate || h.createdAt,
+        h.tenureMonths,
+        h.compoundingFrequency
+      );
+      invested = fdCalc.principal;
+      current = fdCalc.currentValue;
+      target.items.push({ ...h, fdCalc });
+    } else {
+      const units = Number(h.units) || 1;
+      const avg = Number(h.avgPrice) || 0;
+      const cur = Number(h.currentPrice) || avg;
+      invested = units * avg;
+      current = units * cur;
+      target.items.push(h);
+    }
+
+    target.invested += invested;
+    target.current += current;
+    target.count += 1;
+  });
+
+  const totalInvested = Object.values(groups).reduce((sum, g) => sum + g.invested, 0);
+  const totalCurrent = Object.values(groups).reduce((sum, g) => sum + g.current, 0);
+  const totalGain = totalCurrent - totalInvested;
+  const totalGainPct = totalInvested > 0 ? (totalGain / totalInvested) * 100 : 0;
+
+  return {
+    groups,
+    totalInvested: Math.round(totalInvested),
+    totalCurrent: Math.round(totalCurrent),
+    totalGain: Math.round(totalGain),
+    totalGainPct: Number(totalGainPct.toFixed(2)),
+  };
+}

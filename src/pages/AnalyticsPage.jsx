@@ -29,6 +29,8 @@ import MonthlyIncomeChart from '@/components/analytics/MonthlyIncomeChart';
 import CategoryComparisonChart from '@/components/analytics/CategoryComparisonChart';
 import SavingsRateChart from '@/components/analytics/SavingsRateChart';
 import NetWorthGrowthChart from '@/components/analytics/NetWorthGrowthChart';
+import AiSpendingAdvisor from '@/components/analytics/AiSpendingAdvisor';
+import SavingsVsCreditChart from '@/components/analytics/SavingsVsCreditChart';
 
 const PERIOD_OPTIONS = [
   { value: '6', label: 'Last 6 Months' },
@@ -136,6 +138,16 @@ export default function AnalyticsPage() {
       ) : (
         <>
           <AnalyticsSummary {...summaryMetrics} />
+
+          {/* AI Spending Findings & Proactive Advisor */}
+          <AiSpendingAdvisor transactions={transactions} accounts={accounts} />
+
+          {/* Liquid Savings vs Credit Card Dual Spending Outflow */}
+          <SavingsVsCreditChart
+            transactions={transactions}
+            accounts={accounts}
+            selectedMonth={selectedMonth}
+          />
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <MonthlyExpensesChart data={cashFlowData} />

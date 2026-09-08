@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
-import { Plus } from 'lucide-react';
+import { Plus, Sparkles } from 'lucide-react';
 import Button from '../components/ui/Button';
 import TransactionFilters from '../components/transactions/TransactionFilters';
 import TransactionTable from '../components/transactions/TransactionTable';
 import TransactionModal from '../components/transactions/TransactionModal';
+import StatementUploadModal from '../components/statements/StatementUploadModal';
 import { useData } from '../contexts/DataContext';
 import { saveTransaction, updateTransaction, deleteTransaction } from '../services/storage';
 import { formatMoney } from '../utils/formatCurrency';
@@ -16,6 +17,7 @@ const PAGE_SIZE = 15;
 export default function TransactionsPage() {
   const { transactions, accounts, refresh } = useData();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState(null);
   const [page, setPage] = useState(1);
 
@@ -142,9 +144,18 @@ export default function TransactionsPage() {
           <p className="label mb-1 text-zinc-500">{formatMoney(spentThisMonth)} spent this month</p>
           <h1 className="heading-lg text-zinc-900 dark:text-text-dark-primary">Transactions</h1>
         </div>
-        <Button variant="primary" icon={<Plus className="w-4 h-4" />} onClick={handleAddClick}>
-          Add Transaction
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="secondary"
+            icon={<Sparkles className="w-4 h-4 text-brand-amber" />}
+            onClick={() => setIsUploadModalOpen(true)}
+          >
+            Import Statement
+          </Button>
+          <Button variant="primary" icon={<Plus className="w-4 h-4" />} onClick={handleAddClick}>
+            Add Transaction
+          </Button>
+        </div>
       </div>
 
       <TransactionFilters
@@ -199,6 +210,8 @@ export default function TransactionsPage() {
         categories={[...DEFAULT_CATEGORIES]}
         accounts={accounts}
       />
+
+      <StatementUploadModal isOpen={isUploadModalOpen} onClose={() => setIsUploadModalOpen(false)} />
     </div>
   );
 }

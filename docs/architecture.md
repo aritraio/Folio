@@ -147,7 +147,73 @@ The visual language follows an **editorial private-wealth aesthetic**:
 
 ---
 
-## 6. Zero-Backend Migration Trajectory
+## 6. In-Browser AI Statement Ingestion Architecture
+
+Folio provides a privacy-first, automated bank and credit card statement ingestion pipeline that eliminates manual transaction entry fatigue while keeping user financial data strictly client-side:
+
+```
+┌────────────────────────────────────────────────────────────────────────┐
+│                    In-Browser Statement Ingestion                      │
+│                                                                        │
+│   [PDF Statement File]                                                 │
+│            │                                                           │
+│            ▼                                                           │
+│   ┌─────────────────────────────────┐                                  │
+│   │   PDF.js Decryption & Reader    │ ◀─── Bank-Specific Password Hint  │
+│   │   (`services/pdfParser.js`)     │      (DOB, Pan, Name formats)    │
+│   └────────────────┬────────────────┘                                  │
+│                    │ Raw text streams                                  │
+│                    ▼                                                           │
+│   ┌─────────────────────────────────┐                                  │
+│   │   Google Gemini 1.5 Flash       │ ◀─── Optional user API Key       │
+│   │   Structured JSON Extraction    │      (Or Instant Offline Demo)   │
+│   └────────────────┬────────────────┘                                  │
+│                    │ Parsed transaction objects                        │
+│                    ▼                                                           │
+│   ┌─────────────────────────────────┐                                  │
+│   │   Duplicate Detection Staging   │ ◀─── Date, amount & merchant     │
+│   │   (`findPotentialDuplicates`)   │      proximity matching          │
+│   └────────────────┬────────────────┘                                  │
+│                    │ User-reviewed batch                               │
+│                    ▼                                                           │
+│   ┌─────────────────────────────────┐                                  │
+│   │   Atomic Batch Balance Storage  │                                  │
+│   │   (`saveTransactionsBatch`)     │ ──▶  localStorage                │
+│   └─────────────────────────────────┘                                  │
+└────────────────────────────────────────────────────────────────────────┘
+```
+
+1. **Client-Side PDF Decryption**: `pdfjs-dist` loads directly in the browser. Encrypted e-statements prompt the user with pre-configured password patterns for major Indian banks (HDFC, ICICI, SBI, Axis, Cred).
+2. **AI Parsing with Strict Schema**: Extracted statement text is processed via Google Gemini 1.5 Flash using `responseMimeType: 'application/json'`. Extracted records contain `date`, `merchant`, `amount`, `category`, and `type` (debit/credit).
+3. **Interactive Demo Mode**: Users can test ingestion instantly without entering an API key using bundled real-world statements from HDFC Bank and ICICI Amazon Pay Credit Card.
+4. **Staging & Duplicate Protection**: Before committing transactions, transactions are previewed in an interactive review modal where existing transactions with matching dates, amounts, and merchant names are flagged to prevent duplicate entries.
+
+---
+
+## 7. Dual Spending & Debt Segregation Engine
+
+Folio explicitly segregates spending across two distinct behavioral channels:
+
+1. **Liquid Savings Account Spending**: Outflows made directly from checking, savings, or cash via UPI, NetBanking, and debit cards.
+2. **Credit Card Debt Spending**: Unsettled liabilities accrued through credit card swipes and merchant purchases.
+3. **Bill Payment Isolation**: Transfers from a savings account to a credit card to settle monthly statements are identified and excluded from expense metrics, preventing double-counting.
+
+This logic is implemented in `calcSavingsVsCreditSpending` and visualized in the `SavingsVsCreditChart` and `AiSpendingAdvisor` components.
+
+---
+
+## 8. Indian Wealth Management Ecosystem
+
+Folio caters to the Indian personal wealth landscape across four primary asset classes:
+
+- **Equities & Stocks**: Direct stock tracking with average buy price, current market price, and unrealized P&L.
+- **Mutual Funds (AMFI Live NAV)**: Real-time search and daily NAV tracking powered by the public AMFI India Mutual Fund API (`api.mfapi.in`), with auto-fill of historical purchase NAVs and current valuation.
+- **Fixed Deposits (FDs)**: Indian banking standard quarterly compounding calculator ($A = P(1 + r/4)^{4t}$) tracking accrued interest, maturity valuation, days remaining, and visual progress meters.
+- **Bonds & Sovereign Gold Bonds (SGBs)**: Face value, annual coupon yields (e.g. 2.5% p.a. for SGBs), and maturity timelines.
+
+---
+
+## 9. Zero-Backend Migration Trajectory
 
 Folio's clean storage abstraction enables future remote backend integrations without altering presentation components:
 

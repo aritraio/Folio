@@ -5,7 +5,7 @@
 [![React](https://img.shields.io/badge/React-18.3-61dafb?style=flat-square&logo=react)](https://react.dev/)
 [![Vite](https://img.shields.io/badge/Vite-5.4-646cff?style=flat-square&logo=vite)](https://vitejs.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38bdf8?style=flat-square&logo=tailwindcss)](https://tailwindcss.com/)
-[![Vitest](https://img.shields.io/badge/Tests-45%20Passed-22c55e?style=flat-square&logo=vitest)](https://vitest.dev/)
+[![Vitest](https://img.shields.io/badge/Tests-53%20Passed-22c55e?style=flat-square&logo=vitest)](https://vitest.dev/)
 [![ESLint](https://img.shields.io/badge/ESLint-0%20Warnings-4b32c3?style=flat-square&logo=eslint)](https://eslint.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-amber.svg?style=flat-square)](LICENSE)
 
@@ -14,10 +14,13 @@
 ## Highlights
 
 - 🔒 **100% Local-First & Private**: All data lives strictly in your browser's `localStorage`. No cloud database, no tracking, no telemetry.
+- 📄 **In-Browser AI Statement Parsing**: Decrypt password-protected e-statements (HDFC, ICICI, SBI, Axis, Cred) via `pdfjs-dist` and parse transactions via Google Gemini 1.5 Flash directly in the browser—with 1-click interactive demo mode.
+- 💳 **Dual Spending Engine (Savings vs. Credit)**: Clearly segregate liquid account debits (UPI/cash/debit) from credit card debt accumulation, with automated isolation of credit card bill payments to prevent double-counting.
+- 💡 **AI Spending Advisor**: Proactive financial discoveries identifying high-frequency delivery velocity, recurring subscription leakage, and liquidity safety cushions.
+- 🇮🇳 **Indian Wealth Portfolio Suite**: Track Indian Stocks, live AMFI Mutual Funds (daily NAV updates), Fixed Deposits (quarterly compounding engine), and Sovereign Gold Bonds (SGBs).
 - 🏛️ **Editorial Design System**: Crafted with a print-journal private wealth aesthetic—warm ivory surfaces, Playfair Display serifs, tabular monetary figures, and OLED dark mode.
 - ⚖️ **Double-Entry Balance Integrity**: Account balances update atomically upon transaction save, update, or deletion. Inter-account transfers credit destination accounts while being excluded from income/expense totals.
 - 🛡️ **Guarded Accounts**: Prevents deletion of accounts with existing transaction history without explicit reassignment, preserving ledger integrity.
-- ⚡ **Lightning Fast & Lightweight**: Zero runtime state management overhead; routes, charts, and date utilities are split into optimized Rollup chunks.
 - ⌨️ **Global Command Palette (`⌘K` / `Ctrl+K`)**: Rapid search across transactions, accounts, budgets, and investments from anywhere in the app.
 
 ---
@@ -26,11 +29,12 @@
 
 - **Dashboard**: Net worth hero with count-up animations, 5-metric summary strip, net-worth timeline, income vs. expense cash flow, category donut, and recent activity.
 - **Transactions**: Full CRUD with instant search, multi-field filters (date, type, category, account), column sorting, pagination, and transfer support.
+- **AI Statement Ingestion**: Ingestion wizard with PDF decryption, password helper hints, duplicate detection staging table, and batch storage.
 - **Accounts**: Assets vs. liabilities breakdown, balance tracking, and safe deletion with transaction re-mapping.
 - **Budgets**: Monthly category spending limits with visual progress meters and dynamic warning/over-budget states.
-- **Analytics**: Cash flow charts, savings-rate trends, category spend comparisons, and historical growth insights.
-- **Investments**: Portfolio valuation summary, asset-class distribution donut, and holdings tracker.
-- **Settings**: Multi-currency display (`INR ₹`, `USD $`, `EUR €`), theme customization (`light`, `dark`, `system`), versioned JSON backup export/import, and demo reset.
+- **Analytics**: Cash flow charts, savings-rate trends, category spend comparisons, dual savings vs. credit spending breakdown, and the AI Spending Advisor card.
+- **Investments**: Multi-asset wealth tabs (Stocks, Mutual Funds, Fixed Deposits, Bonds), AMFI India live NAV search, and quarterly compounding FD calculator.
+- **Settings**: Multi-currency display (`INR ₹`, `USD $`, `EUR €`), Gemini API key configuration, theme customization (`light`, `dark`, `system`), versioned JSON backup export/import, and demo reset.
 
 ---
 

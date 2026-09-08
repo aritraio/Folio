@@ -26,6 +26,8 @@ export default [
         requestAnimationFrame: 'readonly',
         cancelAnimationFrame: 'readonly',
         process: 'readonly',
+        fetch: 'readonly',
+        File: 'readonly',
       },
     },
     rules: {

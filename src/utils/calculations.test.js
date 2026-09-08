@@ -13,6 +13,10 @@ import {
   calcAverageDailySpending,
   calcTopSpendingCategory,
   calcNetWorthHistory,
+  calcFdMaturityAndInterest,
+  calcBondYieldAndAccrued,
+  calcSavingsVsCreditSpending,
+  calcInvestmentHoldingsByType,
 } from '../utils/calculations.js';
 
 const accounts = [
@@ -161,5 +165,151 @@ describe('net worth history', () => {
   });
   it('returns [] with no basis', () => {
     expect(calcNetWorthHistory([], [], [], 3)).toEqual([]);
+  });
+});
+
+describe('fixed deposit compounding calculations', () => {
+  it('calculates quarterly compounding maturity amount accurately', () => {
+    // ₹100,000 at 7.0% for 12 months with quarterly compounding
+    // A = 100000 * (1 + 0.07/4)^4 = 100000 * (1.0175)^4 = 107,185.90 -> 107186
+    const res = calcFdMaturityAndInterest(100000, 7.0, '2026-01-01', 12, 'quarterly', new Date('2026-07-01'));
+    expect(res.principal).toBe(100000);
+    expect(res.maturityAmount).toBe(107186);
+    expect(res.totalInterest).toBe(7186);
+    expect(res.isMatured).toBe(false);
+    expect(res.currentValue).toBeGreaterThan(100000);
+    expect(res.currentValue).toBeLessThan(107186);
+    expect(res.accruedInterest).toBeGreaterThan(0);
+  });
+
+  it('marks FD as matured when asOfDate is past maturityDate', () => {
+    const res = calcFdMaturityAndInterest(50000, 6.5, '2025-01-01', 12, 'quarterly', new Date('2026-02-01'));
+    expect(res.isMatured).toBe(true);
+    expect(res.daysRemaining).toBe(0);
+    expect(res.currentValue).toBe(res.maturityAmount);
+    expect(res.progressPct).toBe(100);
+  });
+
+  it('handles zero or invalid values gracefully', () => {
+    const res = calcFdMaturityAndInterest(0, 0, '2026-01-01', 12);
+    expect(res.principal).toBe(0);
+    expect(res.maturityAmount).toBe(0);
+    expect(res.totalInterest).toBe(0);
+  });
+});
+
+describe('bonds and sovereign gold bonds calculations', () => {
+  it('computes annual coupon income and current yield percentage', () => {
+    // 10 units of ₹1000 face value bond with 7.5% coupon bought at ₹950
+    // Total face value = 10000, total investment = 9500, annual income = 750
+    // Current yield = 750 / 9500 * 100 = 7.89%
+    const res = calcBondYieldAndAccrued(1000, 7.5, 950, 10, '2030-12-31');
+    expect(res.totalFaceValue).toBe(10000);
+    expect(res.totalInvestment).toBe(9500);
+    expect(res.annualCouponIncome).toBe(750);
+    expect(res.currentYieldPct).toBe(7.89);
+    expect(res.isMatured).toBe(false);
+  });
+});
+
+describe('savings vs credit spending segregation', () => {
+  const customAccounts = [
+    { id: 'acc_sav', type: 'savings', name: 'HDFC Bank' },
+    { id: 'acc_cc', type: 'credit', name: 'ICICI Amazon Pay' },
+  ];
+
+  const mixedTxs = [
+    {
+      id: 'm1',
+      type: 'expense',
+      amount: 3500,
+      date: '2026-09-02',
+      accountId: 'acc_sav',
+      category: 'Groceries',
+    },
+    { id: 'm2', type: 'expense', amount: 1500, date: '2026-09-03', accountId: 'acc_sav', category: 'Fuel' },
+    {
+      id: 'm3',
+      type: 'expense',
+      amount: 8000,
+      date: '2026-09-04',
+      accountId: 'acc_cc',
+      category: 'Electronics',
+    },
+    { id: 'm4', type: 'expense', amount: 2000, date: '2026-09-05', accountId: 'acc_cc', category: 'Dining' },
+    // Transfer from savings to credit card (credit card bill payment)
+    {
+      id: 'm5',
+      type: 'transfer',
+      amount: 10000,
+      date: '2026-09-15',
+      accountId: 'acc_sav',
+      toAccountId: 'acc_cc',
+    },
+  ];
+
+  it('accurately distinguishes savings debits from credit card swipes and isolates bill payments', () => {
+    const res = calcSavingsVsCreditSpending(mixedTxs, customAccounts, '2026-09');
+    expect(res.savingsExpenseTotal).toBe(5000); // 3500 + 1500
+    expect(res.creditExpenseTotal).toBe(10000); // 8000 + 2000
+    expect(res.totalSpend).toBe(15000);
+    expect(res.creditCardBillPaymentTotal).toBe(10000); // Inter-account transfer not double-counted as expense
+    expect(res.savingsPct).toBe(33); // 5000 / 15000 * 100
+    expect(res.creditPct).toBe(67); // 10000 / 15000 * 100
+    expect(res.savingsTxCount).toBe(2);
+    expect(res.creditTxCount).toBe(2);
+    expect(res.billPaymentTxCount).toBe(1);
+  });
+});
+
+describe('investment holdings grouping by asset type', () => {
+  it('categorizes holdings into stocks, mutual funds, FDs, and bonds with aggregations', () => {
+    const holdings = [
+      { id: 'h1', name: 'TCS', type: 'stock', units: 10, avgPrice: 3500, currentPrice: 4000 },
+      {
+        id: 'h2',
+        name: 'Parag Parikh Flexi Cap',
+        type: 'mutual_fund',
+        units: 100,
+        avgPrice: 60,
+        currentPrice: 75,
+      },
+      {
+        id: 'h3',
+        name: 'SBI 1-Year FD',
+        type: 'fixed_deposit',
+        principal: 100000,
+        interestRate: 7.0,
+        tenureMonths: 12,
+        startDate: '2026-01-01',
+      },
+      {
+        id: 'h4',
+        name: 'Sovereign Gold Bond 2030',
+        type: 'bond',
+        units: 5,
+        avgPrice: 6000,
+        currentPrice: 7000,
+      },
+    ];
+
+    const res = calcInvestmentHoldingsByType(holdings);
+    expect(res.groups.stocks.count).toBe(1);
+    expect(res.groups.stocks.invested).toBe(35000);
+    expect(res.groups.stocks.current).toBe(40000);
+
+    expect(res.groups.mutual_funds.count).toBe(1);
+    expect(res.groups.mutual_funds.invested).toBe(6000);
+    expect(res.groups.mutual_funds.current).toBe(7500);
+
+    expect(res.groups.fixed_deposits.count).toBe(1);
+    expect(res.groups.fixed_deposits.invested).toBe(100000);
+
+    expect(res.groups.bonds.count).toBe(1);
+    expect(res.groups.bonds.invested).toBe(30000);
+    expect(res.groups.bonds.current).toBe(35000);
+
+    expect(res.totalInvested).toBeGreaterThan(150000);
+    expect(res.totalCurrent).toBeGreaterThan(res.totalInvested);
   });
 });
