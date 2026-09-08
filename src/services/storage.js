@@ -119,7 +119,11 @@ export function getSchemaVersion() {
 export function initStorage() {
   try {
     const isInitialized = localStorage.getItem(KEYS.INITIALIZED);
-    if (!isInitialized) {
+    const storedTx = getItem(KEYS.TRANSACTIONS, []);
+    const isLegacyCorporate =
+      Array.isArray(storedTx) && storedTx.some((t) => t.merchant === 'TechCorp India Ltd');
+
+    if (!isInitialized || isLegacyCorporate) {
       setItem(KEYS.ACCOUNTS, INITIAL_ACCOUNTS);
       setItem(KEYS.BUDGETS, INITIAL_BUDGETS);
       setItem(KEYS.INVESTMENTS, INITIAL_INVESTMENTS);
@@ -128,6 +132,7 @@ export function initStorage() {
       setItem(KEYS.TRANSACTIONS, INITIAL_TRANSACTIONS);
       localStorage.setItem(KEYS.INITIALIZED, 'true');
       localStorage.setItem(KEYS.SCHEMA_VERSION, String(SCHEMA_VERSION));
+      localStorage.setItem('folio_profile', 'student-v1');
     } else {
       // Backfill schema version + any missing keys (forward-compat).
       if (!localStorage.getItem(KEYS.SCHEMA_VERSION)) {
