@@ -41,10 +41,11 @@ The project has achieved complete implementation across all planned milestones:
 - [x] **Phase 13 — Responsive Polish**: Breakpoints for mobile (< 640px), tablet (640–1024px), and desktop (> 1024px); mobile drawer modals and stacked cards.
 - [x] **Phase 14 — Micro-Interactions**: Chart entry animations, row hover states, count-up numeric transitions, smooth modals.
 - [x] **Phase 15 — Accessibility**: Semantic elements (`<nav>`, `<main>`, `<section>`), keyboard navigation, focus rings, WCAG AA color contrast.
-- [x] **Phase 16 — Production QA & Hardening**: Vitest test suites (53 passing tests), ESLint 0 warnings/errors, Vercel SPA deployment configuration, repository cleanup.
+- [x] **Phase 16 — Production QA & Hardening**: Vitest test suites (63 passing tests), ESLint 0 warnings/errors, Vercel SPA deployment configuration, repository cleanup.
 - [x] **Phase 17 — In-Browser AI Statement Ingestion**: Client-side PDF decryption with `pdfjs-dist`, bank password format hints, Google Gemini 1.5 Flash structured JSON parsing, 1-click interactive demo mode with HDFC and ICICI sample statements, and duplicate detection staging.
 - [x] **Phase 18 — Dual Spending Engine & AI Advisor**: Liquid savings outflows vs. credit card liability segregation, credit card bill payment isolation, and interactive AI Spending Advisor card discovering lifestyle creep, recurring subscriptions, and liquidity safety ratio.
 - [x] **Phase 19 — Indian Wealth Management Suite**: Multi-asset portfolio tabs (Stocks, Mutual Funds, Fixed Deposits, Bonds), live AMFI India daily NAV lookup and search, and Indian standard quarterly compounding FD engine.
+- [x] **Phase 20 — Authentic Dynamic Student Persona**: Shifted from legacy corporate executive data to a realistic Indian college/tech student persona (Aritra) with dynamic relative dates (`subDays(now, X)`) ensuring the active month is always lively and populated.
 
 ---
 
