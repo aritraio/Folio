@@ -157,16 +157,31 @@ export default function AccountsPage() {
         </div>
       ) : (
         <>
-          <Group icon={Landmark} eyebrow="Bank accounts" total={formatMoney(snapshot.totalAssets)} emptyText="No bank accounts.">
+          <Group
+            icon={Landmark}
+            eyebrow="Bank accounts"
+            total={formatMoney(snapshot.totalAssets)}
+            emptyText="No bank accounts."
+          >
             {bankAccounts.map((account) => (
-              <AccountCard key={account.id} account={account} onEdit={handleEditClick} onDelete={() => handleDeleteClick(account)} />
+              <AccountCard
+                key={account.id}
+                account={account}
+                onEdit={handleEditClick}
+                onDelete={() => handleDeleteClick(account)}
+              />
             ))}
           </Group>
 
           {cashAccounts.length > 0 && (
             <Group icon={Wallet} eyebrow="Cash & wallets" emptyText="No cash accounts.">
               {cashAccounts.map((account) => (
-                <AccountCard key={account.id} account={account} onEdit={handleEditClick} onDelete={() => handleDeleteClick(account)} />
+                <AccountCard
+                  key={account.id}
+                  account={account}
+                  onEdit={handleEditClick}
+                  onDelete={() => handleDeleteClick(account)}
+                />
               ))}
             </Group>
           )}
@@ -181,7 +196,10 @@ export default function AccountsPage() {
                     {investments.length}
                   </span>
                 </h2>
-                <Link to="/investments" className="inline-flex items-center gap-1 text-sm font-semibold mono text-investment hover:underline">
+                <Link
+                  to="/investments"
+                  className="inline-flex items-center gap-1 text-sm font-semibold mono text-investment hover:underline"
+                >
                   {formatMoney(investmentTotal)} <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
@@ -194,14 +212,29 @@ export default function AccountsPage() {
           {otherAccounts.length > 0 && (
             <Group icon={Wallet} eyebrow="Other assets" emptyText="No other assets.">
               {otherAccounts.map((account) => (
-                <AccountCard key={account.id} account={account} onEdit={handleEditClick} onDelete={() => handleDeleteClick(account)} />
+                <AccountCard
+                  key={account.id}
+                  account={account}
+                  onEdit={handleEditClick}
+                  onDelete={() => handleDeleteClick(account)}
+                />
               ))}
             </Group>
           )}
 
-          <Group icon={CreditCard} eyebrow="Credit cards · outstanding" total={formatMoney(snapshot.totalLiabilities)} emptyText="No credit cards tracked.">
+          <Group
+            icon={CreditCard}
+            eyebrow="Credit cards · outstanding"
+            total={formatMoney(snapshot.totalLiabilities)}
+            emptyText="No credit cards tracked."
+          >
             {creditAccounts.map((account) => (
-              <AccountCard key={account.id} account={account} onEdit={handleEditClick} onDelete={() => handleDeleteClick(account)} />
+              <AccountCard
+                key={account.id}
+                account={account}
+                onEdit={handleEditClick}
+                onDelete={() => handleDeleteClick(account)}
+              />
             ))}
           </Group>
         </>

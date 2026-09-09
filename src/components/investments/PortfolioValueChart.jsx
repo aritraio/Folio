@@ -1,6 +1,14 @@
 import React, { useMemo } from 'react';
 import {
-  ComposedChart, Area, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
+  ComposedChart,
+  Area,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
 } from 'recharts';
 import { formatINR, formatCompact } from '@/utils/formatCurrency';
 import { getLastNMonths } from '@/utils/dateUtils';

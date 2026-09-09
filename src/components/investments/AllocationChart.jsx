@@ -150,7 +150,9 @@ export default function AllocationChart({ holdings = [], returnPercentage = 0 })
                 <span className="text-[10px] font-semibold uppercase tracking-wider text-text-tertiary dark:text-text-dark-tertiary">
                   Portfolio
                 </span>
-                <span className={`text-[11px] font-semibold mono ${returnPercentage >= 0 ? 'text-brand-emerald' : 'text-brand-red'}`}>
+                <span
+                  className={`text-[11px] font-semibold mono ${returnPercentage >= 0 ? 'text-brand-emerald' : 'text-brand-red'}`}
+                >
                   {formatPercent(returnPercentage, 1)}
                 </span>
               </>

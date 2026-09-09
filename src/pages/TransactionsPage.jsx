@@ -120,7 +120,11 @@ export default function TransactionsPage() {
   }, [transactions]);
 
   const hasActiveFilters =
-    filters.search || filters.month !== 'all' || filters.type !== 'all' || filters.category !== 'all' || filters.accountId !== 'all';
+    filters.search ||
+    filters.month !== 'all' ||
+    filters.type !== 'all' ||
+    filters.category !== 'all' ||
+    filters.accountId !== 'all';
 
   const handleFilterChange = (key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
@@ -217,7 +221,14 @@ export default function TransactionsPage() {
           aria-live="polite"
         >
           <span>
-            Transaction deleted{undo.merchant ? <> — <strong>{undo.merchant}</strong></> : null}.
+            Transaction deleted
+            {undo.merchant ? (
+              <>
+                {' '}
+                — <strong>{undo.merchant}</strong>
+              </>
+            ) : null}
+            .
           </span>
           <button
             onClick={handleUndo}

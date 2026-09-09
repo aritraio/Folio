@@ -86,11 +86,7 @@ export default function CashFlowChart({ data = [] }) {
       {/* Summary cards */}
       <div className="grid grid-cols-3 gap-4 mb-6 pb-5 border-b border-ivory-border dark:border-surface-dark-border">
         <SummaryCard label="Income" value={formatINR(current.income)} color="text-brand-emerald" />
-        <SummaryCard
-          label="Spending"
-          value={formatINR(current.expenses)}
-          color="text-brand-red"
-        />
+        <SummaryCard label="Spending" value={formatINR(current.expenses)} color="text-brand-red" />
         <SummaryCard
           label="Net flow"
           value={formatChange(current.savings)}
@@ -99,7 +95,11 @@ export default function CashFlowChart({ data = [] }) {
       </div>
 
       {/* Chart */}
-      <div className="h-[220px]" role="img" aria-label={`Cash flow: income ${formatINR(current.income)}, spending ${formatINR(current.expenses)}, net ${formatChange(current.savings)} this month`}>
+      <div
+        className="h-[220px]"
+        role="img"
+        aria-label={`Cash flow: income ${formatINR(current.income)}, spending ${formatINR(current.expenses)}, net ${formatChange(current.savings)} this month`}
+      >
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={chartData} margin={{ top: 4, right: 4, left: -16, bottom: 0 }} barGap={4}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-border-subtle)" />

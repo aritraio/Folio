@@ -20,8 +20,17 @@ export default function AnalyticsSummary({
   const cells = [
     { label: 'Income', value: formatINR(monthlyIncome), to: '/transactions', tone: 'text-brand-emerald' },
     { label: 'Spending', value: formatINR(monthlySpending), to: '/transactions', tone: 'text-brand-red' },
-    { label: 'Savings', value: formatINR(savings), to: '/transactions', tone: savings >= 0 ? 'text-brand-emerald' : 'text-brand-red' },
-    { label: 'Savings rate', value: formatPercent(savingsRate, 1), tone: savingsRate >= 20 ? 'text-brand-emerald' : 'text-brand-amber' },
+    {
+      label: 'Savings',
+      value: formatINR(savings),
+      to: '/transactions',
+      tone: savings >= 0 ? 'text-brand-emerald' : 'text-brand-red',
+    },
+    {
+      label: 'Savings rate',
+      value: formatPercent(savingsRate, 1),
+      tone: savingsRate >= 20 ? 'text-brand-emerald' : 'text-brand-amber',
+    },
   ];
 
   return (
@@ -52,7 +61,11 @@ export default function AnalyticsSummary({
         Net flow {formatINR(netCashFlow)} · averaging {formatINR(Math.round(avgDailySpending))} per day
         {topCategory ? (
           <>
-            {' '}· top category <span className="font-semibold text-zinc-800 dark:text-text-dark-primary">{topCategory.category}</span>{' '}
+            {' '}
+            · top category{' '}
+            <span className="font-semibold text-zinc-800 dark:text-text-dark-primary">
+              {topCategory.category}
+            </span>{' '}
             at {formatINR(topCategory.amount)}
           </>
         ) : null}

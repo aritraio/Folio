@@ -29,8 +29,11 @@ function AccountRow({ account }) {
           </p>
         </div>
       </div>
-      <span className={`text-sm font-semibold mono shrink-0 ${isLiability ? 'text-brand-red' : 'text-zinc-900 dark:text-text-dark-primary'}`}>
-        {isLiability ? '−' : ''}{formatINR(Math.abs(Number(account.balance) || 0))}
+      <span
+        className={`text-sm font-semibold mono shrink-0 ${isLiability ? 'text-brand-red' : 'text-zinc-900 dark:text-text-dark-primary'}`}
+      >
+        {isLiability ? '−' : ''}
+        {formatINR(Math.abs(Number(account.balance) || 0))}
       </span>
     </div>
   );
@@ -62,7 +65,9 @@ export default function AccountOverview({ accounts = [], investmentTotal = 0, sn
       {assets.length > 0 && (
         <div className="mb-4">
           <div className="flex items-center justify-between mb-1">
-            <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-cash">Cash & banks</span>
+            <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-cash">
+              Cash & banks
+            </span>
             <span className="text-xs font-semibold mono text-cash">{formatINR(totalAssets)}</span>
           </div>
           <div className="divide-y divide-ivory-border dark:divide-surface-dark-border">
@@ -76,7 +81,10 @@ export default function AccountOverview({ accounts = [], investmentTotal = 0, sn
       {investmentTotal > 0 && (
         <div className="mb-4 flex items-center justify-between py-2.5 px-2 -mx-2 rounded-lg row-hover hover:bg-ivory-muted dark:hover:bg-surface-dark-elevated">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-investment/10 flex items-center justify-center" aria-hidden="true">
+            <div
+              className="w-8 h-8 rounded-lg bg-investment/10 flex items-center justify-center"
+              aria-hidden="true"
+            >
               <TrendingUp className="w-4 h-4 text-investment" />
             </div>
             <span className="text-sm font-medium text-zinc-800 dark:text-text-dark-primary">Investments</span>

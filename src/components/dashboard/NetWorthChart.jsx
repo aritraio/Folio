@@ -1,6 +1,13 @@
 import React, { useState, useMemo } from 'react';
 import {
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceDot,
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  ReferenceDot,
 } from 'recharts';
 import { formatINR, formatCompact, formatChange, formatPercent } from '@/utils/formatCurrency';
 import SegmentedControl from '@/components/ui/SegmentedControl';
@@ -22,9 +29,7 @@ function ChartTooltip({ active, payload, label, deltas }) {
   return (
     <div className="bg-white dark:bg-surface-dark-card border border-ivory-border dark:border-surface-dark-border rounded-lg shadow-elevated dark:shadow-dark-elevated px-4 py-3 min-w-[180px]">
       <p className="text-xs font-semibold text-text-secondary dark:text-text-dark-secondary mb-1">{label}</p>
-      <p className="text-base font-bold mono text-zinc-900 dark:text-text-dark-primary">
-        {formatINR(value)}
-      </p>
+      <p className="text-base font-bold mono text-zinc-900 dark:text-text-dark-primary">{formatINR(value)}</p>
       {delta != null && (
         <p className={`text-xs font-medium mt-0.5 ${delta >= 0 ? 'text-brand-emerald' : 'text-brand-red'}`}>
           {formatChange(delta)} vs prior month
@@ -64,7 +69,10 @@ export default function NetWorthChart({ data = [] }) {
   }, [filteredData]);
 
   const summary = useMemo(() => {
-    if (chartData.length < 2) return chartData.length === 1 ? `Net worth is ${formatINR(chartData[0].value)}.` : 'No net-worth history yet.';
+    if (chartData.length < 2)
+      return chartData.length === 1
+        ? `Net worth is ${formatINR(chartData[0].value)}.`
+        : 'No net-worth history yet.';
     const first = chartData[0];
     const last = chartData[chartData.length - 1];
     const ch = last.value - first.value;

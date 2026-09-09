@@ -26,7 +26,7 @@ export default function HowCalculated({ metricKey = 'netWorth', snapshot }) {
       document.removeEventListener('mousedown', onDoc);
       document.removeEventListener('keydown', onKey);
     };
-  }, [open ]);
+  }, [open]);
 
   if (!def) return null;
 

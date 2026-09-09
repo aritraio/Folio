@@ -603,7 +603,8 @@ export const FINANCIAL_DEFINITIONS = Object.freeze({
   netWorth: {
     label: 'Net Worth',
     formula: 'Assets + Investments − Liabilities',
-    description: 'Cash & bank balances plus portfolio current value, minus credit outstanding and negative balances.',
+    description:
+      'Cash & bank balances plus portfolio current value, minus credit outstanding and negative balances.',
   },
   totalAssets: {
     label: 'Total Assets',
@@ -719,12 +720,19 @@ export function calcUnifiedNetWorth(accounts = [], investments = []) {
  *   investmentTotal === Σ holdings currentValue
  *   savings === income − eligibleExpenses
  */
-export function validateFinancialModel({ accounts = [], investments = [], transactions = [], monthKey = null } = {}) {
+export function validateFinancialModel({
+  accounts = [],
+  investments = [],
+  transactions = [],
+  monthKey = null,
+} = {}) {
   const errors = [];
   const snap = calcFinancialSnapshot(accounts, investments);
   const recombined = snap.totalAssets + snap.investmentTotal - snap.totalLiabilities;
   if (recombined !== snap.netWorth) {
-    errors.push(`netWorth mismatch: ${snap.netWorth} !== ${snap.totalAssets}+${snap.investmentTotal}−${snap.totalLiabilities}`);
+    errors.push(
+      `netWorth mismatch: ${snap.netWorth} !== ${snap.totalAssets}+${snap.investmentTotal}−${snap.totalLiabilities}`
+    );
   }
   const sumHoldings = Math.round(
     (investments || []).reduce((s, h) => s + (Number(calcHoldingCurrentValue(h)) || 0), 0)
@@ -792,7 +800,13 @@ export function calcCategoryComparison(transactions = [], currentMonthKey, prevM
  * Transparent Financial Pulse (§12) — rule-based 0–100 score with reasons.
  * Factors: savings rate, expense volatility, budget adherence, liquidity, debt burden, cash-flow direction.
  */
-export function calcFinancialPulse({ transactions = [], accounts = [], investments = [], budgets = [], monthKey = null } = {}) {
+export function calcFinancialPulse({
+  transactions = [],
+  accounts = [],
+  investments = [],
+  budgets = [],
+  monthKey = null,
+} = {}) {
   const now = new Date();
   const cur = monthKey || `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
   const prevD = new Date(now.getFullYear(), now.getMonth() - 1, 1);
@@ -804,9 +818,10 @@ export function calcFinancialPulse({ transactions = [], accounts = [], investmen
   const savingsRate = calcSavingsRate(income, expenses);
   const { liquidAssets, obligations, coverageRaw } = calcLiquidity(accounts);
   const snap = calcFinancialSnapshot(accounts, investments);
-  const debtBurden = snap.totalAssets + snap.investmentTotal > 0
-    ? (snap.totalLiabilities / (snap.totalAssets + snap.investmentTotal)) * 100
-    : 0;
+  const debtBurden =
+    snap.totalAssets + snap.investmentTotal > 0
+      ? (snap.totalLiabilities / (snap.totalAssets + snap.investmentTotal)) * 100
+      : 0;
 
   const budgetUtil = calcBudgetUtilization(budgets, transactions, cur);
   const overBudgets = budgetUtil.filter((b) => b.status === 'exceeded').length;
@@ -823,47 +838,118 @@ export function calcFinancialPulse({ transactions = [], accounts = [], investmen
   const factors = [];
   const push = (key, label, score, detail, tone) => factors.push({ key, label, score, detail, tone });
 
-  const savingsScore = income <= 0 ? 40 : savingsRate >= 30 ? 100 : savingsRate >= 20 ? 85 : savingsRate >= 10 ? 65 : savingsRate >= 0 ? 45 : 20;
-  push('savings', 'Savings', savingsScore,
+  const savingsScore =
+    income <= 0
+      ? 40
+      : savingsRate >= 30
+        ? 100
+        : savingsRate >= 20
+          ? 85
+          : savingsRate >= 10
+            ? 65
+            : savingsRate >= 0
+              ? 45
+              : 20;
+  push(
+    'savings',
+    'Savings',
+    savingsScore,
     income > 0 ? `${savingsRate.toFixed(1)}% savings rate` : 'No income this month',
-    savingsScore >= 85 ? 'excellent' : savingsScore >= 65 ? 'good' : savingsScore >= 45 ? 'fair' : 'weak');
+    savingsScore >= 85 ? 'excellent' : savingsScore >= 65 ? 'good' : savingsScore >= 45 ? 'fair' : 'weak'
+  );
 
   const cfScore = income - expenses >= 0 ? (income > 0 ? 90 : 60) : 30;
-  push('cashflow', 'Cash flow', cfScore,
+  push(
+    'cashflow',
+    'Cash flow',
+    cfScore,
     `${income - expenses >= 0 ? 'Positive' : 'Negative'} net flow this month`,
-    cfScore >= 80 ? 'excellent' : cfScore >= 60 ? 'fair' : 'weak');
+    cfScore >= 80 ? 'excellent' : cfScore >= 60 ? 'fair' : 'weak'
+  );
 
   const volScore = variance <= 0.25 ? 90 : variance <= 0.5 ? 70 : variance <= 1 ? 50 : 30;
-  push('spending', 'Spending stability', volScore,
+  push(
+    'spending',
+    'Spending stability',
+    volScore,
     prevExpenses > 0
-      ? `${ (((expenses - prevExpenses) / prevExpenses) * 100).toFixed(1) }% vs last month`
+      ? `${(((expenses - prevExpenses) / prevExpenses) * 100).toFixed(1)}% vs last month`
       : 'First month of data',
-    volScore >= 80 ? 'excellent' : volScore >= 60 ? 'fair' : 'weak');
+    volScore >= 80 ? 'excellent' : volScore >= 60 ? 'fair' : 'weak'
+  );
 
-  const liqScore = !Number.isFinite(coverageRaw) ? 95 : coverageRaw >= 5 ? 95 : coverageRaw >= 3 ? 85 : coverageRaw >= 1 ? 65 : 30;
-  push('liquidity', 'Liquidity', liqScore,
-    obligations > 0 ? `${Number.isFinite(coverageRaw) ? coverageRaw.toFixed(1) : '—'}× coverage` : `${liquidAssets > 0 ? 'No dues' : 'No data'}`,
-    liqScore >= 85 ? 'excellent' : liqScore >= 65 ? 'fair' : 'weak');
+  const liqScore = !Number.isFinite(coverageRaw)
+    ? 95
+    : coverageRaw >= 5
+      ? 95
+      : coverageRaw >= 3
+        ? 85
+        : coverageRaw >= 1
+          ? 65
+          : 30;
+  push(
+    'liquidity',
+    'Liquidity',
+    liqScore,
+    obligations > 0
+      ? `${Number.isFinite(coverageRaw) ? coverageRaw.toFixed(1) : '—'}× coverage`
+      : `${liquidAssets > 0 ? 'No dues' : 'No data'}`,
+    liqScore >= 85 ? 'excellent' : liqScore >= 65 ? 'fair' : 'weak'
+  );
 
   const invRet = calcInvestmentReturn(investments);
-  const invScore = investments.length === 0 ? 50 : invRet.returnPercentage >= 10 ? 90 : invRet.returnPercentage >= 0 ? 75 : 45;
-  push('investments', 'Investments', invScore,
+  const invScore =
+    investments.length === 0
+      ? 50
+      : invRet.returnPercentage >= 10
+        ? 90
+        : invRet.returnPercentage >= 0
+          ? 75
+          : 45;
+  push(
+    'investments',
+    'Investments',
+    invScore,
     investments.length === 0 ? 'No holdings yet' : `${invRet.returnPercentage.toFixed(1)}% total return`,
-    invScore >= 85 ? 'excellent' : invScore >= 60 ? 'fair' : 'weak');
+    invScore >= 85 ? 'excellent' : invScore >= 60 ? 'fair' : 'weak'
+  );
 
   const budgetScore = budgetUtil.length === 0 ? 60 : overBudgets > 0 ? 40 : watchBudgets > 0 ? 70 : 90;
-  push('budgets', 'Budget discipline', budgetScore,
-    budgetUtil.length === 0 ? 'No budgets set' : overBudgets > 0 ? `${overBudgets} over budget` : watchBudgets > 0 ? `${watchBudgets} near limit` : 'All within limits',
-    budgetScore >= 85 ? 'excellent' : budgetScore >= 60 ? 'fair' : 'weak');
+  push(
+    'budgets',
+    'Budget discipline',
+    budgetScore,
+    budgetUtil.length === 0
+      ? 'No budgets set'
+      : overBudgets > 0
+        ? `${overBudgets} over budget`
+        : watchBudgets > 0
+          ? `${watchBudgets} near limit`
+          : 'All within limits',
+    budgetScore >= 85 ? 'excellent' : budgetScore >= 60 ? 'fair' : 'weak'
+  );
 
   const debtScore = debtBurden <= 10 ? 95 : debtBurden <= 25 ? 80 : debtBurden <= 50 ? 60 : 35;
-  push('debt', 'Debt burden', debtScore,
+  push(
+    'debt',
+    'Debt burden',
+    debtScore,
     `${debtBurden.toFixed(1)}% of assets`,
-    debtScore >= 80 ? 'excellent' : debtScore >= 60 ? 'fair' : 'weak');
+    debtScore >= 80 ? 'excellent' : debtScore >= 60 ? 'fair' : 'weak'
+  );
 
-  const weights = { savings: 0.25, cashflow: 0.15, spending: 0.12, liquidity: 0.15, investments: 0.13, budgets: 0.1, debt: 0.1 };
+  const weights = {
+    savings: 0.25,
+    cashflow: 0.15,
+    spending: 0.12,
+    liquidity: 0.15,
+    investments: 0.13,
+    budgets: 0.1,
+    debt: 0.1,
+  };
   const score = Math.round(factors.reduce((s, f) => s + f.score * (weights[f.key] || 0), 0));
-  const band = score >= 80 ? 'Strong month' : score >= 60 ? 'Steady' : score >= 40 ? 'Needs attention' : 'At risk';
+  const band =
+    score >= 80 ? 'Strong month' : score >= 60 ? 'Steady' : score >= 40 ? 'Needs attention' : 'At risk';
   return { score: Math.max(0, Math.min(100, score)), band, factors };
 }
 
@@ -875,7 +961,9 @@ export function detectRecurring(transactions = []) {
   const groups = new Map();
   (transactions || []).forEach((tx) => {
     if (tx.type !== 'expense') return;
-    const key = String(tx.merchant || tx.description || '').trim().toLowerCase();
+    const key = String(tx.merchant || tx.description || '')
+      .trim()
+      .toLowerCase();
     if (!key) return;
     const amt = Math.abs(Number(tx.amount) || 0);
     if (!groups.has(key)) groups.set(key, []);
@@ -886,7 +974,7 @@ export function detectRecurring(transactions = []) {
     if (items.length < 2) return;
     const amounts = items.map((i) => i._amt);
     const base = amounts[0];
-    const stable = amounts.every((a) => base === 0 ? a === 0 : Math.abs(a - base) / base <= 0.02);
+    const stable = amounts.every((a) => (base === 0 ? a === 0 : Math.abs(a - base) / base <= 0.02));
     const sorted = [...items].sort((a, b) => String(a.date).localeCompare(String(b.date)));
     const last = sorted[sorted.length - 1];
     const next = new Date(last.date);
@@ -931,7 +1019,15 @@ export function getPortfolioHighlights(holdings = []) {
   const best = rows.reduce((a, b) => (b.ret > a.ret ? b : a));
   const largest = rows.reduce((a, b) => (b.current > a.current ? b : a));
   return {
-    best: { name: best.holding.name, returnPct: Number(best.ret.toFixed(1)), current: Math.round(best.current) },
-    largest: { name: largest.holding.name, current: Math.round(largest.current), invested: Math.round(largest.invested) },
+    best: {
+      name: best.holding.name,
+      returnPct: Number(best.ret.toFixed(1)),
+      current: Math.round(best.current),
+    },
+    largest: {
+      name: largest.holding.name,
+      current: Math.round(largest.current),
+      invested: Math.round(largest.invested),
+    },
   };
 }

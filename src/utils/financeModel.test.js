@@ -55,7 +55,10 @@ describe('unified financial model (§2)', () => {
       { type: 'expense', amount: 400, date: '2026-09-02' },
     ];
     const { ok, errors, snapshot } = validateFinancialModel({
-      accounts, investments: holdings, transactions: txs, monthKey: '2026-09',
+      accounts,
+      investments: holdings,
+      transactions: txs,
+      monthKey: '2026-09',
     });
     expect(ok).toBe(true);
     expect(errors).toEqual([]);
@@ -78,9 +81,27 @@ describe('comparisons + pulse + recurring + forecast', () => {
     { type: 'expense', amount: 200, date: '2026-09-03', category: 'Transport', merchant: 'Metro' },
     { type: 'expense', amount: 500, date: '2026-08-02', category: 'Food & Dining', merchant: 'Canteen' },
     { type: 'income', amount: 5000, date: '2026-09-01', category: 'Salary', merchant: 'Dad' },
-    { type: 'expense', amount: 59, date: '2026-07-02', category: 'Entertainment', merchant: 'Spotify Student' },
-    { type: 'expense', amount: 59, date: '2026-08-02', category: 'Entertainment', merchant: 'Spotify Student' },
-    { type: 'expense', amount: 59, date: '2026-09-02', category: 'Entertainment', merchant: 'Spotify Student' },
+    {
+      type: 'expense',
+      amount: 59,
+      date: '2026-07-02',
+      category: 'Entertainment',
+      merchant: 'Spotify Student',
+    },
+    {
+      type: 'expense',
+      amount: 59,
+      date: '2026-08-02',
+      category: 'Entertainment',
+      merchant: 'Spotify Student',
+    },
+    {
+      type: 'expense',
+      amount: 59,
+      date: '2026-09-02',
+      category: 'Entertainment',
+      merchant: 'Spotify Student',
+    },
   ];
 
   it('category comparison carries prev amount + delta', () => {

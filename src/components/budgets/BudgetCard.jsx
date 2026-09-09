@@ -6,9 +6,17 @@ import { calcBudgetForecast } from '../../utils/calculations';
 import ConfirmDialog from '../ui/ConfirmDialog';
 
 const STATUS_META = {
-  normal: { label: 'Healthy', icon: CheckCircle2, pill: 'text-brand-emerald border-brand-emerald/30 bg-brand-emerald/5' },
+  normal: {
+    label: 'Healthy',
+    icon: CheckCircle2,
+    pill: 'text-brand-emerald border-brand-emerald/30 bg-brand-emerald/5',
+  },
   warning: { label: 'Watch', icon: Eye, pill: 'text-brand-amber border-brand-amber/30 bg-brand-amber/5' },
-  exceeded: { label: 'Over budget', icon: AlertCircle, pill: 'text-brand-red border-brand-red/30 bg-brand-red/5' },
+  exceeded: {
+    label: 'Over budget',
+    icon: AlertCircle,
+    pill: 'text-brand-red border-brand-red/30 bg-brand-red/5',
+  },
 };
 
 export default function BudgetCard({ budget, onEdit, onDelete }) {
@@ -90,7 +98,8 @@ export default function BudgetCard({ budget, onEdit, onDelete }) {
             <p className="text-[11px] leading-relaxed text-text-secondary dark:text-text-dark-secondary">
               Projected month-end spend {formatINR(forecast.projected)} · {forecastLabel.toLowerCase()}{' '}
               <span className="text-text-tertiary dark:text-text-dark-tertiary">
-                (based on {formatINR(Math.round(forecast.daily))}/day over {forecast.elapsed} of {forecast.daysInMonth} days)
+                (based on {formatINR(Math.round(forecast.daily))}/day over {forecast.elapsed} of{' '}
+                {forecast.daysInMonth} days)
               </span>
             </p>
           )}

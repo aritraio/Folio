@@ -124,7 +124,9 @@ export default function AiSpendingAdvisor({ transactions = [], accounts = [], bu
                 {item.description}
               </p>
               {item.evidence && (
-                <p className="text-xs mono text-zinc-700 dark:text-text-dark-secondary mt-2">{item.evidence}</p>
+                <p className="text-xs mono text-zinc-700 dark:text-text-dark-secondary mt-2">
+                  {item.evidence}
+                </p>
               )}
               <div className="mt-2">
                 <Link

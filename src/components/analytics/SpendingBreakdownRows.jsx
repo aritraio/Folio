@@ -33,7 +33,9 @@ export default function SpendingBreakdownRows({ transactions = [], monthKey }) {
   return (
     <section aria-label="Spending breakdown by category" className="section-divider pt-6">
       <p className="eyebrow mb-1">Spending breakdown</p>
-      <h2 className="heading-sm text-zinc-900 dark:text-text-dark-primary mb-4">Where spending concentrates</h2>
+      <h2 className="heading-sm text-zinc-900 dark:text-text-dark-primary mb-4">
+        Where spending concentrates
+      </h2>
       <ul className="space-y-1">
         {rows.map((r) => {
           const up = r.deltaPct > 0;
@@ -46,7 +48,11 @@ export default function SpendingBreakdownRows({ transactions = [], monthKey }) {
                 aria-label={`${r.category}: ${formatINR(r.amount)}, ${flat ? 'flat' : `${formatPercent(r.deltaPct, 0)}`} versus last month. View transactions.`}
               >
                 <span className="text-sm font-medium text-zinc-800 dark:text-text-dark-primary truncate flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full shrink-0" style={{ background: r.color }} aria-hidden="true" />
+                  <span
+                    className="w-2 h-2 rounded-full shrink-0"
+                    style={{ background: r.color }}
+                    aria-hidden="true"
+                  />
                   {r.category}
                 </span>
                 <span
@@ -62,7 +68,9 @@ export default function SpendingBreakdownRows({ transactions = [], monthKey }) {
                   <span className="block text-sm font-semibold mono text-zinc-900 dark:text-text-dark-primary">
                     {formatINR(r.amount)}
                   </span>
-                  <span className={`block text-[11px] font-medium ${flat ? 'text-text-tertiary dark:text-text-dark-tertiary' : up ? 'text-brand-red' : 'text-brand-emerald'}`}>
+                  <span
+                    className={`block text-[11px] font-medium ${flat ? 'text-text-tertiary dark:text-text-dark-tertiary' : up ? 'text-brand-red' : 'text-brand-emerald'}`}
+                  >
                     {flat ? '— flat vs last mo' : `${formatPercent(r.deltaPct, 0)} vs last mo`}
                   </span>
                 </span>

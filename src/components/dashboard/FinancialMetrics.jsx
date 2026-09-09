@@ -20,7 +20,9 @@ function MetricCell({ label, icon: Icon, iconColor, value, subValue, subColor, t
         {value}
       </p>
       {subValue && (
-        <p className={`text-xs font-medium mt-1 ${subColor || 'text-text-tertiary dark:text-text-dark-tertiary'}`}>
+        <p
+          className={`text-xs font-medium mt-1 ${subColor || 'text-text-tertiary dark:text-text-dark-tertiary'}`}
+        >
           {subValue}
         </p>
       )}
@@ -29,7 +31,11 @@ function MetricCell({ label, icon: Icon, iconColor, value, subValue, subColor, t
 
   const cls = `block py-4 px-1 min-w-0 rounded-lg row-hover ${first ? '' : ''}`;
   return to ? (
-    <Link to={to} className={`${cls} hover:opacity-90 focus-visible:rounded-lg`} aria-label={`${label}: ${value}, ${subValue || ''}`}>
+    <Link
+      to={to}
+      className={`${cls} hover:opacity-90 focus-visible:rounded-lg`}
+      aria-label={`${label}: ${value}, ${subValue || ''}`}
+    >
       {inner}
     </Link>
   ) : (
@@ -76,7 +82,11 @@ export default function FinancialMetrics({
           value={formatINR(savings)}
           subValue={`${formatPercent(savingsRate, 1)} rate`}
           subColor={
-            savingsRate >= 20 ? 'text-brand-emerald' : savingsRate >= 0 ? 'text-brand-amber' : 'text-brand-red'
+            savingsRate >= 20
+              ? 'text-brand-emerald'
+              : savingsRate >= 0
+                ? 'text-brand-amber'
+                : 'text-brand-red'
           }
           to="/analytics"
         />

@@ -32,18 +32,30 @@ function TransactionRow({ tx, accounts }) {
               </span>
             )}
             {tx.recurring && (
-              <Repeat className="w-3 h-3 text-text-tertiary dark:text-text-dark-tertiary" aria-label="Recurring" />
+              <Repeat
+                className="w-3 h-3 text-text-tertiary dark:text-text-dark-tertiary"
+                aria-label="Recurring"
+              />
             )}
           </p>
           <div className="flex items-center gap-1.5 mt-0.5 min-w-0">
-            <span className="text-[11px] text-text-tertiary dark:text-text-dark-tertiary truncate">{tx.category}</span>
-            <span className="text-text-tertiary dark:text-text-dark-tertiary text-[9px]" aria-hidden="true">•</span>
+            <span className="text-[11px] text-text-tertiary dark:text-text-dark-tertiary truncate">
+              {tx.category}
+            </span>
+            <span className="text-text-tertiary dark:text-text-dark-tertiary text-[9px]" aria-hidden="true">
+              •
+            </span>
             <span className="text-[11px] text-text-tertiary dark:text-text-dark-tertiary shrink-0">
               {formatDate(tx.date, 'MMM d')}
             </span>
             {account && (
               <>
-                <span className="text-text-tertiary dark:text-text-dark-tertiary text-[9px]" aria-hidden="true">•</span>
+                <span
+                  className="text-text-tertiary dark:text-text-dark-tertiary text-[9px]"
+                  aria-hidden="true"
+                >
+                  •
+                </span>
                 <span className="text-[11px] text-text-tertiary dark:text-text-dark-tertiary truncate">
                   {account.name.split(' ').slice(0, 2).join(' ')}
                 </span>
@@ -55,7 +67,11 @@ function TransactionRow({ tx, accounts }) {
 
       <span
         className={`text-sm font-semibold mono shrink-0 ${
-          isIncome ? 'text-brand-emerald' : isTransfer ? 'text-text-tertiary dark:text-text-dark-tertiary' : 'text-zinc-700 dark:text-text-dark-secondary'
+          isIncome
+            ? 'text-brand-emerald'
+            : isTransfer
+              ? 'text-text-tertiary dark:text-text-dark-tertiary'
+              : 'text-zinc-700 dark:text-text-dark-secondary'
         }`}
       >
         {isIncome ? '+' : isTransfer ? '⇄ ' : '−'}

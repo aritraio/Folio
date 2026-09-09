@@ -589,8 +589,8 @@ export default function StatementUploadModal({ isOpen, onClose }) {
             </h4>
             <p className="text-xs text-text-secondary dark:text-text-dark-secondary">
               {committedCount} transactions added to your ledger
-              {skippedCount > 0 ? `, ${skippedCount} potential duplicates left out` : ''}. Balances,
-              cash flow and analytics updated.
+              {skippedCount > 0 ? `, ${skippedCount} potential duplicates left out` : ''}. Balances, cash flow
+              and analytics updated.
             </p>
           </div>
           <div className="pt-3">

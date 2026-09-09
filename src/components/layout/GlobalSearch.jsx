@@ -1,8 +1,18 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Search, ArrowRight, X, Plus, Upload, LayoutDashboard, ArrowLeftRight,
-  Landmark, BarChart3, PiggyBank, TrendingUp, SunMoon,
+  Search,
+  ArrowRight,
+  X,
+  Plus,
+  Upload,
+  LayoutDashboard,
+  ArrowLeftRight,
+  Landmark,
+  BarChart3,
+  PiggyBank,
+  TrendingUp,
+  SunMoon,
 } from 'lucide-react';
 import { useData } from '../../contexts/DataContext';
 import { useTheme } from '../ThemeProvider';
@@ -19,14 +29,44 @@ function useDebouncedValue(value, delay = 150) {
 }
 
 const COMMANDS = [
-  { id: 'add-tx', label: 'Add transaction', hint: 'Transactions', icon: Plus, run: (nav) => nav('/transactions', { state: { openAdd: true } }) },
-  { id: 'import', label: 'Import statement', hint: 'CSV / PDF', icon: Upload, run: (nav) => nav('/transactions', { state: { openImport: true } }) },
+  {
+    id: 'add-tx',
+    label: 'Add transaction',
+    hint: 'Transactions',
+    icon: Plus,
+    run: (nav) => nav('/transactions', { state: { openAdd: true } }),
+  },
+  {
+    id: 'import',
+    label: 'Import statement',
+    hint: 'CSV / PDF',
+    icon: Upload,
+    run: (nav) => nav('/transactions', { state: { openImport: true } }),
+  },
   { id: 'go-dash', label: 'Go to Dashboard', hint: 'Page', icon: LayoutDashboard, run: (nav) => nav('/') },
-  { id: 'go-tx', label: 'Go to Transactions', hint: 'Page', icon: ArrowLeftRight, run: (nav) => nav('/transactions') },
+  {
+    id: 'go-tx',
+    label: 'Go to Transactions',
+    hint: 'Page',
+    icon: ArrowLeftRight,
+    run: (nav) => nav('/transactions'),
+  },
   { id: 'go-acc', label: 'Go to Accounts', hint: 'Page', icon: Landmark, run: (nav) => nav('/accounts') },
-  { id: 'go-analytics', label: 'Go to Analytics', hint: 'Page', icon: BarChart3, run: (nav) => nav('/analytics') },
+  {
+    id: 'go-analytics',
+    label: 'Go to Analytics',
+    hint: 'Page',
+    icon: BarChart3,
+    run: (nav) => nav('/analytics'),
+  },
   { id: 'go-budgets', label: 'Go to Budgets', hint: 'Page', icon: PiggyBank, run: (nav) => nav('/budgets') },
-  { id: 'go-invest', label: 'Go to Investments', hint: 'Page', icon: TrendingUp, run: (nav) => nav('/investments') },
+  {
+    id: 'go-invest',
+    label: 'Go to Investments',
+    hint: 'Page',
+    icon: TrendingUp,
+    run: (nav) => nav('/investments'),
+  },
 ];
 
 /**
@@ -49,7 +89,10 @@ export default function GlobalSearch({ isOpen, onClose }) {
     const all = [
       ...COMMANDS,
       {
-        id: 'toggle-theme', label: `Toggle theme (now ${preference})`, hint: 'Appearance', icon: SunMoon,
+        id: 'toggle-theme',
+        label: `Toggle theme (now ${preference})`,
+        hint: 'Appearance',
+        icon: SunMoon,
         run: () => setPreference(preference === 'dark' ? 'light' : 'dark'),
       },
     ];
@@ -100,7 +143,13 @@ export default function GlobalSearch({ isOpen, onClose }) {
 
   const flatResults = useMemo(() => {
     const cmds = commandResults.map((c) => ({ kind: 'command', id: c.id, data: c }));
-    return [...cmds, ...results.transactions, ...results.accounts, ...results.budgets, ...results.investments];
+    return [
+      ...cmds,
+      ...results.transactions,
+      ...results.accounts,
+      ...results.budgets,
+      ...results.investments,
+    ];
   }, [commandResults, results]);
 
   useEffect(() => {
@@ -206,7 +255,12 @@ export default function GlobalSearch({ isOpen, onClose }) {
           )}
         </div>
 
-        <div className="max-h-[60vh] overflow-y-auto" id="global-search-results" role="listbox" aria-label="Commands and results">
+        <div
+          className="max-h-[60vh] overflow-y-auto"
+          id="global-search-results"
+          role="listbox"
+          aria-label="Commands and results"
+        >
           {hasQuery && !hasResults ? (
             <div className="px-6 py-12 text-center text-zinc-500 dark:text-zinc-400">
               <p>No results found for &ldquo;{query}&rdquo;</p>
@@ -231,7 +285,9 @@ export default function GlobalSearch({ isOpen, onClose }) {
                           {item.data.label}
                         </span>
                       </span>
-                      <span className="text-[11px] uppercase tracking-wider text-zinc-400">{item.data.hint}</span>
+                      <span className="text-[11px] uppercase tracking-wider text-zinc-400">
+                        {item.data.hint}
+                      </span>
                     </button>
                   ) : item.kind === 'transaction' ? (
                     <button

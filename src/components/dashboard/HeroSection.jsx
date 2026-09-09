@@ -2,7 +2,12 @@ import React, { useMemo } from 'react';
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { useData } from '@/contexts/DataContext';
 import { formatMoney, formatPercent, formatChange } from '@/utils/formatCurrency';
-import { calcMonthlySavings, calcSavingsRate, calcMonthlyIncome, calcMonthlyExpenses } from '@/utils/calculations';
+import {
+  calcMonthlySavings,
+  calcSavingsRate,
+  calcMonthlyIncome,
+  calcMonthlyExpenses,
+} from '@/utils/calculations';
 import { format } from 'date-fns';
 import { useCountUp } from '@/utils/useCountUp';
 import HowCalculated from '@/components/ui/HowCalculated';
@@ -66,7 +71,9 @@ export default function HeroSection({
     <section className="animate-fade-in motion-reduce:animate-none" aria-label="Financial overview">
       <div className="flex items-center gap-2 mb-4">
         <span className="eyebrow">Overview</span>
-        <span className="text-text-tertiary dark:text-text-dark-tertiary text-xs" aria-hidden="true">/</span>
+        <span className="text-text-tertiary dark:text-text-dark-tertiary text-xs" aria-hidden="true">
+          /
+        </span>
         <span className="eyebrow">{currentMonthYear}</span>
       </div>
 
@@ -102,10 +109,7 @@ export default function HeroSection({
         </div>
 
         {monthStats && (
-          <aside
-            className="editorial-callout p-5"
-            aria-label="This month's money flow"
-          >
+          <aside className="editorial-callout p-5" aria-label="This month's money flow">
             <p className="eyebrow mb-3">This month</p>
             <dl className="space-y-2.5">
               <div className="flex items-baseline justify-between gap-3">

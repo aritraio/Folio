@@ -112,11 +112,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Insights as editorial divider section, not cards (§13) */}
-      <FinancialInsights
-        transactions={transactions}
-        accounts={accounts}
-        netWorth={computed.netWorth}
-      />
+      <FinancialInsights transactions={transactions} accounts={accounts} netWorth={computed.netWorth} />
 
       <RecentTransactions transactions={transactions} accounts={accounts} />
 

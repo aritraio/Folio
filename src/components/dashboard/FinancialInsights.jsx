@@ -17,8 +17,7 @@ import { format, subMonths } from 'date-fns';
  * + confidence/qualification + action link where useful.
  */
 function InsightRow({ eyebrow, title, body, meta, to, toLabel, tone }) {
-  const dot =
-    tone === 'alert' ? 'bg-brand-red' : tone === 'positive' ? 'bg-brand-emerald' : 'bg-brand-amber';
+  const dot = tone === 'alert' ? 'bg-brand-red' : tone === 'positive' ? 'bg-brand-emerald' : 'bg-brand-amber';
   return (
     <article className="py-5 first:pt-1 last:pb-1 border-b border-ivory-border dark:border-surface-dark-border last:border-0">
       <div className="flex items-center gap-2 mb-1.5">
@@ -30,9 +29,7 @@ function InsightRow({ eyebrow, title, body, meta, to, toLabel, tone }) {
       <h3 className="text-[15px] font-semibold text-zinc-900 dark:text-text-dark-primary leading-snug">
         {title}
       </h3>
-      <p className="text-sm text-text-secondary dark:text-text-dark-secondary leading-relaxed mt-1">
-        {body}
-      </p>
+      <p className="text-sm text-text-secondary dark:text-text-dark-secondary leading-relaxed mt-1">{body}</p>
       <div className="mt-2 flex items-center justify-between gap-3 flex-wrap">
         <p className="text-xs mono text-zinc-700 dark:text-text-dark-secondary">{meta}</p>
         {to && (
@@ -70,12 +67,11 @@ export default function FinancialInsights({ transactions = [], accounts = [], ne
         if (Math.abs(delta) >= 15) {
           out.push({
             eyebrow: top.category,
-            title: delta > 0
-              ? `${top.category} spending is elevated`
-              : `${top.category} spending cooled off`,
-            body: delta > 0
-              ? `Your ${top.category.toLowerCase()} spending runs above its recent baseline. Worth a glance before it becomes a habit.`
-              : `Your ${top.category.toLowerCase()} spending dropped versus last month — the trend is moving the right way.`,
+            title: delta > 0 ? `${top.category} spending is elevated` : `${top.category} spending cooled off`,
+            body:
+              delta > 0
+                ? `Your ${top.category.toLowerCase()} spending runs above its recent baseline. Worth a glance before it becomes a habit.`
+                : `Your ${top.category.toLowerCase()} spending dropped versus last month — the trend is moving the right way.`,
             meta: `${formatINR(top.amount)} this month · ${formatPercent(delta, 0)} vs ${formatINR(topPrev.amount)} last month`,
             to: `/transactions?search=${encodeURIComponent(top.category)}`,
             tone: delta > 0 ? 'alert' : 'positive',
@@ -83,7 +79,8 @@ export default function FinancialInsights({ transactions = [], accounts = [], ne
         }
       } else if (top) {
         const count = transactions.filter(
-          (t) => t.type === 'expense' && String(t.date).slice(0, 7) === currentMonth && t.category === top.category
+          (t) =>
+            t.type === 'expense' && String(t.date).slice(0, 7) === currentMonth && t.category === top.category
         ).length;
         out.push({
           eyebrow: top.category,
@@ -153,7 +150,10 @@ export default function FinancialInsights({ transactions = [], accounts = [], ne
       if (out.length < 4) {
         out.push({
           eyebrow: 'Cash flow',
-          title: change >= 0 ? `Spending up ${Math.abs(change).toFixed(0)}%` : `Spending down ${Math.abs(change).toFixed(0)}%`,
+          title:
+            change >= 0
+              ? `Spending up ${Math.abs(change).toFixed(0)}%`
+              : `Spending down ${Math.abs(change).toFixed(0)}%`,
           body: `From ${formatINR(lastExpenses)} last month to ${formatINR(currentExpenses)} this month, on ${formatINR(income)} income.`,
           meta: `${formatINR(income - currentExpenses)} net this month`,
           to: '/analytics',

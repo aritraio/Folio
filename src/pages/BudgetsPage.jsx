@@ -127,7 +127,9 @@ export default function BudgetsPage() {
           <dt className="text-[10px] font-semibold uppercase tracking-[0.15em] text-text-secondary dark:text-text-dark-secondary mb-1">
             Remaining
           </dt>
-          <dd className={`text-2xl font-semibold mono ${totalRemaining < 0 ? 'text-brand-red' : 'text-brand-emerald'}`}>
+          <dd
+            className={`text-2xl font-semibold mono ${totalRemaining < 0 ? 'text-brand-red' : 'text-brand-emerald'}`}
+          >
             {formatMoney(totalRemaining)}
           </dd>
         </div>
@@ -145,7 +147,12 @@ export default function BudgetsPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {budgetData.map((budget) => (
-            <BudgetCard key={budget.id} budget={budget} onEdit={handleEditClick} onDelete={handleDeleteClick} />
+            <BudgetCard
+              key={budget.id}
+              budget={budget}
+              onEdit={handleEditClick}
+              onDelete={handleDeleteClick}
+            />
           ))}
         </div>
       )}
@@ -157,7 +164,8 @@ export default function BudgetsPage() {
             <h2 className="heading-sm text-zinc-900 dark:text-text-dark-primary">Recurring candidates</h2>
           </div>
           <p className="text-xs text-text-secondary dark:text-text-dark-secondary mb-4">
-            Detected from repeated merchants — confirm before treating as subscriptions. Never auto-classified.
+            Detected from repeated merchants — confirm before treating as subscriptions. Never
+            auto-classified.
           </p>
           <ul className="divide-y divide-ivory-border dark:divide-surface-dark-border">
             {recurring.map((r, i) => (
@@ -171,8 +179,13 @@ export default function BudgetsPage() {
                   </p>
                 </div>
                 <div className="text-right shrink-0">
-                  <p className="text-sm font-semibold mono">{formatINR(r.amount)}<span className="text-xs font-normal text-text-secondary">/mo</span></p>
-                  <p className="text-[11px] text-text-tertiary dark:text-text-dark-tertiary">{r.confidence}</p>
+                  <p className="text-sm font-semibold mono">
+                    {formatINR(r.amount)}
+                    <span className="text-xs font-normal text-text-secondary">/mo</span>
+                  </p>
+                  <p className="text-[11px] text-text-tertiary dark:text-text-dark-tertiary">
+                    {r.confidence}
+                  </p>
                 </div>
               </li>
             ))}

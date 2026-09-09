@@ -58,10 +58,7 @@ export default function AnalyticsPage() {
   const months = useMemo(() => getLastNMonths(nMonths), [nMonths]);
   const [selectedMonth, setSelectedMonth] = useState(currentMonth);
 
-  const monthOptions = useMemo(
-    () => months.map((m) => ({ value: m.monthKey, label: m.label })),
-    [months]
-  );
+  const monthOptions = useMemo(() => months.map((m) => ({ value: m.monthKey, label: m.label })), [months]);
   const activeMonth = monthOptions.some((o) => o.value === selectedMonth) ? selectedMonth : currentMonth;
 
   const summaryMetrics = useMemo(() => {

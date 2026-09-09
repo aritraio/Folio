@@ -6,7 +6,10 @@ import { useCountUp } from '@/utils/useCountUp';
 function StatCard({ icon: Icon, iconBg, label, value, valueColor }) {
   return (
     <div className="flex items-center gap-4">
-      <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${iconBg}`} aria-hidden="true">
+      <div
+        className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${iconBg}`}
+        aria-hidden="true"
+      >
         <Icon className="w-5 h-5" />
       </div>
       <div>
@@ -75,14 +78,20 @@ export default function PortfolioSummary({
           iconBg={`${isPositiveReturn ? 'bg-emerald-50 dark:bg-emerald-500/10 text-brand-emerald dark:text-emerald-400' : 'bg-rose-50 dark:bg-rose-500/10 text-brand-red dark:text-rose-400'}`}
           label="Total return"
           value={formatChange(totalReturn)}
-          valueColor={isPositiveReturn ? 'text-brand-emerald dark:text-emerald-400' : 'text-brand-red dark:text-rose-400'}
+          valueColor={
+            isPositiveReturn
+              ? 'text-brand-emerald dark:text-emerald-400'
+              : 'text-brand-red dark:text-rose-400'
+          }
         />
         <StatCard
           icon={isPositiveToday ? TrendingUp : TrendingDown}
           iconBg={`${isPositiveToday ? 'bg-emerald-50 dark:bg-emerald-500/10 text-brand-emerald dark:text-emerald-400' : 'bg-rose-50 dark:bg-rose-500/10 text-brand-red dark:text-rose-400'}`}
           label="Today (est.)"
           value={formatChange(todayChange)}
-          valueColor={isPositiveToday ? 'text-brand-emerald dark:text-emerald-400' : 'text-brand-red dark:text-rose-400'}
+          valueColor={
+            isPositiveToday ? 'text-brand-emerald dark:text-emerald-400' : 'text-brand-red dark:text-rose-400'
+          }
         />
       </div>
 

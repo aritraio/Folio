@@ -8,7 +8,13 @@ import { calcFinancialPulse } from '@/utils/calculations';
  * Rule-based 0–100 score with explicit reasons. Never a gimmick:
  * every factor shows its underlying numbers.
  */
-export default function FinancialPulse({ transactions = [], accounts = [], investments = [], budgets = [], monthKey }) {
+export default function FinancialPulse({
+  transactions = [],
+  accounts = [],
+  investments = [],
+  budgets = [],
+  monthKey,
+}) {
   const pulse = useMemo(
     () => calcFinancialPulse({ transactions, accounts, investments, budgets, monthKey }),
     [transactions, accounts, investments, budgets, monthKey]

@@ -97,7 +97,9 @@ export default function Navbar({ onSearchClick }) {
       }
       const over = (budgets || []).filter((b) => {
         const spent = (transactions || [])
-          .filter((t) => t.type === 'expense' && String(t.date).slice(0, 7) === cur && t.category === b.category)
+          .filter(
+            (t) => t.type === 'expense' && String(t.date).slice(0, 7) === cur && t.category === b.category
+          )
           .reduce((s, t) => s + Math.abs(Number(t.amount) || 0), 0);
         return Number(b.limit) > 0 && spent >= Number(b.limit) * 0.85;
       });
@@ -297,7 +299,10 @@ export default function Navbar({ onSearchClick }) {
                   ) : (
                     <ul className="space-y-3">
                       {notifications.map((n, i) => (
-                        <li key={i} className="border-b border-ivory-border dark:border-surface-dark-border last:border-0 pb-3 last:pb-0">
+                        <li
+                          key={i}
+                          className="border-b border-ivory-border dark:border-surface-dark-border last:border-0 pb-3 last:pb-0"
+                        >
                           <p className="text-sm font-semibold text-zinc-900 dark:text-text-dark-primary">
                             {n.title}
                           </p>
