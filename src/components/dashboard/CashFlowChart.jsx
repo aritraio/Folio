@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { formatINR, formatCompact, formatChange } from '@/utils/formatCurrency';
 
@@ -68,30 +69,37 @@ export default function CashFlowChart({ data = [] }) {
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <div>
-          <h2 className="heading-sm text-zinc-900 dark:text-text-dark-primary">Cash Flow</h2>
+          <p className="eyebrow mb-1">Money flow</p>
+          <h2 className="heading-sm text-zinc-900 dark:text-text-dark-primary">Cash flow</h2>
           <p className="text-xs text-text-secondary dark:text-text-dark-secondary mt-0.5">
-            Income vs Expenses
+            Income vs spending · transfers excluded
           </p>
         </div>
+        <Link
+          to="/analytics"
+          className="text-[11px] font-semibold uppercase tracking-[0.15em] text-brand-amber hover:text-brand-amber-hover transition-colors"
+        >
+          Details
+        </Link>
       </div>
 
       {/* Summary cards */}
       <div className="grid grid-cols-3 gap-4 mb-6 pb-5 border-b border-ivory-border dark:border-surface-dark-border">
-        <SummaryCard label="Income" value={formatINR(current.income)} color="text-brand-amber" />
+        <SummaryCard label="Income" value={formatINR(current.income)} color="text-brand-emerald" />
         <SummaryCard
-          label="Expenses"
+          label="Spending"
           value={formatINR(current.expenses)}
-          color="text-zinc-600 dark:text-zinc-400"
+          color="text-brand-red"
         />
         <SummaryCard
-          label="Net Cash Flow"
+          label="Net flow"
           value={formatChange(current.savings)}
           color={current.savings >= 0 ? 'text-brand-emerald' : 'text-brand-red'}
         />
       </div>
 
       {/* Chart */}
-      <div className="h-[220px]">
+      <div className="h-[220px]" role="img" aria-label={`Cash flow: income ${formatINR(current.income)}, spending ${formatINR(current.expenses)}, net ${formatChange(current.savings)} this month`}>
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={chartData} margin={{ top: 4, right: 4, left: -16, bottom: 0 }} barGap={4}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-border-subtle)" />
@@ -110,8 +118,8 @@ export default function CashFlowChart({ data = [] }) {
               dx={-4}
             />
             <Tooltip content={<CashFlowTooltip />} />
-            <Bar dataKey="Income" fill="#D97706" radius={[4, 4, 0, 0]} maxBarSize={32} />
-            <Bar dataKey="Expenses" fill="#71717A" radius={[4, 4, 0, 0]} maxBarSize={32} />
+            <Bar dataKey="Income" fill="#1F9D68" radius={[4, 4, 0, 0]} maxBarSize={32} />
+            <Bar dataKey="Expenses" fill="#D64545" radius={[4, 4, 0, 0]} maxBarSize={32} />
           </BarChart>
         </ResponsiveContainer>
       </div>

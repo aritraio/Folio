@@ -6,47 +6,59 @@
    LEDGER DESIGN SYSTEM — CSS Variables & Utility Classes
    ══════════════════════════════════════════════════════════════ */
 
-/* ── Light Mode CSS Custom Properties ── */
+/* ── Light Mode CSS Custom Properties — Editorial Wealth (§4, §56) ── */
 :root {
-  --color-bg-primary: #fdfbf7;
+  --color-bg-primary: #f8f6f1;
   --color-bg-secondary: #ffffff;
-  --color-bg-tertiary: #f5f2eb;
-  --color-bg-hover: #f5f2eb;
-  --color-border: #e8e3d9;
-  --color-border-subtle: #f0ede5;
-  --color-text-primary: #18181b;
-  --color-text-secondary: #71717a;
-  --color-text-tertiary: #a1a1aa;
-  --color-accent: #d97706;
-  --color-accent-hover: #b45309;
-  --color-accent-bg: #fef3c7;
-  --color-positive: #059669;
-  --color-positive-bg: #d1fae5;
-  --color-negative: #e11d48;
-  --color-negative-bg: #ffe4e6;
-  --color-card-shadow: rgba(0, 0, 0, 0.04);
-  --color-overlay: rgba(0, 0, 0, 0.4);
+  --color-bg-tertiary: #f1ece1;
+  --color-bg-hover: #f1ece1;
+  --color-border: #e7e1d7;
+  --color-border-subtle: #efe9dc;
+  --color-text-primary: #171717;
+  --color-text-secondary: #747474;
+  --color-text-tertiary: #a8a29e;
+  --color-accent: #e87500;
+  --color-accent-hover: #c56100;
+  --color-accent-bg: #fef3e2;
+  --color-positive: #1f9d68;
+  --color-positive-bg: #ddf5e9;
+  --color-negative: #d64545;
+  --color-negative-bg: #fde8e8;
+  --color-cash: #3b82f6;
+  --color-cash-bg: #e3edfd;
+  --color-investment: #8b5cf6;
+  --color-investment-bg: #ece7fd;
+  --color-warning: #d99a00;
+  --color-warning-bg: #fef3c7;
+  --color-card-shadow: rgba(23, 23, 23, 0.05);
+  --color-overlay: rgba(23, 23, 23, 0.4);
 }
 
-/* ── Dark Mode CSS Custom Properties ── */
+/* ── Dark Mode — deliberate wealth theme, not inverted (§59–§61) ── */
 .dark {
-  --color-bg-primary: #141414;
-  --color-bg-secondary: #1e1e1e;
-  --color-bg-tertiary: #282828;
-  --color-bg-hover: #333333;
-  --color-border: #333333;
-  --color-border-subtle: #282828;
-  --color-text-primary: #f5f5f5;
-  --color-text-secondary: #a1a1aa;
-  --color-text-tertiary: #71717a;
+  --color-bg-primary: #0f0f0f;
+  --color-bg-secondary: #171717;
+  --color-bg-tertiary: #1f1f1f;
+  --color-bg-hover: #292929;
+  --color-border: #292929;
+  --color-border-subtle: #1f1f1f;
+  --color-text-primary: #f5f5f4;
+  --color-text-secondary: #a8a29e;
+  --color-text-tertiary: #78716c;
   --color-accent: #f59e0b;
-  --color-accent-hover: #d97706;
-  --color-accent-bg: rgba(245, 158, 11, 0.15);
+  --color-accent-hover: #e87500;
+  --color-accent-bg: rgba(232, 117, 0, 0.14);
   --color-positive: #34d399;
-  --color-positive-bg: rgba(52, 211, 153, 0.15);
-  --color-negative: #fb7185;
-  --color-negative-bg: rgba(251, 113, 133, 0.15);
-  --color-card-shadow: rgba(0, 0, 0, 0.3);
+  --color-positive-bg: rgba(52, 211, 153, 0.12);
+  --color-negative: #f87171;
+  --color-negative-bg: rgba(248, 113, 113, 0.12);
+  --color-cash: #60a5fa;
+  --color-cash-bg: rgba(96, 165, 250, 0.12);
+  --color-investment: #a78bfa;
+  --color-investment-bg: rgba(167, 139, 250, 0.12);
+  --color-warning: #fbbf24;
+  --color-warning-bg: rgba(251, 191, 36, 0.12);
+  --color-card-shadow: rgba(0, 0, 0, 0.35);
   --color-overlay: rgba(0, 0, 0, 0.6);
 }
 
@@ -147,12 +159,14 @@
 }
 
 /* ══════════════════════════════════════════════════════════════
-   COMPONENT LAYER — Reusable patterns
+   COMPONENT LAYER — Reusable patterns (§42–§44, §56–§58)
+   Radius: controls 8px · inputs 10–12px · cards 12–16px · hero 16–20px.
+   Shadows restrained; borders carry elevation.
    ══════════════════════════════════════════════════════════════ */
 @layer components {
-  /* ── Card Surface ── */
+  /* ── Card Surface (use sparingly — §8: −30–40% containment) ── */
   .card {
-    @apply bg-white border border-ivory-border rounded-xl shadow-card;
+    @apply bg-white border border-ivory-border rounded-2xl shadow-card;
     transition:
       box-shadow 0.2s ease,
       border-color 0.2s ease;
@@ -167,11 +181,71 @@
     @apply shadow-dark-elevated;
   }
 
+  /* ── Editorial section: whitespace + divider, no box (§8) ── */
+  .section {
+    @apply py-1;
+  }
+  .section-divider {
+    border-top: 1px solid var(--color-border);
+  }
+  .eyebrow {
+    @apply font-sans text-[11px] font-semibold uppercase;
+    letter-spacing: 0.18em;
+    color: var(--color-text-secondary);
+  }
+  .editorial-callout {
+    border: 1px solid var(--color-border);
+    background: var(--color-bg-secondary);
+    border-radius: 14px;
+  }
+  .dark .editorial-callout {
+    background: var(--color-bg-secondary);
+  }
+
+  /* ── Segmented control (periods, filters — pills reserved §42) ── */
+  .segmented {
+    @apply inline-flex items-center gap-0.5 rounded-full p-1;
+    background: var(--color-bg-tertiary);
+    border: 1px solid var(--color-border);
+  }
+  .segmented button {
+    @apply px-3 py-1.5 rounded-full text-[11px] font-semibold uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text-secondary);
+    transition: all 150ms ease;
+  }
+  .segmented button[aria-pressed='true'],
+  .segmented button[data-active='true'] {
+    background: var(--color-bg-secondary);
+    color: var(--color-text-primary);
+    box-shadow: 0 1px 2px var(--color-card-shadow);
+  }
+
+  /* ── Status pill: label + icon + text, never color-only (§24, §38) ── */
+  .status-pill {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold;
+    border: 1px solid var(--color-border);
+  }
+
+  /* ── Skeleton matching final layout (§29) ── */
+  .skeleton {
+    @apply animate-pulse rounded-lg;
+    background: var(--color-bg-tertiary);
+  }
+
   /* ── Backdrop overlay for modals ── */
   .backdrop-overlay {
     @apply fixed inset-0 z-40;
     background: var(--color-overlay);
     animation: backdrop-fade 0.15s ease-out;
+  }
+
+  /* ── Count-up + row micro-interactions (§31, 150–250ms) ── */
+  .row-hover {
+    transition: background-color 150ms ease;
+  }
+  .press-feedback:active {
+    transform: scale(0.98);
   }
 }
 

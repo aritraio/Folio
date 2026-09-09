@@ -141,48 +141,39 @@ export default function Navbar({ onSearchClick }) {
                 key={to}
                 to={to}
                 end={to === '/'}
+                aria-label={label}
                 className={({ isActive }) => `
                   relative px-3 py-2 rounded-lg
                   flex items-center gap-1.5
                   text-[11px] font-semibold uppercase tracking-widest
-                  transition-all duration-150
+                  transition-all duration-150 press-feedback
                   ${
                     isActive
-                      ? 'text-brand-amber dark:text-amber-400'
-                      : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-text-dark-primary hover:bg-ivory-muted dark:hover:bg-surface-dark-elevated group'
+                      ? 'bg-amber-50 dark:bg-[rgba(232,117,0,0.14)] text-brand-amber dark:text-amber-400'
+                      : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-text-dark-primary hover:bg-ivory-muted dark:hover:bg-surface-dark-elevated'
                   }
                 `}
               >
-                <Icon className="w-3.5 h-3.5" />
+                <Icon className="w-3.5 h-3.5" aria-hidden="true" />
                 <span>{label}</span>
-                {/* Hover/Active indicator — bottom bar */}
-                {({ isActive }) => (
-                  <span
-                    className={`
-                      absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] rounded-sm bg-current transition-all duration-200
-                      ${isActive ? 'w-4 opacity-100' : 'w-0 opacity-0 group-hover:w-4 group-hover:opacity-100'}
-                    `}
-                  />
-                )}
               </NavLink>
             ))}
           </div>
 
           {/* ── Right: Theme, Search, Notifications, Avatar ── */}
           <div className="flex items-center gap-2">
-            {/* AI Statement Ingestion Button */}
+            {/* Primary action: Import Statement (§33) — clearly dominant */}
             <button
               onClick={() => setIsStatementModalOpen(true)}
               className="
-                flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold
-                bg-amber-50 dark:bg-amber-950/40 text-brand-amber
-                hover:bg-amber-100 dark:hover:bg-amber-900/40
-                border border-amber-200/60 dark:border-amber-800/40
-                transition-all cursor-pointer
+                flex items-center gap-1.5 px-3.5 py-2 rounded-[10px] text-xs font-semibold
+                bg-ledger text-white shadow-sm
+                hover:bg-brand-amber-hover
+                transition-all cursor-pointer press-feedback
               "
-              title="Import Bank or Credit Card Statement with AI"
+              title="Import bank or credit card statement (CSV/PDF)"
             >
-              <Sparkles className="w-3.5 h-3.5" />
+              <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
               <span className="hidden sm:inline">Import Statement</span>
             </button>
 

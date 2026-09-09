@@ -1,7 +1,11 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, ArrowRight, X } from 'lucide-react';
+import {
+  Search, ArrowRight, X, Plus, Upload, LayoutDashboard, ArrowLeftRight,
+  Landmark, BarChart3, PiggyBank, TrendingUp, SunMoon,
+} from 'lucide-react';
 import { useData } from '../../contexts/DataContext';
+import { useTheme } from '../ThemeProvider';
 import { formatMoney } from '../../utils/formatCurrency';
 import { formatDate } from '../../utils/dateUtils';
 
@@ -14,14 +18,44 @@ function useDebouncedValue(value, delay = 150) {
   return debounced;
 }
 
+const COMMANDS = [
+  { id: 'add-tx', label: 'Add transaction', hint: 'Transactions', icon: Plus, run: (nav) => nav('/transactions', { state: { openAdd: true } }) },
+  { id: 'import', label: 'Import statement', hint: 'CSV / PDF', icon: Upload, run: (nav) => nav('/transactions', { state: { openImport: true } }) },
+  { id: 'go-dash', label: 'Go to Dashboard', hint: 'Page', icon: LayoutDashboard, run: (nav) => nav('/') },
+  { id: 'go-tx', label: 'Go to Transactions', hint: 'Page', icon: ArrowLeftRight, run: (nav) => nav('/transactions') },
+  { id: 'go-acc', label: 'Go to Accounts', hint: 'Page', icon: Landmark, run: (nav) => nav('/accounts') },
+  { id: 'go-analytics', label: 'Go to Analytics', hint: 'Page', icon: BarChart3, run: (nav) => nav('/analytics') },
+  { id: 'go-budgets', label: 'Go to Budgets', hint: 'Page', icon: PiggyBank, run: (nav) => nav('/budgets') },
+  { id: 'go-invest', label: 'Go to Investments', hint: 'Page', icon: TrendingUp, run: (nav) => nav('/investments') },
+];
+
+/**
+ * GlobalSearch + Command palette (§34–§35, ⌘K/Ctrl+K).
+ * Fuzzy search across transactions/accounts/budgets/investments,
+ * plus action commands (add, import, navigate, toggle theme).
+ */
 export default function GlobalSearch({ isOpen, onClose }) {
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const navigate = useNavigate();
   const inputRef = useRef(null);
   const { transactions, accounts, budgets, investments } = useData();
+  const { preference, setPreference } = useTheme();
 
   const debouncedQuery = useDebouncedValue(query, 150);
+
+  const commandResults = useMemo(() => {
+    const q = debouncedQuery.trim().toLowerCase();
+    const all = [
+      ...COMMANDS,
+      {
+        id: 'toggle-theme', label: `Toggle theme (now ${preference})`, hint: 'Appearance', icon: SunMoon,
+        run: () => setPreference(preference === 'dark' ? 'light' : 'dark'),
+      },
+    ];
+    if (!q) return all.slice(0, 6);
+    return all.filter((c) => c.label.toLowerCase().includes(q)).slice(0, 4);
+  }, [debouncedQuery, preference, setPreference]);
 
   const results = useMemo(() => {
     const q = debouncedQuery.trim().toLowerCase();
@@ -64,10 +98,10 @@ export default function GlobalSearch({ isOpen, onClose }) {
     };
   }, [debouncedQuery, transactions, accounts, budgets, investments]);
 
-  const flatResults = useMemo(
-    () => [...results.transactions, ...results.accounts, ...results.budgets, ...results.investments],
-    [results]
-  );
+  const flatResults = useMemo(() => {
+    const cmds = commandResults.map((c) => ({ kind: 'command', id: c.id, data: c }));
+    return [...cmds, ...results.transactions, ...results.accounts, ...results.budgets, ...results.investments];
+  }, [commandResults, results]);
 
   useEffect(() => {
     if (isOpen) {
@@ -83,6 +117,23 @@ export default function GlobalSearch({ isOpen, onClose }) {
   useEffect(() => {
     setSelectedIndex(0);
   }, [debouncedQuery]);
+
+  const handleSelect = (item) => {
+    if (item.kind === 'command') {
+      item.data.run(navigate);
+    } else if (item.kind === 'transaction') {
+      navigate(
+        `/transactions?search=${encodeURIComponent(item.data.merchant || item.data.description || '')}`
+      );
+    } else if (item.kind === 'account') {
+      navigate('/accounts');
+    } else if (item.kind === 'budget') {
+      navigate('/budgets');
+    } else if (item.kind === 'investment') {
+      navigate('/investments');
+    }
+    onClose();
+  };
 
   const handleKeyDown = (e) => {
     if (e.key === 'Escape') {
@@ -106,21 +157,6 @@ export default function GlobalSearch({ isOpen, onClose }) {
     }
   };
 
-  const handleSelect = (item) => {
-    if (item.kind === 'transaction') {
-      navigate(
-        `/transactions?search=${encodeURIComponent(item.data.merchant || item.data.description || '')}`
-      );
-    } else if (item.kind === 'account') {
-      navigate('/accounts');
-    } else if (item.kind === 'budget') {
-      navigate('/budgets');
-    } else if (item.kind === 'investment') {
-      navigate('/investments');
-    }
-    onClose();
-  };
-
   if (!isOpen) return null;
 
   const hasQuery = query.trim().length > 0;
@@ -132,7 +168,7 @@ export default function GlobalSearch({ isOpen, onClose }) {
       onClick={onClose}
       role="dialog"
       aria-modal="true"
-      aria-label="Global search"
+      aria-label="Command palette and global search"
     >
       <div
         className="w-full max-w-2xl bg-white dark:bg-surface-dark-card rounded-2xl shadow-modal overflow-hidden animate-fade-in-scale motion-reduce:animate-none border border-ivory-border dark:border-surface-dark-border"
@@ -146,9 +182,9 @@ export default function GlobalSearch({ isOpen, onClose }) {
             role="combobox"
             aria-expanded={hasResults}
             aria-controls="global-search-results"
-            aria-label="Search transactions, accounts, budgets, investments"
+            aria-label="Type a command or search transactions, accounts, budgets, investments"
             className="w-full bg-transparent border-0 py-4 px-3 text-lg text-zinc-900 dark:text-text-dark-primary placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-0"
-            placeholder="Search transactions, accounts, budgets…"
+            placeholder="What do you want to do? Try “add”, “import”, “spotify”…"
             value={query}
             onChange={(e) => {
               setQuery(e.target.value);
@@ -170,7 +206,7 @@ export default function GlobalSearch({ isOpen, onClose }) {
           )}
         </div>
 
-        <div className="max-h-[60vh] overflow-y-auto" id="global-search-results" role="listbox">
+        <div className="max-h-[60vh] overflow-y-auto" id="global-search-results" role="listbox" aria-label="Commands and results">
           {hasQuery && !hasResults ? (
             <div className="px-6 py-12 text-center text-zinc-500 dark:text-zinc-400">
               <p>No results found for &ldquo;{query}&rdquo;</p>
@@ -179,7 +215,25 @@ export default function GlobalSearch({ isOpen, onClose }) {
             <ul className="py-2">
               {flatResults.map((item, idx) => (
                 <li key={`${item.kind}-${item.id}`} role="option" aria-selected={idx === selectedIndex}>
-                  {item.kind === 'transaction' ? (
+                  {item.kind === 'command' ? (
+                    <button
+                      className={`w-full text-left px-4 py-3 flex items-center justify-between group transition-colors ${
+                        idx === selectedIndex
+                          ? 'bg-ivory-muted dark:bg-surface-dark-elevated'
+                          : 'hover:bg-ivory-muted/50 dark:hover:bg-surface-dark-elevated/50'
+                      }`}
+                      onMouseEnter={() => setSelectedIndex(idx)}
+                      onClick={() => handleSelect(item)}
+                    >
+                      <span className="flex items-center gap-3">
+                        <item.data.icon className="w-4 h-4 text-brand-amber" aria-hidden="true" />
+                        <span className="text-sm font-semibold text-zinc-900 dark:text-text-dark-primary">
+                          {item.data.label}
+                        </span>
+                      </span>
+                      <span className="text-[11px] uppercase tracking-wider text-zinc-400">{item.data.hint}</span>
+                    </button>
+                  ) : item.kind === 'transaction' ? (
                     <button
                       className={`w-full text-left px-4 py-3 flex items-center justify-between group transition-colors ${
                         idx === selectedIndex

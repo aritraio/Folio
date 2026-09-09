@@ -13,42 +13,62 @@ export default {
         mono: ['"SF Mono"', '"Fira Code"', 'Consolas', 'monospace'],
       },
       colors: {
-        /* ── Light-mode surfaces ── */
+        /* ── Light-mode surfaces — Editorial Wealth §4 (§56 tokens) ── */
         ivory: {
-          DEFAULT: '#FDFBF7',
-          50: '#FFFEF9',
-          100: '#FDFBF7',
-          200: '#F5F2EB',
-          300: '#E8E3D9',
-          muted: '#F5F2EB',
-          border: '#E8E3D9',
+          DEFAULT: '#F8F6F1',
+          50: '#FFFDF8',
+          100: '#F8F6F1',
+          200: '#F1ECE1',
+          300: '#E7E1D7',
+          muted: '#F1ECE1',
+          border: '#E7E1D7',
+          warm: '#F8F6F1',
+          tertiary: '#F1ECE1',
         },
         surface: {
           light: '#FFFFFF',
-          dark: '#141414',
-          'dark-card': '#1E1E1E',
-          'dark-elevated': '#282828',
-          'dark-border': '#333333',
+          dark: '#171717',
+          'dark-card': '#171717',
+          'dark-elevated': '#1F1F1F',
+          'dark-border': '#292929',
+          'dark-hover': '#292929',
         },
 
-        /* ── Brand / accent ── */
+        /* ── Brand / accent — Ledger burnt orange §4.6 ── */
         brand: {
-          amber: '#D97706',
-          'amber-hover': '#B45309',
-          'amber-light': '#FEF3C7',
+          amber: '#E87500',
+          'amber-hover': '#C56100',
+          'amber-light': '#FEF3E2',
           'amber-muted': '#92400E',
-          emerald: '#059669',
-          'emerald-hover': '#047857',
-          'emerald-light': '#D1FAE5',
-          'emerald-muted': '#065F46',
-          red: '#E11D48',
-          'red-hover': '#BE123C',
-          'red-light': '#FFE4E6',
-          'red-muted': '#9F1239',
+          emerald: '#1F9D68',
+          'emerald-hover': '#177A52',
+          'emerald-light': '#DDF5E9',
+          'emerald-muted': '#14532D',
+          red: '#D64545',
+          'red-hover': '#B23535',
+          'red-light': '#FDE8E8',
+          'red-muted': '#7F1D1D',
           teal: '#0D9488',
           'teal-light': '#CCFBF1',
-          gold: '#B45309',
+          gold: '#D99A00',
           navy: '#1E293B',
+        },
+        /* ── Semantic roles — stable across themes §60 ── */
+        ledger: {
+          DEFAULT: '#E87500',
+          hover: '#C56100',
+        },
+        positive: {
+          DEFAULT: '#1F9D68',
+        },
+        negative: {
+          DEFAULT: '#D64545',
+        },
+        cash: {
+          DEFAULT: '#3B82F6',
+        },
+        investment: {
+          DEFAULT: '#8B5CF6',
         },
 
         /* ── Chart palette ── */
@@ -63,15 +83,15 @@ export default {
           lime: '#84CC16',
         },
 
-        /* ── Semantic text ── */
+        /* ── Semantic text — §4.3/4.4 ── */
         text: {
-          primary: '#18181B',
-          secondary: '#71717A',
-          tertiary: '#A1A1AA',
+          primary: '#171717',
+          secondary: '#747474',
+          tertiary: '#A8A29E',
           inverse: '#FAFAFA',
-          'dark-primary': '#F5F5F5',
-          'dark-secondary': '#A1A1AA',
-          'dark-tertiary': '#71717A',
+          'dark-primary': '#F5F5F4',
+          'dark-secondary': '#A8A29E',
+          'dark-tertiary': '#78716C',
         },
       },
 

@@ -1,14 +1,15 @@
 import React, { useState, useMemo } from 'react';
-import { Plus } from 'lucide-react';
+import { Plus, CalendarClock } from 'lucide-react';
 import Button from '../components/ui/Button';
 import Select from '../components/ui/Select';
 import EmptyState from '../components/ui/EmptyState';
+import PageHeader from '../components/ui/PageHeader';
 import BudgetCard from '../components/budgets/BudgetCard';
 import BudgetModal from '../components/budgets/BudgetModal';
 import { useData } from '../contexts/DataContext';
 import { saveBudget, updateBudget, deleteBudget } from '../services/storage';
-import { calcBudgetUtilization } from '../utils/calculations';
-import { formatMoney } from '../utils/formatCurrency';
+import { calcBudgetUtilization, detectRecurring } from '../utils/calculations';
+import { formatMoney, formatINR } from '../utils/formatCurrency';
 import { format } from 'date-fns';
 
 export default function BudgetsPage() {
@@ -46,18 +47,14 @@ export default function BudgetsPage() {
   const { totalBudget, totalSpent, totalRemaining } = useMemo(() => {
     let budgetTotal = 0;
     let spentTotal = 0;
-
     budgetData.forEach((b) => {
       budgetTotal += b.limit;
       spentTotal += b.spent;
     });
-
-    return {
-      totalBudget: budgetTotal,
-      totalSpent: spentTotal,
-      totalRemaining: budgetTotal - spentTotal,
-    };
+    return { totalBudget: budgetTotal, totalSpent: spentTotal, totalRemaining: budgetTotal - spentTotal };
   }, [budgetData]);
+
+  const recurring = useMemo(() => detectRecurring(transactions).slice(0, 3), [transactions]);
 
   const handleAddClick = () => {
     setEditingBudget(null);
@@ -84,12 +81,13 @@ export default function BudgetsPage() {
   };
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-        <div>
-          <p className="label mb-1 text-zinc-500">Planning</p>
-          <div className="flex items-center gap-4 mb-6">
-            <h1 className="heading-lg text-zinc-900 dark:text-text-dark-primary">Budgets</h1>
+    <div className="space-y-8 pb-12">
+      <PageHeader
+        eyebrow="Planning"
+        title="Budgets"
+        description="Actionable limits with month-end forecasts — healthy, watch, or over."
+        actions={
+          <>
             {monthOptions.length > 0 && (
               <div className="w-40">
                 <Select
@@ -101,61 +99,85 @@ export default function BudgetsPage() {
                 />
               </div>
             )}
-          </div>
+            <Button variant="primary" icon={<Plus className="w-4 h-4" />} onClick={handleAddClick}>
+              Create Budget
+            </Button>
+          </>
+        }
+      />
 
-          <div className="flex flex-wrap gap-x-8 gap-y-4">
-            <div>
-              <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-1 font-medium tracking-wide">
-                TOTAL BUDGET
-              </p>
-              <p className="text-2xl font-mono text-zinc-900 dark:text-text-dark-primary">
-                {formatMoney(totalBudget)}
-              </p>
-            </div>
-            <div>
-              <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-1 font-medium tracking-wide">SPENT</p>
-              <p className="text-2xl font-mono text-zinc-900 dark:text-text-dark-primary">
-                {formatMoney(totalSpent)}
-              </p>
-            </div>
-            <div className="pl-6 border-l border-ivory-border dark:border-surface-dark-border">
-              <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-1 font-medium tracking-wide">
-                REMAINING
-              </p>
-              <p
-                className={`text-2xl font-mono ${totalRemaining < 0 ? 'text-brand-red dark:text-rose-400' : 'text-brand-emerald dark:text-emerald-400'}`}
-              >
-                {formatMoney(totalRemaining)}
-              </p>
-            </div>
-          </div>
+      <dl className="grid grid-cols-3 gap-x-8 section-divider pt-5">
+        <div>
+          <dt className="text-[10px] font-semibold uppercase tracking-[0.15em] text-text-secondary dark:text-text-dark-secondary mb-1">
+            Total budget
+          </dt>
+          <dd className="text-2xl font-semibold mono text-zinc-900 dark:text-text-dark-primary">
+            {formatMoney(totalBudget)}
+          </dd>
         </div>
-
-        <Button variant="primary" icon={<Plus className="w-4 h-4" />} onClick={handleAddClick}>
-          Create Budget
-        </Button>
-      </div>
+        <div>
+          <dt className="text-[10px] font-semibold uppercase tracking-[0.15em] text-text-secondary dark:text-text-dark-secondary mb-1">
+            Spent
+          </dt>
+          <dd className="text-2xl font-semibold mono text-zinc-900 dark:text-text-dark-primary">
+            {formatMoney(totalSpent)}
+          </dd>
+        </div>
+        <div>
+          <dt className="text-[10px] font-semibold uppercase tracking-[0.15em] text-text-secondary dark:text-text-dark-secondary mb-1">
+            Remaining
+          </dt>
+          <dd className={`text-2xl font-semibold mono ${totalRemaining < 0 ? 'text-brand-red' : 'text-brand-emerald'}`}>
+            {formatMoney(totalRemaining)}
+          </dd>
+        </div>
+      </dl>
 
       {budgetData.length === 0 ? (
         <div className="card p-8 md:p-12">
           <EmptyState
-            title="No budgets created yet"
-            description="Set monthly spending limits for categories to track your finances better."
+            title="No budgets yet"
+            description="Set a monthly limit for a category — for example Food & Dining ₹1,500 — and Ledger will track pace and forecast the month-end."
             actionLabel="Create Budget"
             onAction={handleAddClick}
           />
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {budgetData.map((budget) => (
-            <BudgetCard
-              key={budget.id}
-              budget={budget}
-              onEdit={handleEditClick}
-              onDelete={handleDeleteClick}
-            />
+            <BudgetCard key={budget.id} budget={budget} onEdit={handleEditClick} onDelete={handleDeleteClick} />
           ))}
         </div>
+      )}
+
+      {recurring.length > 0 && (
+        <section aria-label="Possible recurring payments" className="section-divider pt-6">
+          <div className="flex items-center gap-2 mb-1">
+            <CalendarClock className="w-4 h-4 text-brand-amber" aria-hidden="true" />
+            <h2 className="heading-sm text-zinc-900 dark:text-text-dark-primary">Recurring candidates</h2>
+          </div>
+          <p className="text-xs text-text-secondary dark:text-text-dark-secondary mb-4">
+            Detected from repeated merchants — confirm before treating as subscriptions. Never auto-classified.
+          </p>
+          <ul className="divide-y divide-ivory-border dark:divide-surface-dark-border">
+            {recurring.map((r, i) => (
+              <li key={i} className="flex items-center justify-between gap-3 py-3">
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-zinc-900 dark:text-text-dark-primary truncate">
+                    {r.merchant}
+                  </p>
+                  <p className="text-xs text-text-secondary dark:text-text-dark-secondary">
+                    {r.category} · {r.count} charges · next expected {r.nextExpected}
+                  </p>
+                </div>
+                <div className="text-right shrink-0">
+                  <p className="text-sm font-semibold mono">{formatINR(r.amount)}<span className="text-xs font-normal text-text-secondary">/mo</span></p>
+                  <p className="text-[11px] text-text-tertiary dark:text-text-dark-tertiary">{r.confidence}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
       )}
 
       <BudgetModal

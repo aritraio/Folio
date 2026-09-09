@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Sector } from 'recharts';
 import { formatINR } from '@/utils/formatCurrency';
 
@@ -85,11 +86,14 @@ export default function SpendingBreakdown({ data = [], totalExpenses = 0 }) {
       style={{ animationDelay: '0.2s' }}
     >
       {/* Header */}
-      <div className="mb-5">
-        <h2 className="heading-sm text-zinc-900 dark:text-text-dark-primary">Spending Breakdown</h2>
-        <p className="text-xs text-text-secondary dark:text-text-dark-secondary mt-0.5">
-          Category-wise this month
-        </p>
+      <div className="mb-5 flex items-start justify-between gap-3">
+        <div>
+          <p className="eyebrow mb-1">Where it went</p>
+          <h2 className="heading-sm text-zinc-900 dark:text-text-dark-primary">Spending breakdown</h2>
+          <p className="text-xs text-text-secondary dark:text-text-dark-secondary mt-0.5">
+            By category · this month · select to drill down
+          </p>
+        </div>
       </div>
 
       <div className="flex flex-col sm:flex-row items-center gap-6">
@@ -130,18 +134,20 @@ export default function SpendingBreakdown({ data = [], totalExpenses = 0 }) {
           </div>
         </div>
 
-        {/* Category Legend */}
-        <div className="flex-1 w-full space-y-2.5">
+        {/* Category Legend — drill-down links (§72) */}
+        <div className="flex-1 w-full space-y-1">
           {data.map((item, idx) => (
-            <div
+            <Link
               key={item.category}
+              to={`/transactions?search=${encodeURIComponent(item.category)}`}
               className={`
-                flex items-center justify-between py-1.5 px-2 rounded-lg
+                flex items-center justify-between py-1.5 px-2 rounded-lg row-hover
                 transition-colors duration-150
                 ${activeIndex === idx ? 'bg-ivory-muted dark:bg-surface-dark-elevated' : ''}
               `}
               onMouseEnter={() => setActiveIndex(idx)}
               onMouseLeave={() => setActiveIndex(-1)}
+              aria-label={`${item.category}: ${formatINR(item.amount)}, ${item.percentage.toFixed(0)} percent. View transactions.`}
             >
               <div className="flex items-center gap-2.5 min-w-0">
                 <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: item.color }} />
@@ -157,7 +163,7 @@ export default function SpendingBreakdown({ data = [], totalExpenses = 0 }) {
                   {formatINR(item.amount)}
                 </span>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>

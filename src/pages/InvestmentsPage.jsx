@@ -3,11 +3,12 @@ import { Plus, TrendingUp, Landmark, PieChart } from 'lucide-react';
 
 import { useData } from '@/contexts/DataContext';
 import { saveInvestment, updateInvestment, deleteInvestment } from '@/services/storage';
-import { calcInvestmentReturn } from '@/utils/calculations';
+import { calcInvestmentReturn, getPortfolioHighlights } from '@/utils/calculations';
 
 import Button from '@/components/ui/Button';
 import EmptyState from '@/components/ui/EmptyState';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
+import PageHeader from '@/components/ui/PageHeader';
 
 import PortfolioSummary from '@/components/investments/PortfolioSummary';
 import AllocationChart from '@/components/investments/AllocationChart';
@@ -30,14 +31,17 @@ export default function InvestmentsPage() {
   const [editingHolding, setEditingHolding] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState({ open: false, id: null });
 
-  // Compute overall portfolio return metrics
+  // Compute overall portfolio return metrics + real-data highlights (§20)
   const portfolio = useMemo(() => {
     const result = calcInvestmentReturn(holdings);
     const todayChangePct = 0.0047;
     const todayChange = Math.round(result.totalCurrent * todayChangePct);
+    const { best, largest } = getPortfolioHighlights(holdings);
     return {
       ...result,
       todayChange,
+      best,
+      largest,
     };
   }, [holdings]);
 
@@ -109,47 +113,47 @@ export default function InvestmentsPage() {
   return (
     <div className="space-y-8 pb-12">
       {/* Header & Quick Add CTAs */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-        <div>
-          <p className="label mb-1 text-zinc-500">Portfolio & Wealth</p>
-          <h1 className="heading-lg text-zinc-900 dark:text-text-dark-primary">Investments</h1>
-        </div>
+      <PageHeader
+        eyebrow="Portfolio & wealth"
+        title="Investments"
+        description="Holdings feed net worth directly — every value below reconciles with the dashboard."
+        actions={
+          <>
+            <Button
+              variant="secondary"
+              icon={<Landmark className="w-4 h-4 text-brand-amber" />}
+              onClick={() => {
+                setEditingHolding(null);
+                setIsFdModalOpen(true);
+              }}
+            >
+              + Fixed Deposit (FD)
+            </Button>
 
-        <div className="flex items-center gap-2 flex-wrap">
-          <Button
-            variant="secondary"
-            icon={<Landmark className="w-4 h-4 text-brand-amber" />}
-            onClick={() => {
-              setEditingHolding(null);
-              setIsFdModalOpen(true);
-            }}
-          >
-            + Fixed Deposit (FD)
-          </Button>
+            <Button
+              variant="secondary"
+              icon={<PieChart className="w-4 h-4 text-blue-500" />}
+              onClick={() => {
+                setEditingHolding(null);
+                setIsMfModalOpen(true);
+              }}
+            >
+              + Mutual Fund (AMFI)
+            </Button>
 
-          <Button
-            variant="secondary"
-            icon={<PieChart className="w-4 h-4 text-blue-500" />}
-            onClick={() => {
-              setEditingHolding(null);
-              setIsMfModalOpen(true);
-            }}
-          >
-            + Mutual Fund (AMFI)
-          </Button>
-
-          <Button
-            variant="primary"
-            icon={<Plus className="w-4 h-4" />}
-            onClick={() => {
-              setEditingHolding(null);
-              setIsHoldingModalOpen(true);
-            }}
-          >
-            Add Stock / Asset
-          </Button>
-        </div>
-      </div>
+            <Button
+              variant="primary"
+              icon={<Plus className="w-4 h-4" />}
+              onClick={() => {
+                setEditingHolding(null);
+                setIsHoldingModalOpen(true);
+              }}
+            >
+              Add Stock / Asset
+            </Button>
+          </>
+        }
+      />
 
       {!hasHoldings ? (
         <div className="card p-8 md:p-12">
@@ -169,10 +173,12 @@ export default function InvestmentsPage() {
             totalReturn={portfolio.totalReturn}
             returnPercentage={portfolio.returnPercentage}
             todayChange={portfolio.todayChange}
+            best={portfolio.best}
+            largest={portfolio.largest}
           />
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <AllocationChart holdings={holdings} />
+            <AllocationChart holdings={holdings} returnPercentage={portfolio.returnPercentage} />
             <PortfolioValueChart totalCurrent={portfolio.totalCurrent} />
           </div>
 

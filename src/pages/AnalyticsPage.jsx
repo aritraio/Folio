@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { format } from 'date-fns';
+import { format, subMonths } from 'date-fns';
 import { BarChart3 } from 'lucide-react';
 
 import { useData } from '@/contexts/DataContext';
@@ -21,9 +21,12 @@ import { getLastNMonths } from '@/utils/dateUtils';
 // UI
 import Select from '@/components/ui/Select';
 import EmptyState from '@/components/ui/EmptyState';
+import PageHeader from '@/components/ui/PageHeader';
+import SegmentedControl from '@/components/ui/SegmentedControl';
 
-// Analytics components
+// Analytics components (§89 target composition)
 import AnalyticsSummary from '@/components/analytics/AnalyticsSummary';
+import SpendingBreakdownRows from '@/components/analytics/SpendingBreakdownRows';
 import MonthlyExpensesChart from '@/components/analytics/MonthlyExpensesChart';
 import MonthlyIncomeChart from '@/components/analytics/MonthlyIncomeChart';
 import CategoryComparisonChart from '@/components/analytics/CategoryComparisonChart';
@@ -31,48 +34,44 @@ import SavingsRateChart from '@/components/analytics/SavingsRateChart';
 import NetWorthGrowthChart from '@/components/analytics/NetWorthGrowthChart';
 import AiSpendingAdvisor from '@/components/analytics/AiSpendingAdvisor';
 import SavingsVsCreditChart from '@/components/analytics/SavingsVsCreditChart';
+import LiquidityPanel from '@/components/analytics/LiquidityPanel';
 
 const PERIOD_OPTIONS = [
-  { value: '6', label: 'Last 6 Months' },
-  { value: '9', label: 'Last 9 Months' },
-  { value: '12', label: 'Last 12 Months' },
+  { value: '6', label: '6M' },
+  { value: '9', label: '9M' },
+  { value: '12', label: '12M' },
 ];
 
 /**
- * AnalyticsPage — Comprehensive spending trends and financial analytics.
+ * AnalyticsPage — "Explain what happened to the user's money" (§14).
+ * Editorial order: performance → breakdown → trend → liquidity → insights.
  */
 export default function AnalyticsPage() {
   const [period, setPeriod] = useState('6');
-  const { transactions, accounts, netWorthHistory: netWorthHistoryRaw } = useData();
+  const { transactions, accounts, budgets, netWorthHistory: netWorthHistoryRaw } = useData();
 
   const nMonths = parseInt(period, 10);
   const now = new Date();
   const currentMonth = format(now, 'yyyy-MM');
+  const prevMonth = format(subMonths(now, 1), 'yyyy-MM');
 
   const months = useMemo(() => getLastNMonths(nMonths), [nMonths]);
-
   const [selectedMonth, setSelectedMonth] = useState(currentMonth);
 
-  const monthOptions = useMemo(() => {
-    const opts = months.map((m) => ({
-      value: m.monthKey,
-      label: m.label,
-    }));
-    return opts;
-  }, [months]);
+  const monthOptions = useMemo(
+    () => months.map((m) => ({ value: m.monthKey, label: m.label })),
+    [months]
+  );
+  const activeMonth = monthOptions.some((o) => o.value === selectedMonth) ? selectedMonth : currentMonth;
 
   const summaryMetrics = useMemo(() => {
-    const month = monthOptions.some((o) => o.value === selectedMonth) ? selectedMonth : currentMonth;
-    const income = calcMonthlyIncome(transactions, month);
-    const expenses = calcMonthlyExpenses(transactions, month);
+    const income = calcMonthlyIncome(transactions, activeMonth);
+    const expenses = calcMonthlyExpenses(transactions, activeMonth);
     const savingsRate = calcSavingsRate(income, expenses);
     const netCashFlow = income - expenses;
-    const avgDaily = calcAverageDailySpending(transactions, month);
-    const topCat = calcTopSpendingCategory(transactions, month);
-
-    const monthEntry = months.find((m) => m.monthKey === month);
-    const monthLabel = monthEntry ? monthEntry.label : month;
-
+    const avgDaily = calcAverageDailySpending(transactions, activeMonth);
+    const topCat = calcTopSpendingCategory(transactions, activeMonth);
+    const monthEntry = months.find((m) => m.monthKey === activeMonth);
     return {
       monthlySpending: expenses,
       monthlyIncome: income,
@@ -80,13 +79,12 @@ export default function AnalyticsPage() {
       netCashFlow,
       avgDailySpending: avgDaily,
       topCategory: topCat,
-      monthLabel,
+      monthLabel: monthEntry ? monthEntry.label : activeMonth,
+      prevMonth,
     };
-  }, [transactions, selectedMonth, months, monthOptions, currentMonth]);
+  }, [transactions, activeMonth, months, currentMonth, prevMonth]);
 
-  const cashFlowData = useMemo(() => {
-    return calcMonthlyCashFlow(transactions, nMonths);
-  }, [transactions, nMonths]);
+  const cashFlowData = useMemo(() => calcMonthlyCashFlow(transactions, nMonths), [transactions, nMonths]);
 
   const netWorthHistory = useMemo(() => {
     const history = calcNetWorthHistory(netWorthHistoryRaw, transactions, accounts, nMonths);
@@ -97,33 +95,30 @@ export default function AnalyticsPage() {
 
   return (
     <div className="space-y-8 pb-12">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-        <div>
-          <p className="label mb-1 text-zinc-500">Insights</p>
-          <h1 className="heading-lg text-zinc-900 dark:text-text-dark-primary">Analytics</h1>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <div className="w-40">
-            <Select
-              aria-label="Summary month"
-              options={monthOptions}
-              value={monthOptions.some((o) => o.value === selectedMonth) ? selectedMonth : currentMonth}
-              onChange={(e) => setSelectedMonth(e.target.value)}
-              placeholder={null}
-            />
-          </div>
-          <div className="w-40">
-            <Select
-              aria-label="Period"
+      <PageHeader
+        eyebrow="Insights"
+        title="Analytics"
+        description="Financial performance at a glance — what came in, what went out, and what it means."
+        actions={
+          <>
+            <div className="w-40">
+              <Select
+                aria-label="Summary month"
+                options={monthOptions}
+                value={activeMonth}
+                onChange={(e) => setSelectedMonth(e.target.value)}
+                placeholder={null}
+              />
+            </div>
+            <SegmentedControl
+              ariaLabel="Trend period"
               options={PERIOD_OPTIONS}
               value={period}
-              onChange={(e) => setPeriod(e.target.value)}
-              placeholder={null}
+              onChange={setPeriod}
             />
-          </div>
-        </div>
-      </div>
+          </>
+        }
+      />
 
       {!hasTransactions ? (
         <div className="card p-8 md:p-12">
@@ -139,15 +134,7 @@ export default function AnalyticsPage() {
         <>
           <AnalyticsSummary {...summaryMetrics} />
 
-          {/* AI Spending Findings & Proactive Advisor */}
-          <AiSpendingAdvisor transactions={transactions} accounts={accounts} />
-
-          {/* Liquid Savings vs Credit Card Dual Spending Outflow */}
-          <SavingsVsCreditChart
-            transactions={transactions}
-            accounts={accounts}
-            selectedMonth={selectedMonth}
-          />
+          <SpendingBreakdownRows transactions={transactions} monthKey={activeMonth} />
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <MonthlyExpensesChart data={cashFlowData} />
@@ -155,6 +142,17 @@ export default function AnalyticsPage() {
           </div>
 
           <CategoryComparisonChart transactions={transactions} months={months} />
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <LiquidityPanel accounts={accounts} />
+            <SavingsVsCreditChart
+              transactions={transactions}
+              accounts={accounts}
+              selectedMonth={activeMonth}
+            />
+          </div>
+
+          <AiSpendingAdvisor transactions={transactions} accounts={accounts} budgets={budgets} />
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <SavingsRateChart transactions={transactions} months={months} />

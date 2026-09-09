@@ -1,7 +1,9 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
-import { Plus, Sparkles } from 'lucide-react';
+import { Plus, Sparkles, ReceiptText } from 'lucide-react';
 import Button from '../components/ui/Button';
+import PageHeader from '../components/ui/PageHeader';
+import EmptyState from '../components/ui/EmptyState';
 import TransactionFilters from '../components/transactions/TransactionFilters';
 import TransactionTable from '../components/transactions/TransactionTable';
 import TransactionModal from '../components/transactions/TransactionModal';
@@ -14,12 +16,20 @@ import { DEFAULT_CATEGORIES } from '../constants/finance';
 
 const PAGE_SIZE = 15;
 
+/**
+ * TransactionsPage — rows, not cards (§21).
+ * Search + type/category/account/month filters with URL persistence,
+ * easy clear, pagination, detail modal (no forced page nav), undo on delete (§53),
+ * and honest empty states (§28).
+ */
 export default function TransactionsPage() {
   const { transactions, accounts, refresh } = useData();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState(null);
   const [page, setPage] = useState(1);
+  const [undo, setUndo] = useState(null);
+  const undoTimer = useRef(null);
 
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -34,17 +44,30 @@ export default function TransactionsPage() {
     accountId: initialAccountId,
   });
 
-  // Keep search box in sync when arriving from GlobalSearch (?search=...).
   useEffect(() => {
     if (urlSearch && urlSearch !== filters.search) {
       setFilters((prev) => ({ ...prev, search: urlSearch }));
     }
   }, [urlSearch]);
 
-  // Reset to page 1 whenever filters change.
   useEffect(() => {
     setPage(1);
   }, [filters]);
+
+  // Command palette deep-links (§35): open Add / Import directly.
+  useEffect(() => {
+    if (location.state?.openAdd) {
+      setEditingTransaction(null);
+      setIsModalOpen(true);
+      window.history.replaceState({}, '');
+    }
+    if (location.state?.openImport) {
+      setIsUploadModalOpen(true);
+      window.history.replaceState({}, '');
+    }
+  }, [location.state]);
+
+  useEffect(() => () => clearTimeout(undoTimer.current), []);
 
   const filteredTransactions = useMemo(() => {
     return transactions.filter((tx) => {
@@ -96,6 +119,9 @@ export default function TransactionsPage() {
       .sort((a, b) => b.monthKey.localeCompare(a.monthKey));
   }, [transactions]);
 
+  const hasActiveFilters =
+    filters.search || filters.month !== 'all' || filters.type !== 'all' || filters.category !== 'all' || filters.accountId !== 'all';
+
   const handleFilterChange = (key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
     if (key === 'search') {
@@ -120,8 +146,24 @@ export default function TransactionsPage() {
   };
 
   const handleDeleteClick = (id) => {
+    const victim = transactions.find((t) => t.id === id);
     deleteTransaction(id);
     refresh();
+    if (victim) {
+      clearTimeout(undoTimer.current);
+      setUndo(victim);
+      undoTimer.current = setTimeout(() => setUndo(null), 8000);
+    }
+  };
+
+  const handleUndo = () => {
+    if (!undo) return;
+    const { id: _drop, ...rest } = undo;
+    void _drop;
+    saveTransaction(rest);
+    refresh();
+    clearTimeout(undoTimer.current);
+    setUndo(null);
   };
 
   const handleSaveTransaction = (data) => {
@@ -138,25 +180,26 @@ export default function TransactionsPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div>
-          <p className="label mb-1 text-zinc-500">{formatMoney(spentThisMonth)} spent this month</p>
-          <h1 className="heading-lg text-zinc-900 dark:text-text-dark-primary">Transactions</h1>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="secondary"
-            icon={<Sparkles className="w-4 h-4 text-brand-amber" />}
-            onClick={() => setIsUploadModalOpen(true)}
-          >
-            Import Statement
-          </Button>
-          <Button variant="primary" icon={<Plus className="w-4 h-4" />} onClick={handleAddClick}>
-            Add Transaction
-          </Button>
-        </div>
-      </div>
+    <div className="space-y-6 pb-12">
+      <PageHeader
+        eyebrow={`${formatMoney(spentThisMonth)} spent this month`}
+        title="Transactions"
+        description="Every move, searchable. Transfers never count as spend — select a row to inspect."
+        actions={
+          <>
+            <Button
+              variant="secondary"
+              icon={<Sparkles className="w-4 h-4 text-brand-amber" />}
+              onClick={() => setIsUploadModalOpen(true)}
+            >
+              Import Statement
+            </Button>
+            <Button variant="primary" icon={<Plus className="w-4 h-4" />} onClick={handleAddClick}>
+              Add Transaction
+            </Button>
+          </>
+        }
+      />
 
       <TransactionFilters
         filters={filters}
@@ -167,12 +210,57 @@ export default function TransactionsPage() {
         months={uniqueMonths}
       />
 
-      <TransactionTable
-        transactions={pagedTransactions}
-        accounts={accounts}
-        onEdit={handleEditClick}
-        onDelete={handleDeleteClick}
-      />
+      {undo && (
+        <div
+          className="flex items-center justify-between gap-3 px-4 py-3 rounded-xl border border-ivory-border dark:border-surface-dark-border bg-white dark:bg-surface-dark-card text-sm"
+          role="status"
+          aria-live="polite"
+        >
+          <span>
+            Transaction deleted{undo.merchant ? <> — <strong>{undo.merchant}</strong></> : null}.
+          </span>
+          <button
+            onClick={handleUndo}
+            className="text-xs font-semibold uppercase tracking-[0.12em] text-brand-amber hover:text-brand-amber-hover press-feedback"
+          >
+            Undo
+          </button>
+        </div>
+      )}
+
+      {transactions.length === 0 ? (
+        <div className="card p-8 md:p-12">
+          <EmptyState
+            icon={<ReceiptText className="w-7 h-7 text-brand-amber" />}
+            title="No transactions yet"
+            description="Add your first transaction manually, or import a bank statement — Ledger will categorise, detect duplicates and update balances."
+            actionLabel="Add Transaction"
+            onAction={handleAddClick}
+          />
+        </div>
+      ) : filteredTransactions.length === 0 ? (
+        <div className="card p-8 md:p-12">
+          <EmptyState
+            title="No matches for these filters"
+            description={`Nothing matches${filters.search ? ` “${filters.search}”` : ''}. Try widening the month or clearing filters.`}
+            actionLabel="Clear filters"
+            onAction={handleClearFilters}
+          />
+        </div>
+      ) : (
+        <>
+          <p className="text-xs text-text-secondary dark:text-text-dark-secondary" role="status">
+            {filteredTransactions.length} result{filteredTransactions.length === 1 ? '' : 's'}
+            {hasActiveFilters ? ' · filters active' : ''}
+          </p>
+          <TransactionTable
+            transactions={pagedTransactions}
+            accounts={accounts}
+            onEdit={handleEditClick}
+            onDelete={handleDeleteClick}
+          />
+        </>
+      )}
 
       {filteredTransactions.length > PAGE_SIZE && (
         <nav className="flex items-center justify-between pt-2" aria-label="Transaction pages">
@@ -180,7 +268,7 @@ export default function TransactionsPage() {
             Showing {(safePage - 1) * PAGE_SIZE + 1}–
             {Math.min(safePage * PAGE_SIZE, filteredTransactions.length)} of {filteredTransactions.length}
           </p>
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
             <Button
               variant="secondary"
               disabled={safePage <= 1}

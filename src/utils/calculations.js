@@ -588,3 +588,350 @@ export function calcInvestmentHoldingsByType(holdings = []) {
     totalGainPct: Number(totalGainPct.toFixed(2)),
   };
 }
+
+/* ══════════════════════════════════════════════════════════════
+   UNIFIED FINANCIAL MODEL — §2 / §47 / §87-P0 of uiimprovements.md
+   Net Worth = Cash & Bank Balances + Investments + Other Assets − Liabilities
+   Every page must derive from this single source of truth.
+   ══════════════════════════════════════════════════════════════ */
+
+/**
+ * Metric definitions — single source of truth for "How calculated?" UX (§47, §71).
+ * Keep formulas in sync with the functions below.
+ */
+export const FINANCIAL_DEFINITIONS = Object.freeze({
+  netWorth: {
+    label: 'Net Worth',
+    formula: 'Assets + Investments − Liabilities',
+    description: 'Cash & bank balances plus portfolio current value, minus credit outstanding and negative balances.',
+  },
+  totalAssets: {
+    label: 'Total Assets',
+    formula: 'Σ positive non-credit balances',
+    description: 'Savings, current, cash and wallet accounts with positive balances.',
+  },
+  investmentTotal: {
+    label: 'Investments',
+    formula: 'Σ holdings currentValue',
+    description: 'Sum of each holding’s current value (units × current price, or FD accrued value).',
+  },
+  totalLiabilities: {
+    label: 'Total Liabilities',
+    formula: 'Σ credit outstanding + negative balances',
+    description: 'Credit-card outstanding plus any overdrawn asset account.',
+  },
+  savings: {
+    label: 'Savings',
+    formula: 'Income − eligible expenses (transfers excluded)',
+    description: 'Inter-account transfers and credit-card bill payments never count as income or expense.',
+  },
+  savingsRate: {
+    label: 'Savings Rate',
+    formula: '(Income − expenses) / Income × 100',
+    description: '0 when income is zero. Uses eligible expenses only.',
+  },
+  totalReturn: {
+    label: 'Total Return',
+    formula: 'Current Value − Invested Capital',
+    description: 'Unrealised gain across holdings. Excludes realised gains/dividends in v1.',
+  },
+  liquidityCoverage: {
+    label: 'Liquidity Coverage',
+    formula: 'Liquid Assets / Current Obligations',
+    description: 'How many times liquid cash covers credit outstanding.',
+  },
+});
+
+/**
+ * Current value of one holding, honouring FD accrual.
+ */
+export function calcHoldingCurrentValue(h = {}) {
+  const type = String(h.type || '').toLowerCase();
+  if (type === 'fixed_deposit' || type === 'fd') {
+    try {
+      const fd = calcFdMaturityAndInterest(
+        h.principal ?? h.investedAmount ?? h.investedValue ?? h.avgPrice,
+        h.interestRate ?? h.annualRatePct,
+        h.startDate ?? h.createdAt,
+        h.tenureMonths,
+        h.compoundingFrequency
+      );
+      return fd.currentValue;
+    } catch {
+      return Number(h.currentValue) || Number(h.principal) || 0;
+    }
+  }
+  if (h.currentValue != null && Number.isFinite(Number(h.currentValue))) return Number(h.currentValue);
+  const units = Number(h.units);
+  const price = Number(h.currentPrice ?? h.avgPrice);
+  if (Number.isFinite(units) && Number.isFinite(price)) return units * price;
+  return 0;
+}
+
+/**
+ * Sum of portfolio current values — feeds net worth (§2, §78).
+ */
+export function calcInvestmentTotal(holdings = []) {
+  return (holdings || []).reduce((sum, h) => sum + (Number(calcHoldingCurrentValue(h)) || 0), 0);
+}
+
+/**
+ * Liquid cash: savings + current + cash balances (positive legs only).
+ */
+export function calcLiquidAssets(accounts = []) {
+  return (accounts || []).reduce((sum, acc) => {
+    if (acc.type === 'credit' || acc.type === 'investment') return sum;
+    const bal = Number(acc.balance) || 0;
+    return sum + Math.max(0, bal);
+  }, 0);
+}
+
+/**
+ * Unified snapshot every page should use.
+ * Net Worth = Total Assets + Investments − Total Liabilities.
+ */
+export function calcFinancialSnapshot(accounts = [], investments = []) {
+  const totalAssets = calcTotalAssets(accounts);
+  const totalLiabilities = calcTotalLiabilities(accounts);
+  const investmentTotal = Math.round(calcInvestmentTotal(investments));
+  const liquidAssets = Math.round(calcLiquidAssets(accounts));
+  const netWorth = Math.round(totalAssets + investmentTotal - totalLiabilities);
+  return {
+    totalAssets: Math.round(totalAssets),
+    totalLiabilities: Math.round(totalLiabilities),
+    investmentTotal,
+    liquidAssets,
+    netWorth,
+  };
+}
+
+/**
+ * Unified net worth — prefer this over calcNetWorth(accounts) for display.
+ * calcNetWorth is kept for backward compat (accounts-only leg).
+ */
+export function calcUnifiedNetWorth(accounts = [], investments = []) {
+  return calcFinancialSnapshot(accounts, investments).netWorth;
+}
+
+/**
+ * Dev-time validation layer (§2). Returns { ok, errors } — never throws in prod render.
+ *   netWorth === totalAssets + investmentTotal − totalLiabilities
+ *   investmentTotal === Σ holdings currentValue
+ *   savings === income − eligibleExpenses
+ */
+export function validateFinancialModel({ accounts = [], investments = [], transactions = [], monthKey = null } = {}) {
+  const errors = [];
+  const snap = calcFinancialSnapshot(accounts, investments);
+  const recombined = snap.totalAssets + snap.investmentTotal - snap.totalLiabilities;
+  if (recombined !== snap.netWorth) {
+    errors.push(`netWorth mismatch: ${snap.netWorth} !== ${snap.totalAssets}+${snap.investmentTotal}−${snap.totalLiabilities}`);
+  }
+  const sumHoldings = Math.round(
+    (investments || []).reduce((s, h) => s + (Number(calcHoldingCurrentValue(h)) || 0), 0)
+  );
+  if (sumHoldings !== snap.investmentTotal) {
+    errors.push(`investmentTotal mismatch: ${snap.investmentTotal} !== Σ holdings (${sumHoldings})`);
+  }
+  if (transactions && monthKey) {
+    const income = calcMonthlyIncome(transactions, monthKey);
+    const expenses = calcMonthlyExpenses(transactions, monthKey);
+    const savings = calcMonthlySavings(transactions, monthKey);
+    if (savings !== income - expenses) {
+      errors.push(`savings mismatch: ${savings} !== ${income}−${expenses}`);
+    }
+    const counted = (transactions || [])
+      .filter((t) => {
+        if (!t.date) return false;
+        const k = String(t.date).slice(0, 7);
+        return k === monthKey && t.type === 'transfer';
+      })
+      .filter((t) => t.type === 'transfer');
+    void counted;
+  }
+  if (typeof process !== 'undefined' && process.env?.NODE_ENV !== 'production') {
+    errors.forEach((e) => console.warn(`[finance-model] ${e}`));
+  }
+  return { ok: errors.length === 0, errors, snapshot: snap };
+}
+
+/**
+ * Liquidity: liquid assets vs credit obligations (§16).
+ */
+export function calcLiquidity(accounts = []) {
+  const liquidAssets = Math.round(calcLiquidAssets(accounts));
+  const obligations = Math.round(
+    (accounts || [])
+      .filter((a) => a.type === 'credit')
+      .reduce((s, a) => s + Math.abs(Number(a.balance) || 0), 0)
+  );
+  const coverage = obligations > 0 ? liquidAssets / obligations : liquidAssets > 0 ? Infinity : 0;
+  return {
+    liquidAssets,
+    obligations,
+    coverage: Number.isFinite(coverage) ? Number(coverage.toFixed(1)) : '—',
+    coverageRaw: coverage,
+  };
+}
+
+/**
+ * Month-over-month comparison per category (§15).
+ */
+export function calcCategoryComparison(transactions = [], currentMonthKey, prevMonthKey) {
+  const cur = calcCategoryBreakdown(transactions, currentMonthKey);
+  const prevMap = new Map(
+    calcCategoryBreakdown(transactions, prevMonthKey).map((c) => [c.category, c.amount])
+  );
+  return cur.map((c) => {
+    const prev = prevMap.get(c.category) || 0;
+    const delta = prev > 0 ? ((c.amount - prev) / prev) * 100 : c.amount > 0 && prev === 0 ? 100 : 0;
+    return { ...c, prevAmount: prev, deltaPct: Number(delta.toFixed(1)) };
+  });
+}
+
+/**
+ * Transparent Financial Pulse (§12) — rule-based 0–100 score with reasons.
+ * Factors: savings rate, expense volatility, budget adherence, liquidity, debt burden, cash-flow direction.
+ */
+export function calcFinancialPulse({ transactions = [], accounts = [], investments = [], budgets = [], monthKey = null } = {}) {
+  const now = new Date();
+  const cur = monthKey || `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  const prevD = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const prev = `${prevD.getFullYear()}-${String(prevD.getMonth() + 1).padStart(2, '0')}`;
+
+  const income = calcMonthlyIncome(transactions, cur);
+  const expenses = calcMonthlyExpenses(transactions, cur);
+  const prevExpenses = calcMonthlyExpenses(transactions, prev);
+  const savingsRate = calcSavingsRate(income, expenses);
+  const { liquidAssets, obligations, coverageRaw } = calcLiquidity(accounts);
+  const snap = calcFinancialSnapshot(accounts, investments);
+  const debtBurden = snap.totalAssets + snap.investmentTotal > 0
+    ? (snap.totalLiabilities / (snap.totalAssets + snap.investmentTotal)) * 100
+    : 0;
+
+  const budgetUtil = calcBudgetUtilization(budgets, transactions, cur);
+  const overBudgets = budgetUtil.filter((b) => b.status === 'exceeded').length;
+  const watchBudgets = budgetUtil.filter((b) => b.status === 'warning').length;
+
+  const last3 = [0, 1, 2].map((i) => {
+    const dd = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const k = `${dd.getFullYear()}-${String(dd.getMonth() + 1).padStart(2, '0')}`;
+    return calcMonthlyExpenses(transactions, k);
+  });
+  const avg = last3.reduce((a, b) => a + b, 0) / Math.max(1, last3.length);
+  const variance = avg > 0 ? (Math.max(...last3) - Math.min(...last3)) / avg : 0;
+
+  const factors = [];
+  const push = (key, label, score, detail, tone) => factors.push({ key, label, score, detail, tone });
+
+  const savingsScore = income <= 0 ? 40 : savingsRate >= 30 ? 100 : savingsRate >= 20 ? 85 : savingsRate >= 10 ? 65 : savingsRate >= 0 ? 45 : 20;
+  push('savings', 'Savings', savingsScore,
+    income > 0 ? `${savingsRate.toFixed(1)}% savings rate` : 'No income this month',
+    savingsScore >= 85 ? 'excellent' : savingsScore >= 65 ? 'good' : savingsScore >= 45 ? 'fair' : 'weak');
+
+  const cfScore = income - expenses >= 0 ? (income > 0 ? 90 : 60) : 30;
+  push('cashflow', 'Cash flow', cfScore,
+    `${income - expenses >= 0 ? 'Positive' : 'Negative'} net flow this month`,
+    cfScore >= 80 ? 'excellent' : cfScore >= 60 ? 'fair' : 'weak');
+
+  const volScore = variance <= 0.25 ? 90 : variance <= 0.5 ? 70 : variance <= 1 ? 50 : 30;
+  push('spending', 'Spending stability', volScore,
+    prevExpenses > 0
+      ? `${ (((expenses - prevExpenses) / prevExpenses) * 100).toFixed(1) }% vs last month`
+      : 'First month of data',
+    volScore >= 80 ? 'excellent' : volScore >= 60 ? 'fair' : 'weak');
+
+  const liqScore = !Number.isFinite(coverageRaw) ? 95 : coverageRaw >= 5 ? 95 : coverageRaw >= 3 ? 85 : coverageRaw >= 1 ? 65 : 30;
+  push('liquidity', 'Liquidity', liqScore,
+    obligations > 0 ? `${Number.isFinite(coverageRaw) ? coverageRaw.toFixed(1) : '—'}× coverage` : `${liquidAssets > 0 ? 'No dues' : 'No data'}`,
+    liqScore >= 85 ? 'excellent' : liqScore >= 65 ? 'fair' : 'weak');
+
+  const invRet = calcInvestmentReturn(investments);
+  const invScore = investments.length === 0 ? 50 : invRet.returnPercentage >= 10 ? 90 : invRet.returnPercentage >= 0 ? 75 : 45;
+  push('investments', 'Investments', invScore,
+    investments.length === 0 ? 'No holdings yet' : `${invRet.returnPercentage.toFixed(1)}% total return`,
+    invScore >= 85 ? 'excellent' : invScore >= 60 ? 'fair' : 'weak');
+
+  const budgetScore = budgetUtil.length === 0 ? 60 : overBudgets > 0 ? 40 : watchBudgets > 0 ? 70 : 90;
+  push('budgets', 'Budget discipline', budgetScore,
+    budgetUtil.length === 0 ? 'No budgets set' : overBudgets > 0 ? `${overBudgets} over budget` : watchBudgets > 0 ? `${watchBudgets} near limit` : 'All within limits',
+    budgetScore >= 85 ? 'excellent' : budgetScore >= 60 ? 'fair' : 'weak');
+
+  const debtScore = debtBurden <= 10 ? 95 : debtBurden <= 25 ? 80 : debtBurden <= 50 ? 60 : 35;
+  push('debt', 'Debt burden', debtScore,
+    `${debtBurden.toFixed(1)}% of assets`,
+    debtScore >= 80 ? 'excellent' : debtScore >= 60 ? 'fair' : 'weak');
+
+  const weights = { savings: 0.25, cashflow: 0.15, spending: 0.12, liquidity: 0.15, investments: 0.13, budgets: 0.1, debt: 0.1 };
+  const score = Math.round(factors.reduce((s, f) => s + f.score * (weights[f.key] || 0), 0));
+  const band = score >= 80 ? 'Strong month' : score >= 60 ? 'Steady' : score >= 40 ? 'Needs attention' : 'At risk';
+  return { score: Math.max(0, Math.min(100, score)), band, factors };
+}
+
+/**
+ * Recurring-payment candidates (§26) — same merchant + same amount (±2%) 2+ times.
+ * Returns candidates with confidence; never auto-classifies.
+ */
+export function detectRecurring(transactions = []) {
+  const groups = new Map();
+  (transactions || []).forEach((tx) => {
+    if (tx.type !== 'expense') return;
+    const key = String(tx.merchant || tx.description || '').trim().toLowerCase();
+    if (!key) return;
+    const amt = Math.abs(Number(tx.amount) || 0);
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push({ ...tx, _amt: amt });
+  });
+  const out = [];
+  groups.forEach((items) => {
+    if (items.length < 2) return;
+    const amounts = items.map((i) => i._amt);
+    const base = amounts[0];
+    const stable = amounts.every((a) => base === 0 ? a === 0 : Math.abs(a - base) / base <= 0.02);
+    const sorted = [...items].sort((a, b) => String(a.date).localeCompare(String(b.date)));
+    const last = sorted[sorted.length - 1];
+    const next = new Date(last.date);
+    next.setMonth(next.getMonth() + 1);
+    out.push({
+      merchant: last.merchant || last.description,
+      category: last.category,
+      amount: base,
+      count: items.length,
+      lastDate: last.date,
+      nextExpected: next.toISOString().slice(0, 10),
+      confidence: stable && items.length >= 3 ? 'High confidence' : 'Possible pattern',
+      accountId: last.accountId,
+    });
+  });
+  return out.sort((a, b) => b.count - a.count).slice(0, 6);
+}
+
+/**
+ * Budget month-end forecast (§25) — prorates spend by elapsed days.
+ */
+export function calcBudgetForecast(spent = 0, asOfDate = new Date()) {
+  const d = asOfDate instanceof Date ? asOfDate : new Date(asOfDate);
+  const dim = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+  const elapsed = Math.max(1, Math.min(dim, d.getDate()));
+  const daily = spent / elapsed;
+  const projected = daily * dim;
+  return { elapsed, daysInMonth: dim, daily, projected: Math.round(projected) };
+}
+
+/**
+ * Best performer + largest position (§20) — real data only, null when empty.
+ */
+export function getPortfolioHighlights(holdings = []) {
+  if (!holdings || holdings.length === 0) return { best: null, largest: null };
+  const rows = holdings.map((h) => {
+    const invested = Number(h.investedValue) || (Number(h.units) || 0) * (Number(h.avgPrice) || 0);
+    const current = Number(calcHoldingCurrentValue(h)) || 0;
+    const ret = invested > 0 ? ((current - invested) / invested) * 100 : 0;
+    return { holding: h, invested, current, ret };
+  });
+  const best = rows.reduce((a, b) => (b.ret > a.ret ? b : a));
+  const largest = rows.reduce((a, b) => (b.current > a.current ? b : a));
+  return {
+    best: { name: best.holding.name, returnPct: Number(best.ret.toFixed(1)), current: Math.round(best.current) },
+    largest: { name: largest.holding.name, current: Math.round(largest.current), invested: Math.round(largest.invested) },
+  };
+}

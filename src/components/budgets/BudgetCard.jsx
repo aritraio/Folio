@@ -1,24 +1,32 @@
-import React, { useState } from 'react';
-import { Pencil, Trash2, AlertCircle } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { Pencil, Trash2, AlertCircle, CheckCircle2, Eye } from 'lucide-react';
 import BudgetProgress from './BudgetProgress';
 import { formatINR, formatPercent } from '../../utils/formatCurrency';
+import { calcBudgetForecast } from '../../utils/calculations';
 import ConfirmDialog from '../ui/ConfirmDialog';
+
+const STATUS_META = {
+  normal: { label: 'Healthy', icon: CheckCircle2, pill: 'text-brand-emerald border-brand-emerald/30 bg-brand-emerald/5' },
+  warning: { label: 'Watch', icon: Eye, pill: 'text-brand-amber border-brand-amber/30 bg-brand-amber/5' },
+  exceeded: { label: 'Over budget', icon: AlertCircle, pill: 'text-brand-red border-brand-red/30 bg-brand-red/5' },
+};
 
 export default function BudgetCard({ budget, onEdit, onDelete }) {
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
 
   const { category, limit, spent, remaining, percentage, status } = budget;
+  const meta = STATUS_META[status] || STATUS_META.normal;
+  const StatusIcon = meta.icon;
 
-  // Derive styling from status
-  let statusColor = 'text-brand-emerald dark:text-emerald-400';
-  let StatusIcon = null;
-
-  if (status === 'warning') {
-    statusColor = 'text-brand-amber dark:text-amber-400';
-  } else if (status === 'exceeded') {
-    statusColor = 'text-brand-red dark:text-rose-400';
-    StatusIcon = AlertCircle;
-  }
+  // Month-end forecast (§25) — transparent proration, not a promise.
+  const forecast = useMemo(() => calcBudgetForecast(spent, new Date()), [spent]);
+  const forecastVsLimit = forecast.projected - limit;
+  const forecastLabel =
+    limit <= 0
+      ? null
+      : forecastVsLimit <= 0
+        ? `Likely under budget by ${formatINR(Math.abs(forecastVsLimit))}`
+        : `Likely over budget by ${formatINR(forecastVsLimit)}`;
 
   const handleEdit = (e) => {
     e.stopPropagation();
@@ -36,12 +44,13 @@ export default function BudgetCard({ budget, onEdit, onDelete }) {
         {/* Decorative left border for over-budget */}
         {status === 'exceeded' && <div className="absolute top-0 left-0 w-1 h-full bg-brand-red" />}
 
-        <div className="flex justify-between items-start mb-6">
-          <div className="flex items-center gap-2">
-            <h3 className="text-sm font-medium text-zinc-900 dark:text-text-dark-primary flex items-center gap-1.5">
-              {category}
-              {StatusIcon && <StatusIcon className="w-4 h-4 text-brand-red" />}
-            </h3>
+        <div className="flex justify-between items-start mb-5">
+          <div className="flex items-center gap-2 flex-wrap">
+            <h3 className="text-sm font-medium text-zinc-900 dark:text-text-dark-primary">{category}</h3>
+            <span className={`status-pill ${meta.pill}`} aria-label={`Budget status: ${meta.label}`}>
+              <StatusIcon className="w-3.5 h-3.5" aria-hidden="true" />
+              {meta.label}
+            </span>
           </div>
 
           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -69,21 +78,22 @@ export default function BudgetCard({ budget, onEdit, onDelete }) {
                 {formatINR(spent, { showSymbol: true })}
               </p>
               <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
-                of {formatINR(limit, { showSymbol: true })} limit
-              </p>
-            </div>
-            <div className="text-right">
-              <p className={`text-xs font-semibold ${statusColor}`}>{formatPercent(percentage, 1)}</p>
-              <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
-                {status === 'exceeded' ? 'Over budget by ' : 'Remaining: '}
-                <span className="font-mono font-medium text-zinc-900 dark:text-zinc-300">
-                  {formatINR(status === 'exceeded' ? Math.abs(remaining) : remaining, { showSymbol: true })}
-                </span>
+                of {formatINR(limit, { showSymbol: true })} · {formatPercent(percentage, 0)} used ·{' '}
+                {formatINR(status === 'exceeded' ? 0 : remaining, { showSymbol: true })} remaining
               </p>
             </div>
           </div>
 
           <BudgetProgress percentage={percentage} status={status} />
+
+          {forecastLabel && (
+            <p className="text-[11px] leading-relaxed text-text-secondary dark:text-text-dark-secondary">
+              Projected month-end spend {formatINR(forecast.projected)} · {forecastLabel.toLowerCase()}{' '}
+              <span className="text-text-tertiary dark:text-text-dark-tertiary">
+                (based on {formatINR(Math.round(forecast.daily))}/day over {forecast.elapsed} of {forecast.daysInMonth} days)
+              </span>
+            </p>
+          )}
         </div>
       </div>
 

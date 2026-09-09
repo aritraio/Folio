@@ -1,165 +1,192 @@
 import React, { useMemo } from 'react';
-import {
-  TrendingUp,
-  TrendingDown,
-  PiggyBank,
-  ShoppingBag,
-  ArrowDownRight,
-  ArrowUpRight,
-  Lightbulb,
-} from 'lucide-react';
-import { formatINR, formatPercent, formatCompact } from '@/utils/formatCurrency';
+import { Link } from 'react-router-dom';
+import { Sparkles, ArrowRight } from 'lucide-react';
+import { formatINR, formatPercent } from '@/utils/formatCurrency';
 import {
   calcMonthlyExpenses,
   calcMonthlyIncome,
-  calcSavingsRate,
-  calcTopSpendingCategory,
   calcCategoryBreakdown,
+  calcLiquidity,
+  detectRecurring,
 } from '@/utils/calculations';
 import { format, subMonths } from 'date-fns';
 
 /**
- * Single insight card.
+ * Ledger Insights (§13, §75–§77) — evidence-backed, never vague.
+ * Every insight: title + explanation + supporting numbers + time comparison
+ * + confidence/qualification + action link where useful.
  */
-function InsightCard({ icon: Icon, iconBg, iconColor, title, description }) {
+function InsightRow({ eyebrow, title, body, meta, to, toLabel, tone }) {
+  const dot =
+    tone === 'alert' ? 'bg-brand-red' : tone === 'positive' ? 'bg-brand-emerald' : 'bg-brand-amber';
   return (
-    <div
-      className="
-      flex items-start gap-3.5
-      p-3.5 rounded-xl
-      bg-ivory-muted/50 dark:bg-surface-dark-elevated/50
-      hover:bg-ivory-muted dark:hover:bg-surface-dark-elevated
-      transition-colors duration-150
-    "
-    >
-      <div
-        className={`
-        shrink-0 p-2 rounded-lg
-        ${iconBg}
-      `}
-      >
-        <Icon className={`w-4 h-4 ${iconColor}`} />
-      </div>
-      <div className="min-w-0">
-        <p className="text-sm font-medium text-zinc-800 dark:text-text-dark-primary mb-0.5">{title}</p>
-        <p className="text-xs text-text-secondary dark:text-text-dark-secondary leading-relaxed">
-          {description}
+    <article className="py-5 first:pt-1 last:pb-1 border-b border-ivory-border dark:border-surface-dark-border last:border-0">
+      <div className="flex items-center gap-2 mb-1.5">
+        <span className={`w-1.5 h-1.5 rounded-full ${dot}`} aria-hidden="true" />
+        <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-text-secondary dark:text-text-dark-secondary">
+          {eyebrow}
         </p>
       </div>
-    </div>
+      <h3 className="text-[15px] font-semibold text-zinc-900 dark:text-text-dark-primary leading-snug">
+        {title}
+      </h3>
+      <p className="text-sm text-text-secondary dark:text-text-dark-secondary leading-relaxed mt-1">
+        {body}
+      </p>
+      <div className="mt-2 flex items-center justify-between gap-3 flex-wrap">
+        <p className="text-xs mono text-zinc-700 dark:text-text-dark-secondary">{meta}</p>
+        {to && (
+          <Link
+            to={to}
+            className="inline-flex items-center gap-1 text-xs font-semibold text-brand-amber hover:text-brand-amber-hover transition-colors"
+          >
+            {toLabel || 'View transactions'}
+            <ArrowRight className="w-3 h-3" />
+          </Link>
+        )}
+      </div>
+    </article>
   );
 }
 
-/**
- * FinancialInsights — Auto-generated data-driven insight cards.
- *
- * @param {{
- *   transactions: Array,
- *   netWorth: number,
- *   prevNetWorth: number,
- * }} props
- */
-export default function FinancialInsights({ transactions = [], netWorth = 0, prevNetWorth = 0 }) {
+export default function FinancialInsights({ transactions = [], accounts = [], netWorth = 0 }) {
   const insights = useMemo(() => {
     const now = new Date();
     const currentMonth = format(now, 'yyyy-MM');
     const lastMonth = format(subMonths(now, 1), 'yyyy-MM');
 
+    const out = [];
     const currentExpenses = calcMonthlyExpenses(transactions, currentMonth);
     const lastExpenses = calcMonthlyExpenses(transactions, lastMonth);
-    const currentIncome = calcMonthlyIncome(transactions, currentMonth);
-    const savingsRate = calcSavingsRate(currentIncome, currentExpenses);
-    const topCategory = calcTopSpendingCategory(transactions, currentMonth);
+    const income = calcMonthlyIncome(transactions, currentMonth);
+    const breakdown = calcCategoryBreakdown(transactions, currentMonth);
 
-    const expenseChange = lastExpenses > 0 ? ((currentExpenses - lastExpenses) / lastExpenses) * 100 : 0;
-
-    const netWorthChange = netWorth - prevNetWorth;
-
-    const result = [];
-
-    // 1. Month-over-month spending
-    if (lastExpenses > 0) {
-      const direction = expenseChange > 0 ? 'increased' : 'decreased';
-      const absChange = Math.abs(expenseChange);
-      result.push({
-        icon: expenseChange > 0 ? ArrowUpRight : ArrowDownRight,
-        iconBg:
-          expenseChange > 0
-            ? 'bg-brand-red-light dark:bg-[rgba(251,113,133,0.12)]'
-            : 'bg-brand-emerald-light dark:bg-[rgba(52,211,153,0.12)]',
-        iconColor: expenseChange > 0 ? 'text-brand-red' : 'text-brand-emerald',
-        title: `Spending ${direction} ${absChange.toFixed(1)}%`,
-        description: `Your expenses ${direction} from ${formatINR(lastExpenses)} last month to ${formatINR(currentExpenses)} this month.`,
+    // 1. Spending anomaly vs baseline (3-mo avg ex-current would be ideal; use last month + avg)
+    if (breakdown.length > 0) {
+      const top = breakdown[0];
+      const topPrev = calcCategoryBreakdown(transactions, lastMonth).find((c) => c.category === top.category);
+      if (topPrev && topPrev.amount > 0) {
+        const delta = ((top.amount - topPrev.amount) / topPrev.amount) * 100;
+        if (Math.abs(delta) >= 15) {
+          out.push({
+            eyebrow: top.category,
+            title: delta > 0
+              ? `${top.category} spending is elevated`
+              : `${top.category} spending cooled off`,
+            body: delta > 0
+              ? `Your ${top.category.toLowerCase()} spending runs above its recent baseline. Worth a glance before it becomes a habit.`
+              : `Your ${top.category.toLowerCase()} spending dropped versus last month — the trend is moving the right way.`,
+            meta: `${formatINR(top.amount)} this month · ${formatPercent(delta, 0)} vs ${formatINR(topPrev.amount)} last month`,
+            to: `/transactions?search=${encodeURIComponent(top.category)}`,
+            tone: delta > 0 ? 'alert' : 'positive',
+          });
+        }
+      } else if (top) {
+        const count = transactions.filter(
+          (t) => t.type === 'expense' && String(t.date).slice(0, 7) === currentMonth && t.category === top.category
+        ).length;
+        out.push({
+          eyebrow: top.category,
+          title: `${top.category} leads spending`,
+          body: `Most of this month's outflow concentrates in one category.`,
+          meta: `${formatINR(top.amount)} across ${count} transaction${count === 1 ? '' : 's'} · ${top.percentage.toFixed(0)}% of spend`,
+          to: `/transactions?search=${encodeURIComponent(top.category)}`,
+          tone: 'neutral',
+        });
+      }
+    } else if (currentExpenses === 0 && income > 0) {
+      out.push({
+        eyebrow: 'Spending',
+        title: 'No spending recorded yet',
+        body: 'Income is in, but no expenses are categorised for this month. Add transactions to unlock patterns.',
+        meta: `${formatINR(income)} income · ${formatINR(0)} tracked spend`,
+        to: '/transactions',
+        toLabel: 'Add transactions',
+        tone: 'neutral',
       });
     }
 
-    // 2. Savings rate
-    if (currentIncome > 0) {
-      const rateLabel =
-        savingsRate >= 30 ? 'Excellent' : savingsRate >= 20 ? 'Good' : savingsRate >= 10 ? 'Fair' : 'Low';
-      result.push({
-        icon: PiggyBank,
-        iconBg:
-          savingsRate >= 20
-            ? 'bg-brand-emerald-light dark:bg-[rgba(52,211,153,0.12)]'
-            : 'bg-amber-50 dark:bg-[rgba(245,158,11,0.12)]',
-        iconColor: savingsRate >= 20 ? 'text-brand-emerald' : 'text-brand-amber',
-        title: `${rateLabel} savings rate: ${formatPercent(savingsRate)}`,
-        description: `You saved ${formatINR(currentIncome - currentExpenses)} of ${formatINR(currentIncome)} income this month.`,
+    // 2. Recurring detection with confidence (§26, §76)
+    const recurring = detectRecurring(transactions);
+    if (recurring.length > 0) {
+      const r = recurring[0];
+      out.push({
+        eyebrow: 'Recurring',
+        title: `${r.merchant} · ${formatINR(r.amount)}/month`,
+        body:
+          r.confidence === 'High confidence'
+            ? `Charged ${r.count} times at a stable amount. Looks like a subscription.`
+            : `Seen ${r.count} times at a similar amount — a possible pattern, not yet confirmed.`,
+        meta: `${r.count} occurrences · ${r.confidence} · next expected ${r.nextExpected}`,
+        to: `/transactions?search=${encodeURIComponent(r.merchant)}`,
+        tone: 'neutral',
       });
     }
 
-    // 3. Top spending category
-    if (topCategory) {
-      const breakdown = calcCategoryBreakdown(transactions, currentMonth);
-      const topItem = breakdown[0];
-      if (topItem) {
-        result.push({
-          icon: ShoppingBag,
-          iconBg: 'bg-blue-50 dark:bg-[rgba(59,130,246,0.12)]',
-          iconColor: 'text-blue-500',
-          title: `Top category: ${topItem.category}`,
-          description: `${topItem.category} accounts for ${topItem.percentage.toFixed(0)}% of spending at ${formatINR(topItem.amount)}.`,
+    // 3. Liquidity (§16) — precise, no "safe" claims without definition
+    const { liquidAssets, obligations, coverage } = calcLiquidity(accounts);
+    if (obligations > 0) {
+      out.push({
+        eyebrow: 'Liquidity',
+        title: liquidAssets >= obligations ? 'Well buffered' : 'Tight coverage',
+        body: `Your current liquid assets cover listed card obligations by ${coverage}×.`,
+        meta: `${formatINR(liquidAssets)} liquid · ${formatINR(obligations)} obligations · ${coverage}× coverage`,
+        to: '/accounts',
+        toLabel: 'View accounts',
+        tone: liquidAssets >= obligations ? 'positive' : 'alert',
+      });
+    } else if (liquidAssets > 0) {
+      out.push({
+        eyebrow: 'Liquidity',
+        title: 'No card dues outstanding',
+        body: 'Nothing owed on tracked credit accounts right now.',
+        meta: `${formatINR(liquidAssets)} liquid assets`,
+        to: '/accounts',
+        toLabel: 'View accounts',
+        tone: 'positive',
+      });
+    }
+
+    // 4. Savings context when meaningful
+    if (income > 0 && lastExpenses > 0) {
+      const change = ((currentExpenses - lastExpenses) / lastExpenses) * 100;
+      if (out.length < 4) {
+        out.push({
+          eyebrow: 'Cash flow',
+          title: change >= 0 ? `Spending up ${Math.abs(change).toFixed(0)}%` : `Spending down ${Math.abs(change).toFixed(0)}%`,
+          body: `From ${formatINR(lastExpenses)} last month to ${formatINR(currentExpenses)} this month, on ${formatINR(income)} income.`,
+          meta: `${formatINR(income - currentExpenses)} net this month`,
+          to: '/analytics',
+          toLabel: 'Open analytics',
+          tone: change > 20 ? 'alert' : 'neutral',
         });
       }
     }
 
-    // 4. Net worth trajectory
-    if (prevNetWorth > 0) {
-      const nwPercent = (netWorthChange / prevNetWorth) * 100;
-      const growing = netWorthChange > 0;
-      result.push({
-        icon: growing ? TrendingUp : TrendingDown,
-        iconBg: growing
-          ? 'bg-brand-emerald-light dark:bg-[rgba(52,211,153,0.12)]'
-          : 'bg-brand-red-light dark:bg-[rgba(251,113,133,0.12)]',
-        iconColor: growing ? 'text-brand-emerald' : 'text-brand-red',
-        title: `Net worth ${growing ? 'grew' : 'declined'} ${formatPercent(Math.abs(nwPercent))}`,
-        description: `Your net worth changed by ${formatINR(Math.abs(netWorthChange))} compared to last month, now at ${formatCompact(netWorth)}.`,
-      });
-    }
-
-    return result;
-  }, [transactions, netWorth, prevNetWorth]);
+    void netWorth;
+    return out.slice(0, 3);
+  }, [transactions, accounts, netWorth]);
 
   if (insights.length === 0) return null;
 
   return (
     <section
-      className="card p-6 animate-fade-in-up"
-      aria-label="Financial insights"
-      style={{ animationDelay: '0.35s' }}
+      className="animate-fade-in-up section-divider pt-6"
+      aria-label="Ledger insights"
+      style={{ animationDelay: '0.3s' }}
     >
-      {/* Header */}
-      <div className="flex items-center gap-2 mb-5">
-        <Lightbulb className="w-4 h-4 text-brand-amber" />
-        <h2 className="heading-sm text-zinc-900 dark:text-text-dark-primary">Insights</h2>
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center gap-2">
+          <Sparkles className="w-4 h-4 text-brand-amber" aria-hidden="true" />
+          <h2 className="heading-sm text-zinc-900 dark:text-text-dark-primary">Ledger Insights</h2>
+        </div>
+        <span className="text-xs text-text-tertiary dark:text-text-dark-tertiary">
+          {insights.length} thing{insights.length === 1 ? '' : 's'} worth knowing
+        </span>
       </div>
-
-      {/* Insight cards */}
-      <div className="space-y-3">
-        {insights.map((insight, idx) => (
-          <InsightCard key={idx} {...insight} />
+      <div>
+        {insights.map((ins, i) => (
+          <InsightRow key={i} {...ins} />
         ))}
       </div>
     </section>
