@@ -6,3 +6,6 @@ export { default as Badge } from './Badge';
 export { default as EmptyState } from './EmptyState';
 export { default as Tooltip } from './Tooltip';
 export { default as ConfirmDialog } from './ConfirmDialog';
+export { default as PageHeader } from './PageHeader';
+export { default as SegmentedControl } from './SegmentedControl';
+export { default as HowCalculated } from './HowCalculated';

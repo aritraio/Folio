@@ -43,6 +43,7 @@ export default function StatementUploadModal({ isOpen, onClose }) {
   const [selectedTargetAccountId, setSelectedTargetAccountId] = useState('');
   const [error, setError] = useState(null);
   const [committedCount, setCommittedCount] = useState(0);
+  const [skippedCount, setSkippedCount] = useState(0);
 
   const apiKey = settings?.geminiApiKey || '';
 
@@ -195,6 +196,7 @@ export default function StatementUploadModal({ isOpen, onClose }) {
 
     saveTransactionsBatch(formattedForSave);
     setCommittedCount(formattedForSave.length);
+    setSkippedCount(stagedTransactions.length - formattedForSave.length);
     refresh();
     setStep('success');
   };
@@ -583,10 +585,12 @@ export default function StatementUploadModal({ isOpen, onClose }) {
           </div>
           <div className="space-y-1">
             <h4 className="text-base font-semibold text-zinc-900 dark:text-text-dark-primary">
-              Successfully Imported {committedCount} Transactions
+              {committedCount} imported · {skippedCount} duplicates skipped
             </h4>
             <p className="text-xs text-text-secondary dark:text-text-dark-secondary">
-              Ledger account balances, cash flow charts, and spending analytics have been updated dynamically.
+              {committedCount} transactions added to your ledger
+              {skippedCount > 0 ? `, ${skippedCount} potential duplicates left out` : ''}. Balances,
+              cash flow and analytics updated.
             </p>
           </div>
           <div className="pt-3">

@@ -1,5 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { format, subMonths } from 'date-fns';
 import {
   Wallet,
   LayoutDashboard,
@@ -55,7 +56,7 @@ export default function Navbar({ onSearchClick }) {
   const userMenuRef = useRef(null);
   const notifRef = useRef(null);
   const { theme, preference, setPreference } = useTheme();
-  const { settings } = useData();
+  const { settings, transactions, budgets } = useData();
   const userName = settings?.userName || 'User';
   const userEmail = settings?.email || '';
   const initials = (userName || 'U')
@@ -72,6 +73,46 @@ export default function Navbar({ onSearchClick }) {
   };
 
   const themeLabel = preference === 'system' ? `System (${theme})` : preference === 'dark' ? 'Dark' : 'Light';
+
+  // Meaningful financial events only (§51) — never "you completed a transaction".
+  const notifications = useMemo(() => {
+    const items = [];
+    try {
+      const now = new Date();
+      const cur = format(now, 'yyyy-MM');
+      const prev = format(subMonths(now, 1), 'yyyy-MM');
+      const sumMonth = (k) =>
+        (transactions || [])
+          .filter((t) => t.type === 'expense' && String(t.date).slice(0, 7) === k)
+          .reduce((s, t) => s + Math.abs(Number(t.amount) || 0), 0);
+      const curSpend = sumMonth(cur);
+      const prevSpend = sumMonth(prev);
+      if (prevSpend > 0 && curSpend > prevSpend * 1.25) {
+        const pct = Math.round(((curSpend - prevSpend) / prevSpend) * 100);
+        items.push({
+          title: `Spending is ${pct}% above last month`,
+          body: 'Review where the increase concentrates before it compounds.',
+          to: '/analytics',
+        });
+      }
+      const over = (budgets || []).filter((b) => {
+        const spent = (transactions || [])
+          .filter((t) => t.type === 'expense' && String(t.date).slice(0, 7) === cur && t.category === b.category)
+          .reduce((s, t) => s + Math.abs(Number(t.amount) || 0), 0);
+        return Number(b.limit) > 0 && spent >= Number(b.limit) * 0.85;
+      });
+      over.slice(0, 2).forEach((b) =>
+        items.push({
+          title: `${b.category} budget needs attention`,
+          body: 'Approaching or over its monthly limit.',
+          to: '/budgets',
+        })
+      );
+    } catch {
+      /* notifications are best-effort */
+    }
+    return items.slice(0, 4);
+  }, [transactions, budgets]);
 
   // Close menus on outside click
   useEffect(() => {
@@ -225,38 +266,57 @@ export default function Navbar({ onSearchClick }) {
                   hover:bg-ivory-muted dark:hover:bg-surface-dark-elevated
                   transition-colors duration-150
                 "
-                aria-label="Notifications"
+                aria-label={`Notifications${notifications.length ? `, ${notifications.length} unread` : ''}`}
                 aria-expanded={notifOpen}
                 aria-haspopup="true"
               >
                 <Bell className="w-[18px] h-[18px]" />
-                <span
-                  className="absolute top-2 right-2 w-1.5 h-1.5 bg-brand-red rounded-full"
-                  aria-hidden="true"
-                />
+                {notifications.length > 0 && (
+                  <span
+                    className="absolute top-2 right-2 w-1.5 h-1.5 bg-brand-red rounded-full"
+                    aria-hidden="true"
+                  />
+                )}
               </button>
               {notifOpen && (
                 <div
-                  className="absolute right-0 top-full mt-2 w-72 p-4 bg-white dark:bg-surface-dark-card border border-ivory-border dark:border-surface-dark-border rounded-xl shadow-elevated dark:shadow-dark-elevated z-50"
+                  className="absolute right-0 top-full mt-2 w-80 p-4 bg-white dark:bg-surface-dark-card border border-ivory-border dark:border-surface-dark-border rounded-xl shadow-elevated dark:shadow-dark-elevated z-50"
                   role="menu"
                   aria-label="Notifications"
                 >
-                  <p className="text-sm font-semibold text-zinc-900 dark:text-text-dark-primary mb-1">
-                    You&apos;re all caught up
-                  </p>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
-                    Local-first demo: budgets, insights and reminders update from your transactions on the
-                    Dashboard. No server notifications in v1.
-                  </p>
-                  <button
-                    onClick={() => {
-                      setNotifOpen(false);
-                      navigate('/');
-                    }}
-                    className="mt-3 text-xs font-medium text-brand-amber hover:underline"
-                  >
-                    View insights →
-                  </button>
+                  {notifications.length === 0 ? (
+                    <>
+                      <p className="text-sm font-semibold text-zinc-900 dark:text-text-dark-primary mb-1">
+                        You&apos;re all caught up
+                      </p>
+                      <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
+                        No budget risks or spending anomalies right now. Insights update from your
+                        transactions on the Dashboard.
+                      </p>
+                    </>
+                  ) : (
+                    <ul className="space-y-3">
+                      {notifications.map((n, i) => (
+                        <li key={i} className="border-b border-ivory-border dark:border-surface-dark-border last:border-0 pb-3 last:pb-0">
+                          <p className="text-sm font-semibold text-zinc-900 dark:text-text-dark-primary">
+                            {n.title}
+                          </p>
+                          <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed mt-0.5">
+                            {n.body}
+                          </p>
+                          <button
+                            onClick={() => {
+                              setNotifOpen(false);
+                              navigate(n.to);
+                            }}
+                            className="mt-1.5 text-xs font-medium text-brand-amber hover:underline"
+                          >
+                            Review →
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
               )}
             </div>
