@@ -25,10 +25,11 @@ export default function Button({
   const base = [
     'inline-flex items-center justify-center gap-2',
     'font-sans font-medium rounded max-md:min-h-[44px]',
-    'transition-colors duration-150',
+    'transition-all duration-150 ease-out',
     'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white dark:focus-visible:outline-white',
     'disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none',
     'select-none cursor-pointer',
+    'active:scale-[0.97]',
   ].join(' ');
 
   const variants = {
@@ -37,22 +38,21 @@ export default function Button({
       'hover:bg-[#404040] hover:border-[#404040]',
       'dark:bg-white dark:text-[#0A0A0A] dark:border-white',
       'dark:hover:bg-[#E4E4E7] dark:hover:border-[#E4E4E7]',
-      'active:scale-[0.98]',
     ].join(' '),
     secondary: [
       'bg-transparent text-[#0A0A0A] border border-[#E5E5E5]',
-      'hover:bg-[#F5F5F5] hover:border-[#CCCCCC] active:scale-[0.98]',
+      'hover:bg-[#F5F5F5] hover:border-[#CCCCCC]',
       'dark:bg-transparent dark:text-white dark:border-[#262626]',
       'dark:hover:bg-[#1E1E1E] dark:hover:border-[#404040]',
     ].join(' '),
     ghost: [
       'bg-transparent text-[#404040] border border-transparent',
-      'hover:bg-[#F5F5F5] hover:text-[#0A0A0A] active:scale-[0.98]',
+      'hover:bg-[#F5F5F5] hover:text-[#0A0A0A]',
       'dark:text-[#C4C7C8] dark:hover:bg-[#1E1E1E] dark:hover:text-white',
     ].join(' '),
     destructive: [
       'bg-[#ff6b6b] text-[#0A0A0A] border border-[#ff6b6b]',
-      'hover:opacity-90 active:scale-[0.98]',
+      'hover:opacity-90',
       'dark:bg-[#ff6b6b] dark:text-[#0A0A0A] dark:border-[#ff6b6b]',
       'dark:hover:opacity-90',
     ].join(' '),

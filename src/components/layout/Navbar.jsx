@@ -2,47 +2,46 @@ import React, { useState, useRef, useEffect } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import {
   Terminal,
-  LayoutDashboard,
-  ArrowLeftRight,
-  Landmark,
-  BarChart3,
-  PiggyBank,
-  TrendingUp,
-  Settings,
+  Menu,
+  X,
   Search,
-  Bell,
   User,
   Download,
   Moon,
   Sun,
+  Settings,
 } from 'lucide-react';
-import MobileNav from './MobileNav';
 import { useTheme } from '../ThemeProvider';
 import { useData } from '../../contexts/DataContext';
 import { downloadBackup } from '../../services/storage';
 
-const NAV_ITEMS = [
-  { to: '/', label: 'Dashboard', icon: LayoutDashboard },
-  { to: '/transactions', label: 'Transactions', icon: ArrowLeftRight },
-  { to: '/accounts', label: 'Accounts', icon: Landmark },
-  { to: '/analytics', label: 'Analytics', icon: BarChart3 },
-  { to: '/budgets', label: 'Budgets', icon: PiggyBank },
-  { to: '/investments', label: 'Investments', icon: TrendingUp },
-  { to: '/settings', label: 'Settings', icon: Settings },
-];
+const PAGE_LABELS = {
+  '/': 'Dashboard',
+  '/transactions': 'Transactions',
+  '/accounts': 'Accounts',
+  '/analytics': 'Analytics',
+  '/budgets': 'Budgets',
+  '/investments': 'Investments',
+  '/settings': 'Settings',
+};
 
 /**
- * Navbar — Terminal top navigation.
- * Bg #0A0A0A/#111111 with crisp 1px #262626 border. Active route:
- * solid white indicator + high-contrast neutral badge. Monochrome brand.
+ * Navbar — Minimalist terminal top bar.
+ *
+ * Left: animated hamburger trigger + brand mark + live breadcrumb.
+ * Center: quick-search pill (⌘K) on wide screens.
+ * Right: theme flip toggle, search icon (compact screens), user pill.
+ * Full navigation lives in the SidebarDrawer on all screen sizes.
+ *
+ * @param {() => void} onSearchClick
+ * @param {boolean} isDrawerOpen
+ * @param {() => void} onMenuClick
  */
-export default function Navbar({ onSearchClick }) {
+export default function Navbar({ onSearchClick, isDrawerOpen = false, onMenuClick }) {
   const location = useLocation();
   const navigate = useNavigate();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const [notifOpen, setNotifOpen] = useState(false);
   const userMenuRef = useRef(null);
-  const notifRef = useRef(null);
   const { theme, preference, setPreference } = useTheme();
   const { settings } = useData();
   const userName = settings?.userName || 'User';
@@ -61,27 +60,23 @@ export default function Navbar({ onSearchClick }) {
   };
 
   const themeLabel = preference === 'system' ? `System (${theme})` : preference === 'dark' ? 'Dark' : 'Light';
+  const activePage = PAGE_LABELS[location.pathname] || 'Not Found';
 
-  // Close menus on outside click
+  // Close user menu on outside click / route change
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
         setUserMenuOpen(false);
       }
-      if (notifRef.current && !notifRef.current.contains(e.target)) {
-        setNotifOpen(false);
-      }
     };
-    if (userMenuOpen || notifOpen) {
+    if (userMenuOpen) {
       document.addEventListener('mousedown', handleClickOutside);
     }
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [userMenuOpen, notifOpen]);
+  }, [userMenuOpen]);
 
-  // Close menus on route change
   useEffect(() => {
     setUserMenuOpen(false);
-    setNotifOpen(false);
   }, [location.pathname]);
 
   return (
@@ -95,102 +90,115 @@ export default function Navbar({ onSearchClick }) {
       role="navigation"
       aria-label="Main navigation"
     >
-      <div className="max-w-[1400px] mx-auto px-6">
-        <div className="flex items-center justify-between h-16">
-          {/* ── Left: Mobile Hamburger + Logo ── */}
-          <div className="flex items-center gap-2">
-            <MobileNav />
-            <NavLink
-              to="/"
-              className="flex items-center gap-2.5 shrink-0 group"
-              aria-label="Folio — Go to dashboard"
-            >
-              <div
-                className="
-              p-2 rounded
-              bg-[#0A0A0A] text-white
-              dark:bg-white dark:text-[#0A0A0A]
-              group-hover:opacity-80
-              transition-opacity duration-150
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
+        <div className="flex items-center gap-2 h-16">
+          {/* ── Left: Hamburger + Brand + Breadcrumb ── */}
+          <button
+            onClick={onMenuClick}
+            className="
+              group p-2.5 rounded
+              text-[#8E9192]
+              hover:text-[#0A0A0A] dark:hover:text-white
+              hover:bg-[#F5F5F5] dark:hover:bg-[#1E1E1E]
+              transition-all duration-150 ease-out
+              active:scale-[0.97]
             "
-              >
-                <Terminal className="w-5 h-5" />
-              </div>
-              <span className="font-sans text-lg font-semibold tracking-tight text-[#0A0A0A] dark:text-white">
-                FOLIO
-                <span className="ml-2 font-mono text-[10px] font-medium text-[#8E9192] tracking-widest">
-                  v1.0
-                </span>
-              </span>
-            </NavLink>
-          </div>
-
-          {/* ── Center: Navigation Links ── */}
-          <div className="hidden md:flex items-center gap-1">
-            {NAV_ITEMS.map(({ to, label, icon: Icon }) => (
-              <NavLink
-                key={to}
-                to={to}
-                end={to === '/'}
-                className={({ isActive }) => `
-                  relative px-3 py-2 rounded
-                  flex items-center gap-1.5
-                  text-[11px] font-semibold uppercase tracking-widest
-                  transition-colors duration-150
-                  ${
-                    isActive
-                      ? 'text-[#0A0A0A] bg-[#F5F5F5] border border-[#E5E5E5] dark:text-white dark:bg-[#1E1E1E] dark:border-[#404040]'
-                      : 'text-[#8E9192] border border-transparent hover:text-[#0A0A0A] hover:bg-[#F5F5F5] dark:hover:text-white dark:hover:bg-[#1E1E1E] group'
-                  }
-                `}
-              >
-                <Icon className="w-3.5 h-3.5" />
-                <span>{label}</span>
-                {/* Active indicator — solid white line */}
-                {({ isActive }) => (
-                  <span
-                    className={`
-                      absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] rounded-sm bg-current transition-all duration-200
-                      ${isActive ? 'w-4 opacity-100' : 'w-0 opacity-0 group-hover:w-4 group-hover:opacity-100'}
-                    `}
-                  />
-                )}
-              </NavLink>
-            ))}
-          </div>
-
-          {/* ── Right: Actions ── */}
-          <div className="flex items-center gap-1">
-            {/* Theme Toggle */}
-            <button
-              onClick={cycleTheme}
-              className="
-                relative p-2.5 rounded
-                text-[#8E9192]
-                hover:text-[#0A0A0A] dark:hover:text-white
-                hover:bg-[#F5F5F5] dark:hover:bg-[#1E1E1E]
-                transition-colors duration-150
-                group
-              "
-              aria-label={`Toggle theme (current: ${themeLabel})`}
-              title={`Theme: ${themeLabel}`}
+            aria-label={isDrawerOpen ? 'Close navigation menu' : 'Open navigation menu (M)'}
+            aria-expanded={isDrawerOpen}
+            aria-controls="sidebar-drawer"
+          >
+            <span
+              key={isDrawerOpen ? 'x' : 'menu'}
+              className="icon-flip motion-reduce:animate-none transition-transform duration-200 group-hover:rotate-90"
             >
-              {theme === 'dark' ? (
-                <Moon className="w-[18px] h-[18px]" />
-              ) : (
-                <Sun className="w-[18px] h-[18px]" />
-              )}
-            </button>
+              {isDrawerOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </span>
+          </button>
 
-            {/* Search */}
+          <NavLink
+            to="/"
+            className="flex items-center gap-2.5 shrink-0 group transition-all duration-150 ease-out active:scale-[0.97]"
+            aria-label="Folio — Go to dashboard"
+          >
+            <div className="p-2 rounded bg-[#0A0A0A] text-white dark:bg-white dark:text-[#0A0A0A] group-hover:opacity-80 transition-opacity duration-150">
+              <Terminal className="w-5 h-5" />
+            </div>
+            <span className="font-sans text-lg font-semibold tracking-tight text-[#0A0A0A] dark:text-white">
+              FOLIO
+              <span className="ml-2 font-mono text-[10px] font-medium text-[#8E9192] tracking-widest">
+                v1.0
+              </span>
+            </span>
+          </NavLink>
+
+          <span
+            className="hidden md:flex items-center gap-2 ml-3 pl-3 border-l border-[#E5E5E5] dark:border-[#262626] font-mono text-xs text-[#8E9192] whitespace-nowrap"
+            aria-label={`Current page: ${activePage}`}
+            aria-live="polite"
+          >
+            <span>FOLIO</span>
+            <span aria-hidden="true">/</span>
+            <span key={activePage} className="page-enter motion-reduce:animate-none text-[#404040] dark:text-[#C4C7C8]">
+              {activePage}
+            </span>
+          </span>
+
+          {/* ── Center: quick-search pill ── */}
+          <div className="hidden lg:flex flex-1 justify-center px-6">
             <button
               onClick={onSearchClick}
+              className="
+                w-full max-w-md flex items-center gap-2.5 px-3.5 py-2 rounded
+                border border-[#E5E5E5] dark:border-[#262626]
+                bg-[#F5F5F5] dark:bg-[#0A0A0A]
+                text-sm text-[#8E9192]
+                hover:border-[#CCCCCC] dark:hover:border-[#404040]
+                hover:text-[#404040] dark:hover:text-[#C4C7C8]
+                transition-all duration-150 ease-out
+                active:scale-[0.97]
+              "
+              aria-label="Search (Ctrl+K)"
+            >
+              <Search className="w-4 h-4 shrink-0" />
+              <span className="flex-1 text-left truncate">Search transactions, accounts…</span>
+              <kbd className="shrink-0 font-mono text-[10px] px-1.5 py-0.5 rounded border border-[#E5E5E5] dark:border-[#262626] bg-white dark:bg-[#1E1E1E]">
+                ⌘K
+              </kbd>
+            </button>
+          </div>
+          <div className="flex-1 lg:hidden" />
+
+          {/* ── Right: tools + profile ── */}
+          <div className="flex items-center gap-1 shrink-0">
+            {/* Theme Toggle with flip */}
+            <button
+              onClick={cycleTheme}
               className="
                 p-2.5 rounded
                 text-[#8E9192]
                 hover:text-[#0A0A0A] dark:hover:text-white
                 hover:bg-[#F5F5F5] dark:hover:bg-[#1E1E1E]
-                transition-colors duration-150
+                transition-all duration-150 ease-out
+                active:scale-[0.97]
+              "
+              aria-label={`Toggle theme (current: ${themeLabel})`}
+              title={`Theme: ${themeLabel}`}
+            >
+              <span key={theme} className="icon-flip motion-reduce:animate-none">
+                {theme === 'dark' ? <Moon className="w-[18px] h-[18px]" /> : <Sun className="w-[18px] h-[18px]" />}
+              </span>
+            </button>
+
+            {/* Search (compact screens — pill covers lg+) */}
+            <button
+              onClick={onSearchClick}
+              className="
+                lg:hidden p-2.5 rounded
+                text-[#8E9192]
+                hover:text-[#0A0A0A] dark:hover:text-white
+                hover:bg-[#F5F5F5] dark:hover:bg-[#1E1E1E]
+                transition-all duration-150 ease-out
+                active:scale-[0.97]
               "
               aria-label="Search (Ctrl+K)"
               title="Search (Ctrl+K)"
@@ -198,64 +206,19 @@ export default function Navbar({ onSearchClick }) {
               <Search className="w-[18px] h-[18px]" />
             </button>
 
-            {/* Notifications */}
-            <div className="relative" ref={notifRef}>
-              <button
-                onClick={() => setNotifOpen((v) => !v)}
-                className="
-                  relative p-2.5 rounded
-                  text-[#8E9192]
-                  hover:text-[#0A0A0A] dark:hover:text-white
-                  hover:bg-[#F5F5F5] dark:hover:bg-[#1E1E1E]
-                  transition-colors duration-150
-                "
-                aria-label="Notifications"
-                aria-expanded={notifOpen}
-                aria-haspopup="true"
-              >
-                <Bell className="w-[18px] h-[18px]" />
-                <span
-                  className="absolute top-2 right-2 w-1.5 h-1.5 bg-[#ff6b6b] rounded-full"
-                  aria-hidden="true"
-                />
-              </button>
-              {notifOpen && (
-                <div
-                  className="absolute right-0 top-full mt-2 w-72 p-4 bg-white dark:bg-[#141414] border border-[#E5E5E5] dark:border-[#262626] rounded-md z-50"
-                  role="menu"
-                  aria-label="Notifications"
-                >
-                  <p className="text-sm font-semibold text-[#0A0A0A] dark:text-white mb-1">
-                    You&apos;re all caught up
-                  </p>
-                  <p className="text-xs text-[#8E9192] leading-relaxed">
-                    Local-first demo: budgets, insights and reminders update from your transactions on the
-                    Dashboard. No server notifications in v1.
-                  </p>
-                  <button
-                    onClick={() => {
-                      setNotifOpen(false);
-                      navigate('/');
-                    }}
-                    className="mt-3 text-xs font-medium text-[#0A0A0A] dark:text-white hover:opacity-70 underline underline-offset-2"
-                  >
-                    View insights →
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* Divider */}
             <div className="w-px h-6 bg-[#E5E5E5] dark:bg-[#262626] mx-1.5" aria-hidden="true" />
 
-            {/* User Menu */}
+            {/* User pill */}
             <div className="relative" ref={userMenuRef}>
               <button
-                onClick={() => setUserMenuOpen(!userMenuOpen)}
+                onClick={() => setUserMenuOpen((v) => !v)}
                 className="
-                  flex items-center gap-2 p-1.5 pr-3 rounded
+                  flex items-center gap-2 p-1.5 pr-2.5 rounded
+                  border border-transparent
                   hover:bg-[#F5F5F5] dark:hover:bg-[#1E1E1E]
-                  transition-colors duration-150
+                  hover:border-[#E5E5E5] dark:hover:border-[#262626]
+                  transition-all duration-150 ease-out
+                  active:scale-[0.97]
                 "
                 aria-label="User menu"
                 aria-expanded={userMenuOpen}
@@ -278,7 +241,6 @@ export default function Navbar({ onSearchClick }) {
                 </span>
               </button>
 
-              {/* Dropdown */}
               {userMenuOpen && (
                 <div
                   className="
@@ -287,17 +249,16 @@ export default function Navbar({ onSearchClick }) {
                     bg-white dark:bg-[#141414]
                     border border-[#E5E5E5] dark:border-[#262626]
                     rounded-md
-                    animate-fade-in-up
+                    animate-fade-in-up motion-reduce:animate-none
                     z-50
                   "
                   role="menu"
                 >
-                  {/* User info */}
                   <div className="px-4 py-3 border-b border-[#E5E5E5] dark:border-[#262626]">
                     <p className="text-sm font-semibold text-[#0A0A0A] dark:text-white">
                       {userName}
                     </p>
-                    {userEmail && <p className="text-xs text-[#8E9192]">{userEmail}</p>}
+                    {userEmail && <p className="text-xs text-[#8E9192] font-mono">{userEmail}</p>}
                   </div>
 
                   <div className="py-1">

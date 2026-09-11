@@ -194,11 +194,13 @@
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
     transition:
-      border-color 0.15s ease,
-      background-color 0.15s ease;
+      border-color 0.2s ease,
+      background-color 0.15s ease,
+      transform 0.2s ease;
   }
   .card:hover {
     border-color: var(--color-border-hover);
+    transform: translateY(-1px);
   }
 
   /* ── Backdrop overlay for modals ── */
@@ -224,6 +226,72 @@
     border-radius: var(--radius-md);
     font-family: 'JetBrains Mono', monospace;
     font-variant-numeric: tabular-nums;
+  }
+
+  /* ── Drawer panel entrance (280ms expo slide) ── */
+  .drawer-panel {
+    animation: drawerSlideIn 280ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  /* ── Staggered drawer items (delay via --stagger-delay) ── */
+  .drawer-item {
+    opacity: 0;
+    animation: staggerFade 220ms ease-out forwards;
+    animation-delay: var(--stagger-delay, 0ms);
+  }
+
+  /* ── Route view entrance (180ms fade-and-rise) ── */
+  .page-enter {
+    animation: pageEnter 180ms ease-out both;
+  }
+
+  /* ── Icon flip (theme toggle Menu↔X morph) ── */
+  .icon-flip {
+    display: inline-flex;
+    animation: iconFlip 220ms ease-out both;
+  }
+}
+
+/* ── Micro-animation keyframes ── */
+@keyframes drawerSlideIn {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes staggerFade {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes iconFlip {
+  from {
+    transform: rotate(-180deg) scale(0.9);
+    opacity: 0.4;
+  }
+  to {
+    transform: rotate(0deg) scale(1);
+    opacity: 1;
   }
 }
 
