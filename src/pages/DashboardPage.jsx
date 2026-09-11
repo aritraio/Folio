@@ -85,7 +85,7 @@ export default function DashboardPage() {
         investmentReturn={computed.investmentReturns.returnPercentage}
       />
 
-      <NetWorthChart data={computed.netWorthHistory} />
+      <NetWorthChart data={computed.netWorthHistory} currentNetWorth={computed.netWorth} />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <CashFlowChart data={computed.cashFlow} />
