@@ -154,19 +154,19 @@ export default function HoldingModal({ isOpen, onClose, holding, onSave }) {
 
         {/* Preview computed values */}
         {formData.units && formData.avgPrice && formData.currentPrice && (
-          <div className="bg-ivory-muted dark:bg-surface-dark-elevated rounded-lg p-4 space-y-2">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-text-secondary dark:text-text-dark-secondary">
+          <div className="bg-[#F5F5F5] dark:bg-[#0A0A0A] border border-[#E5E5E5] dark:border-[#262626] rounded p-4 space-y-2">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[#8E9192] font-mono">
               Preview
             </p>
             <div className="flex justify-between text-sm">
-              <span className="text-text-secondary dark:text-text-dark-secondary">Invested Value</span>
-              <span className="mono font-semibold text-zinc-900 dark:text-text-dark-primary">
+              <span className="text-[#8E9192]">Invested Value</span>
+              <span className="mono font-semibold font-mono tabular-nums text-[#0A0A0A] dark:text-white">
                 ₹{(Number(formData.units) * Number(formData.avgPrice)).toLocaleString('en-IN')}
               </span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-text-secondary dark:text-text-dark-secondary">Current Value</span>
-              <span className="mono font-semibold text-zinc-900 dark:text-text-dark-primary">
+              <span className="text-[#8E9192]">Current Value</span>
+              <span className="mono font-semibold font-mono tabular-nums text-[#0A0A0A] dark:text-white">
                 ₹{(Number(formData.units) * Number(formData.currentPrice)).toLocaleString('en-IN')}
               </span>
             </div>
@@ -176,10 +176,10 @@ export default function HoldingModal({ isOpen, onClose, holding, onSave }) {
               const ret = cur - inv;
               const isPos = ret >= 0;
               return (
-                <div className="flex justify-between text-sm pt-1 border-t border-ivory-border dark:border-surface-dark-border">
-                  <span className="text-text-secondary dark:text-text-dark-secondary">P&L</span>
+                <div className="flex justify-between text-sm pt-1 border-t border-[#E5E5E5] dark:border-[#262626]">
+                  <span className="text-[#8E9192]">P&L</span>
                   <span
-                    className={`mono font-bold ${isPos ? 'text-brand-emerald dark:text-emerald-400' : 'text-brand-red dark:text-rose-400'}`}
+                    className={`mono font-bold font-mono tabular-nums ${isPos ? 'text-[#00a383] dark:text-[#00b894]' : 'text-[#e84118] dark:text-[#ff6b6b]'}`}
                   >
                     {isPos ? '+' : '−'}₹{Math.abs(ret).toLocaleString('en-IN')}
                   </span>
@@ -189,7 +189,7 @@ export default function HoldingModal({ isOpen, onClose, holding, onSave }) {
           </div>
         )}
 
-        <div className="pt-4 flex justify-end gap-3 border-t border-ivory-border dark:border-surface-dark-border mt-6">
+        <div className="pt-4 flex justify-end gap-3 border-t border-[#E5E5E5] dark:border-[#262626] mt-6">
           <Button type="button" variant="ghost" onClick={onClose}>
             Cancel
           </Button>

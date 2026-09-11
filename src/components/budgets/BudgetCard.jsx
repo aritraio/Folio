@@ -9,14 +9,14 @@ export default function BudgetCard({ budget, onEdit, onDelete }) {
 
   const { category, limit, spent, remaining, percentage, status } = budget;
 
-  // Derive styling from status
-  let statusColor = 'text-brand-emerald dark:text-emerald-400';
+  // Derive styling from status — terminal: white neutral, red only when exceeded
+  let statusClass = 'text-[#00a383] dark:text-[#00b894]';
   let StatusIcon = null;
 
   if (status === 'warning') {
-    statusColor = 'text-brand-amber dark:text-amber-400';
+    statusClass = 'text-[#0A0A0A] dark:text-white';
   } else if (status === 'exceeded') {
-    statusColor = 'text-brand-red dark:text-rose-400';
+    statusClass = 'text-[#e84118] dark:text-[#ff6b6b]';
     StatusIcon = AlertCircle;
   }
 
@@ -32,29 +32,29 @@ export default function BudgetCard({ budget, onEdit, onDelete }) {
 
   return (
     <>
-      <div className="card p-5 group relative overflow-hidden transition-all duration-200 hover:shadow-md hover:border-zinc-300 dark:hover:border-zinc-600">
-        {/* Decorative left border for over-budget */}
-        {status === 'exceeded' && <div className="absolute top-0 left-0 w-1 h-full bg-brand-red" />}
+      <div className="card p-5 group relative overflow-hidden transition-colors duration-150 hover:border-[#CCCCCC] dark:hover:border-[#404040]">
+        {/* Sharp left signal for over-budget */}
+        {status === 'exceeded' && <div className="absolute top-0 left-0 w-[2px] h-full bg-[#ff6b6b]" />}
 
         <div className="flex justify-between items-start mb-6">
           <div className="flex items-center gap-2">
-            <h3 className="text-sm font-medium text-zinc-900 dark:text-text-dark-primary flex items-center gap-1.5">
+            <h3 className="text-sm font-medium text-[#0A0A0A] dark:text-white flex items-center gap-1.5">
               {category}
-              {StatusIcon && <StatusIcon className="w-4 h-4 text-brand-red" />}
+              {StatusIcon && <StatusIcon className="w-4 h-4 text-[#ff6b6b]" />}
             </h3>
           </div>
 
           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
             <button
               onClick={handleEdit}
-              className="p-1.5 text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 dark:hover:text-zinc-200 dark:hover:bg-surface-dark-elevated rounded-md transition-colors"
+              className="p-1.5 text-[#8E9192] hover:text-[#0A0A0A] hover:bg-[#F5F5F5] dark:hover:text-white dark:hover:bg-[#1E1E1E] rounded transition-colors"
               aria-label="Edit budget"
             >
               <Pencil className="w-4 h-4" />
             </button>
             <button
               onClick={handleDelete}
-              className="p-1.5 text-zinc-400 hover:text-brand-red hover:bg-brand-red-light rounded-md transition-colors"
+              className="p-1.5 text-[#8E9192] hover:text-[#ff6b6b] hover:bg-[rgba(255,107,107,0.12)] rounded transition-colors"
               aria-label="Delete budget"
             >
               <Trash2 className="w-4 h-4" />
@@ -65,18 +65,18 @@ export default function BudgetCard({ budget, onEdit, onDelete }) {
         <div className="space-y-4">
           <div className="flex justify-between items-end">
             <div>
-              <p className="text-xl font-mono font-medium text-zinc-900 dark:text-text-dark-primary">
+              <p className="text-xl font-mono tabular-nums font-bold text-[#0A0A0A] dark:text-white">
                 {formatINR(spent, { showSymbol: true })}
               </p>
-              <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
+              <p className="text-xs text-[#8E9192] mt-1 font-mono">
                 of {formatINR(limit, { showSymbol: true })} limit
               </p>
             </div>
             <div className="text-right">
-              <p className={`text-xs font-semibold ${statusColor}`}>{formatPercent(percentage, 1)}</p>
-              <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
+              <p className={`text-xs font-semibold font-mono tabular-nums ${statusClass}`}>{formatPercent(percentage, 1)}</p>
+              <p className="text-xs text-[#8E9192] mt-1">
                 {status === 'exceeded' ? 'Over budget by ' : 'Remaining: '}
-                <span className="font-mono font-medium text-zinc-900 dark:text-zinc-300">
+                <span className="font-mono tabular-nums font-medium text-[#0A0A0A] dark:text-white">
                   {formatINR(status === 'exceeded' ? Math.abs(remaining) : remaining, { showSymbol: true })}
                 </span>
               </p>

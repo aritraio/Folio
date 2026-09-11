@@ -140,7 +140,7 @@ export default function TransactionModal({
     >
       <form onSubmit={handleSubmit} className="space-y-5" noValidate>
         <div
-          className="flex bg-zinc-100 dark:bg-surface-dark-elevated p-1 rounded-lg"
+          className="flex bg-[#F5F5F5] dark:bg-[#0A0A0A] border border-[#E5E5E5] dark:border-[#262626] p-1 rounded"
           role="tablist"
           aria-label="Transaction type"
         >
@@ -150,10 +150,10 @@ export default function TransactionModal({
               type="button"
               role="tab"
               aria-selected={formData.type === t}
-              className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-colors capitalize ${
+              className={`flex-1 py-1.5 text-sm font-medium font-mono uppercase tracking-wider rounded transition-colors capitalize ${
                 formData.type === t
-                  ? 'bg-white dark:bg-surface-dark-card text-zinc-900 dark:text-text-dark-primary shadow-sm'
-                  : 'text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200'
+                  ? 'bg-[#0A0A0A] text-white dark:bg-white dark:text-[#0A0A0A]'
+                  : 'text-[#8E9192] hover:text-[#0A0A0A] dark:hover:text-white'
               }`}
               onClick={() => setFormData({ ...formData, type: t })}
             >
@@ -171,7 +171,7 @@ export default function TransactionModal({
             step="0.01"
             inputMode="decimal"
             placeholder="0.00"
-            icon={<span className="text-sm">{getCurrencySymbol()}</span>}
+            icon={<span className="text-sm font-mono">{getCurrencySymbol()}</span>}
             value={formData.amount}
             onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
             error={errors.amount}
@@ -186,7 +186,7 @@ export default function TransactionModal({
               error={errors.date}
             />
             {isFuture && !errors.date && (
-              <p className="mt-1 text-xs text-brand-amber">
+              <p className="mt-1 text-xs text-[#0A0A0A] dark:text-white">
                 Future date — scheduled transactions aren&apos;t tracked separately yet.
               </p>
             )}
@@ -241,7 +241,7 @@ export default function TransactionModal({
         </div>
 
         {formData.type === 'transfer' && (
-          <p className="text-xs text-zinc-500 dark:text-zinc-400 -mt-2">
+          <p className="text-xs text-[#8E9192] -mt-2">
             Transfers move money between your accounts and are excluded from income/expense totals.
           </p>
         )}
@@ -249,13 +249,13 @@ export default function TransactionModal({
         <div>
           <label
             htmlFor="tx-notes"
-            className="block text-sm font-medium text-zinc-700 dark:text-text-dark-secondary mb-1.5"
+            className="block text-sm font-medium text-[#404040] dark:text-[#C4C7C8] mb-1.5"
           >
             Notes (Optional)
           </label>
           <textarea
             id="tx-notes"
-            className="w-full px-3.5 py-2.5 text-sm font-sans text-zinc-900 dark:text-text-dark-primary bg-white dark:bg-surface-dark-elevated border border-ivory-border dark:border-surface-dark-border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-amber/20 focus:border-brand-amber transition-all duration-150 resize-none"
+            className="w-full px-3.5 py-2.5 text-sm font-sans text-[#0A0A0A] dark:text-white bg-white dark:bg-[#0A0A0A] border border-[#E5E5E5] dark:border-[#262626] rounded focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-[#0A0A0A] dark:focus:border-white transition-colors duration-150 resize-none"
             rows={3}
             maxLength={500}
             placeholder="Add details about this transaction..."
@@ -264,13 +264,13 @@ export default function TransactionModal({
             aria-describedby={errors.notes ? 'tx-notes-error' : undefined}
           />
           {errors.notes && (
-            <p id="tx-notes-error" className="mt-1 text-xs text-brand-red" role="alert">
+            <p id="tx-notes-error" className="mt-1 text-xs text-[#ff6b6b]" role="alert">
               {errors.notes}
             </p>
           )}
         </div>
 
-        <div className="pt-4 flex justify-end gap-3 border-t border-ivory-border dark:border-surface-dark-border">
+        <div className="pt-4 flex justify-end gap-3 border-t border-[#E5E5E5] dark:border-[#262626]">
           <Button type="button" variant="ghost" onClick={onClose} disabled={isSaving}>
             Cancel
           </Button>

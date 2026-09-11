@@ -2,38 +2,32 @@ import React, { useState, useCallback } from 'react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Sector } from 'recharts';
 import { formatINR } from '@/utils/formatCurrency';
 
+/* Monochrome allocation tones by asset class */
 const ALLOCATION_COLORS = {
-  'Mutual Fund': '#D97706',
-  Stocks: '#0D9488',
-  Gold: '#F59E0B',
-  'Provident Fund': '#6366F1',
-  'Fixed Deposit': '#3B82F6',
-  Bonds: '#8B5CF6',
-  'Real Estate': '#EC4899',
-  Other: '#6B7280',
+  'Mutual Fund': '#FFFFFF',
+  Stocks: '#E4E4E7',
+  Gold: '#A1A1AA',
+  'Provident Fund': '#71717A',
+  'Fixed Deposit': '#52525B',
+  Bonds: '#3F3F46',
+  'Real Estate': '#27272A',
+  Other: '#71717A',
 };
 
 /**
- * Custom tooltip for the allocation donut.
+ * Terminal tooltip: #141414 bg, #262626 border, mono figures.
  */
 function AllocationTooltip({ active, payload }) {
   if (!active || !payload?.length) return null;
   const { name, value, percentage, color } = payload[0].payload;
   return (
-    <div
-      className="
-      bg-white dark:bg-surface-dark-card
-      border border-ivory-border dark:border-surface-dark-border
-      rounded-lg shadow-elevated dark:shadow-dark-elevated
-      px-4 py-3
-    "
-    >
+    <div className="bg-[#141414] border border-[#262626] rounded px-4 py-3">
       <div className="flex items-center gap-2 mb-1">
         <span className="w-2.5 h-2.5 rounded-full" style={{ background: color }} />
-        <span className="text-xs font-semibold text-zinc-900 dark:text-text-dark-primary">{name}</span>
+        <span className="text-xs font-semibold text-white">{name}</span>
       </div>
-      <p className="text-sm font-bold mono text-zinc-900 dark:text-text-dark-primary">{formatINR(value)}</p>
-      <p className="text-xs text-text-secondary dark:text-text-dark-secondary">
+      <p className="text-sm font-bold font-mono tabular-nums text-white">{formatINR(value)}</p>
+      <p className="text-xs text-[#8E9192] font-mono">
         {percentage.toFixed(1)}% of portfolio
       </p>
     </div>
@@ -62,9 +56,7 @@ function renderActiveShape(props) {
 }
 
 /**
- * AllocationChart — Donut chart showing investment allocation by category.
- *
- * @param {{ holdings: Array }} props
+ * AllocationChart — Monochrome donut of allocation by asset class.
  */
 export default function AllocationChart({ holdings = [] }) {
   const [activeIndex, setActiveIndex] = useState(-1);
@@ -94,7 +86,7 @@ export default function AllocationChart({ holdings = [] }) {
         name,
         value,
         percentage: total > 0 ? (value / total) * 100 : 0,
-        color: ALLOCATION_COLORS[name] || '#6B7280',
+        color: ALLOCATION_COLORS[name] || '#71717A',
       }))
       .sort((a, b) => b.value - a.value);
   })();
@@ -110,8 +102,8 @@ export default function AllocationChart({ holdings = [] }) {
       style={{ animationDelay: '0.1s' }}
     >
       <div className="mb-5">
-        <h2 className="heading-sm text-zinc-900 dark:text-text-dark-primary">Allocation</h2>
-        <p className="text-xs text-text-secondary dark:text-text-dark-secondary mt-0.5">
+        <h2 className="heading-sm text-[#0A0A0A] dark:text-white">Allocation</h2>
+        <p className="text-xs text-[#8E9192] mt-0.5 font-mono uppercase tracking-widest">
           Portfolio distribution by asset class
         </p>
       </div>
@@ -137,7 +129,7 @@ export default function AllocationChart({ holdings = [] }) {
                 onMouseLeave={onPieLeave}
               >
                 {allocationData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
+                  <Cell key={`cell-${index}`} fill={entry.color} stroke="#0A0A0A" strokeWidth={1} />
                 ))}
               </Pie>
               <Tooltip content={<AllocationTooltip />} />
@@ -145,10 +137,10 @@ export default function AllocationChart({ holdings = [] }) {
           </ResponsiveContainer>
           {/* Center text */}
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-text-tertiary dark:text-text-dark-tertiary">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-[#8E9192] font-mono">
               Total
             </span>
-            <span className="text-sm font-bold mono text-zinc-900 dark:text-text-dark-primary">
+            <span className="text-sm font-bold font-mono tabular-nums text-[#0A0A0A] dark:text-white">
               {formatINR(totalValue)}
             </span>
           </div>
@@ -160,24 +152,24 @@ export default function AllocationChart({ holdings = [] }) {
             <div
               key={item.name}
               className={`
-                flex items-center justify-between py-1.5 px-2 rounded-lg
+                flex items-center justify-between py-1.5 px-2 rounded
                 transition-colors duration-150
-                ${activeIndex === idx ? 'bg-ivory-muted dark:bg-surface-dark-elevated' : ''}
+                ${activeIndex === idx ? 'bg-[#F5F5F5] dark:bg-[#1E1E1E]' : ''}
               `}
               onMouseEnter={() => setActiveIndex(idx)}
               onMouseLeave={() => setActiveIndex(-1)}
             >
               <div className="flex items-center gap-2.5 min-w-0">
                 <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: item.color }} />
-                <span className="text-sm text-zinc-700 dark:text-text-dark-secondary truncate">
+                <span className="text-sm text-[#404040] dark:text-[#C4C7C8] truncate">
                   {item.name}
                 </span>
               </div>
               <div className="flex items-center gap-3 shrink-0">
-                <span className="text-xs text-text-tertiary dark:text-text-dark-tertiary w-10 text-right">
+                <span className="text-xs text-[#8E9192] w-10 text-right font-mono tabular-nums">
                   {item.percentage.toFixed(0)}%
                 </span>
-                <span className="text-sm font-semibold mono text-zinc-900 dark:text-text-dark-primary w-24 text-right">
+                <span className="text-sm font-semibold font-mono tabular-nums text-[#0A0A0A] dark:text-white w-24 text-right">
                   {formatINR(item.value)}
                 </span>
               </div>

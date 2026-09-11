@@ -8,70 +8,117 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        serif: ['"Playfair Display"', 'Georgia', 'serif'],
         sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-        mono: ['"SF Mono"', '"Fira Code"', 'Consolas', 'monospace'],
+        mono: ['"JetBrains Mono"', 'monospace'],
       },
       colors: {
-        /* ── Light-mode surfaces ── */
+        /* ── Terminal surfaces (dark primary) ── */
+        base: {
+          DEFAULT: '#0A0A0A',
+          secondary: '#111111',
+          surface: '#141414',
+          card: '#141414',
+          hover: '#1E1E1E',
+        },
+        line: {
+          DEFAULT: '#262626',
+          hover: '#404040',
+          subtle: '#262626',
+        },
+        ink: {
+          primary: '#FFFFFF',
+          secondary: '#C4C7C8',
+          muted: '#8E9192',
+        },
+        finance: {
+          in: '#00b894',
+          out: '#ff6b6b',
+          'in-light': '#00a383',
+          'out-light': '#e84118',
+        },
+
+        /* ── Spec-literal tokens (bg-bg-primary, text-text-primary, …) ── */
+        'bg-primary': '#0A0A0A',
+        'bg-secondary': '#111111',
+        'bg-surface': '#141414',
+        'bg-card': '#141414',
+        'border-color': '#262626',
+        'text-primary': '#FFFFFF',
+        'text-secondary': '#C4C7C8',
+        'text-muted': '#8E9192',
+        'finance-in': '#00b894',
+        'finance-out': '#ff6b6b',
+
+        /* ── Monochromatic tonal gradient for donut charts ── */
+        terminal: {
+          50: '#FFFFFF',
+          100: '#E4E4E7',
+          200: '#A1A1AA',
+          300: '#71717A',
+          400: '#52525B',
+          500: '#3F3F46',
+          600: '#27272A',
+        },
+
+        /* ── Legacy aliases (mapped to terminal palette — do not use in new code) ── */
         ivory: {
-          DEFAULT: '#FDFBF7',
-          50: '#FFFEF9',
-          100: '#FDFBF7',
-          200: '#F5F2EB',
-          300: '#E8E3D9',
-          muted: '#F5F2EB',
-          border: '#E8E3D9',
+          DEFAULT: '#FAFAFA',
+          50: '#FAFAFA',
+          100: '#FAFAFA',
+          200: '#F5F5F5',
+          300: '#E5E5E5',
+          muted: '#F5F5F5',
+          border: '#E5E5E5',
         },
         surface: {
           light: '#FFFFFF',
-          dark: '#141414',
-          'dark-card': '#1E1E1E',
-          'dark-elevated': '#282828',
-          'dark-border': '#333333',
+          dark: '#0A0A0A',
+          'dark-card': '#141414',
+          'dark-elevated': '#1E1E1E',
+          'dark-border': '#262626',
         },
 
-        /* ── Brand / accent ── */
+        /* ── Brand / accent → monochrome + finance signals ── */
         brand: {
-          amber: '#D97706',
-          'amber-hover': '#B45309',
-          'amber-light': '#FEF3C7',
-          'amber-muted': '#92400E',
-          emerald: '#059669',
-          'emerald-hover': '#047857',
-          'emerald-light': '#D1FAE5',
-          'emerald-muted': '#065F46',
-          red: '#E11D48',
-          'red-hover': '#BE123C',
-          'red-light': '#FFE4E6',
-          'red-muted': '#9F1239',
-          teal: '#0D9488',
-          'teal-light': '#CCFBF1',
-          gold: '#B45309',
-          navy: '#1E293B',
+          amber: '#FFFFFF',
+          'amber-hover': '#C4C7C8',
+          'amber-light': 'rgba(255, 255, 255, 0.08)',
+          'amber-muted': '#C4C7C8',
+          emerald: '#00b894',
+          'emerald-hover': '#00a383',
+          'emerald-light': 'rgba(0, 184, 148, 0.12)',
+          'emerald-muted': '#00b894',
+          red: '#ff6b6b',
+          'red-hover': '#e84118',
+          'red-light': 'rgba(255, 107, 107, 0.12)',
+          'red-muted': '#ff6b6b',
+          teal: '#C4C7C8',
+          'teal-light': 'rgba(255, 255, 255, 0.08)',
+          gold: '#FFFFFF',
+          navy: '#FFFFFF',
         },
 
-        /* ── Chart palette ── */
+        /* ── Chart palette → terminal monochrome + two finance signals ── */
         chart: {
-          teal: '#0D9488',
-          gold: '#D97706',
-          navy: '#1E293B',
-          coral: '#F97316',
-          plum: '#7C3AED',
-          rose: '#F43F5E',
-          sky: '#0EA5E9',
-          lime: '#84CC16',
+          teal: '#00b894',
+          gold: '#FFFFFF',
+          navy: '#A1A1AA',
+          coral: '#ff6b6b',
+          plum: '#71717A',
+          rose: '#ff6b6b',
+          sky: '#C4C7C8',
+          lime: '#00b894',
         },
 
-        /* ── Semantic text ── */
+        /* ── Semantic text → terminal ink ── */
         text: {
-          primary: '#18181B',
-          secondary: '#71717A',
-          tertiary: '#A1A1AA',
-          inverse: '#FAFAFA',
-          'dark-primary': '#F5F5F5',
-          'dark-secondary': '#A1A1AA',
-          'dark-tertiary': '#71717A',
+          primary: '#0A0A0A',
+          secondary: '#404040',
+          tertiary: '#8E9192',
+          inverse: '#FFFFFF',
+          'dark-primary': '#FFFFFF',
+          'dark-secondary': '#C4C7C8',
+          'dark-tertiary': '#8E9192',
         },
       },
 
@@ -87,16 +134,21 @@ export default {
       },
 
       borderRadius: {
-        '4xl': '2rem',
+        sm: '2px',
+        md: '4px',
+        lg: '6px',
+        xl: '6px',
+        '2xl': '6px',
+        '4xl': '6px',
       },
 
       boxShadow: {
-        'card': '0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06)',
-        'card-hover': '0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04)',
-        'elevated': '0 10px 30px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.04)',
-        'modal': '0 24px 48px rgba(0, 0, 0, 0.16), 0 12px 24px rgba(0, 0, 0, 0.08)',
-        'dark-card': '0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2)',
-        'dark-elevated': '0 10px 30px rgba(0, 0, 0, 0.4), 0 4px 8px rgba(0, 0, 0, 0.3)',
+        card: 'none',
+        'card-hover': 'none',
+        elevated: 'none',
+        modal: '0 16px 48px rgba(0, 0, 0, 0.5)',
+        'dark-card': 'none',
+        'dark-elevated': 'none',
       },
 
       transitionTimingFunction: {

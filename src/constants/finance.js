@@ -30,21 +30,34 @@ export const BUDGET_STATUSES = Object.freeze({
 });
 
 export const CATEGORY_COLORS = Object.freeze({
-  'Food & Dining': '#F59E0B',
-  Shopping: '#3B82F6',
-  'Bills & Utilities': '#10B981',
-  Entertainment: '#8B5CF6',
-  Transport: '#EC4899',
-  Healthcare: '#EF4444',
-  Travel: '#06B6D4',
-  Education: '#6366F1',
-  Investment: '#10B981',
-  Salary: '#059669',
-  Freelance: '#0D9488',
-  Other: '#6B7280',
+  'Food & Dining': '#FFFFFF',
+  Shopping: '#E4E4E7',
+  'Bills & Utilities': '#A1A1AA',
+  Entertainment: '#71717A',
+  Transport: '#52525B',
+  Healthcare: '#3F3F46',
+  Travel: '#27272A',
+  Education: '#E4E4E7',
+  Investment: '#A1A1AA',
+  Salary: '#FFFFFF',
+  Freelance: '#E4E4E7',
+  Other: '#71717A',
 });
 
-export const FALLBACK_CATEGORY_COLOR = '#6B7280';
+export const FALLBACK_CATEGORY_COLOR = '#71717A';
+
+/* ── Terminal chart theme: single source of truth for Recharts ── */
+export const TERMINAL_CHART = Object.freeze({
+  grid: '#262626',
+  line: '#FFFFFF',
+  areaFillTop: 'rgba(255, 255, 255, 0.05)',
+  areaFillBottom: 'rgba(255, 255, 255, 0)',
+  income: '#00b894',
+  expense: '#ff6b6b',
+  tooltipBg: '#141414',
+  tooltipBorder: '#262626',
+  monoGradient: ['#FFFFFF', '#E4E4E7', '#A1A1AA', '#71717A', '#52525B', '#3F3F46', '#27272A'],
+});
 
 export const CURRENCIES = Object.freeze({
   INR: { code: 'INR', symbol: '₹', locale: 'en-IN', label: 'Indian Rupee (₹)' },

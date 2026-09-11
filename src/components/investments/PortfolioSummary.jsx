@@ -3,19 +3,19 @@ import { TrendingUp, TrendingDown, Wallet, BarChart3 } from 'lucide-react';
 import { formatINR, formatPercent, formatChange } from '@/utils/formatCurrency';
 
 /**
- * Single stat card within the portfolio summary.
+ * Single stat card within the portfolio summary — terminal monochrome chip.
  */
-function StatCard({ icon: Icon, iconBg, label, value, valueColor }) {
+function StatCard({ icon: Icon, label, value, valueClass }) {
   return (
     <div className="flex items-center gap-4">
-      <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${iconBg}`}>
-        <Icon className="w-5 h-5" />
+      <div className="w-10 h-10 rounded border border-[#E5E5E5] dark:border-[#262626] bg-[#F5F5F5] dark:bg-[#1E1E1E] flex items-center justify-center shrink-0">
+        <Icon className="w-5 h-5 text-[#0A0A0A] dark:text-white" />
       </div>
       <div>
-        <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-text-secondary dark:text-text-dark-secondary">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[#8E9192] font-mono">
           {label}
         </p>
-        <p className={`text-lg font-bold mono ${valueColor || 'text-zinc-900 dark:text-text-dark-primary'}`}>
+        <p className={`text-lg font-bold font-mono tabular-nums ${valueClass || 'text-[#0A0A0A] dark:text-white'}`}>
           {value}
         </p>
       </div>
@@ -25,8 +25,6 @@ function StatCard({ icon: Icon, iconBg, label, value, valueColor }) {
 
 /**
  * PortfolioSummary — Top-level portfolio metrics.
- *
- * @param {{ totalInvested: number, totalCurrent: number, totalReturn: number, returnPercentage: number, todayChange: number }} props
  */
 export default function PortfolioSummary({
   totalInvested = 0,
@@ -41,16 +39,16 @@ export default function PortfolioSummary({
   return (
     <section className="card p-6 animate-fade-in-up" aria-label="Portfolio summary">
       {/* Big headline number */}
-      <div className="mb-6 pb-6 border-b border-ivory-border dark:border-surface-dark-border">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-text-secondary dark:text-text-dark-secondary mb-1">
+      <div className="mb-6 pb-6 border-b border-[#E5E5E5] dark:border-[#262626]">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[#8E9192] mb-1 font-mono">
           Total Investments
         </p>
         <div className="flex items-baseline gap-3 flex-wrap">
-          <span className="display-xl text-zinc-900 dark:text-text-dark-primary">
+          <span className="display-xl text-[#0A0A0A] dark:text-white tabular-nums">
             {formatINR(totalCurrent)}
           </span>
           <span
-            className={`text-sm font-semibold mono ${isPositiveReturn ? 'text-brand-emerald dark:text-emerald-400' : 'text-brand-red dark:text-rose-400'}`}
+            className={`text-sm font-semibold font-mono tabular-nums ${isPositiveReturn ? 'text-[#00a383] dark:text-[#00b894]' : 'text-[#e84118] dark:text-[#ff6b6b]'}`}
           >
             {formatChange(totalReturn)} ({formatPercent(returnPercentage)})
           </span>
@@ -61,34 +59,30 @@ export default function PortfolioSummary({
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
           icon={Wallet}
-          iconBg="bg-amber-50 dark:bg-amber-500/10 text-brand-amber dark:text-amber-400"
           label="Invested"
           value={formatINR(totalInvested)}
         />
         <StatCard
           icon={BarChart3}
-          iconBg="bg-teal-50 dark:bg-teal-500/10 text-brand-teal dark:text-teal-400"
           label="Current Value"
           value={formatINR(totalCurrent)}
         />
         <StatCard
           icon={isPositiveReturn ? TrendingUp : TrendingDown}
-          iconBg={`${isPositiveReturn ? 'bg-emerald-50 dark:bg-emerald-500/10 text-brand-emerald dark:text-emerald-400' : 'bg-rose-50 dark:bg-rose-500/10 text-brand-red dark:text-rose-400'}`}
           label="Total Return"
           value={formatChange(totalReturn)}
-          valueColor={
+          valueClass={
             isPositiveReturn
-              ? 'text-brand-emerald dark:text-emerald-400'
-              : 'text-brand-red dark:text-rose-400'
+              ? 'text-[#00a383] dark:text-[#00b894]'
+              : 'text-[#e84118] dark:text-[#ff6b6b]'
           }
         />
         <StatCard
           icon={isPositiveToday ? TrendingUp : TrendingDown}
-          iconBg={`${isPositiveToday ? 'bg-emerald-50 dark:bg-emerald-500/10 text-brand-emerald dark:text-emerald-400' : 'bg-rose-50 dark:bg-rose-500/10 text-brand-red dark:text-rose-400'}`}
           label="Today"
           value={formatChange(todayChange)}
-          valueColor={
-            isPositiveToday ? 'text-brand-emerald dark:text-emerald-400' : 'text-brand-red dark:text-rose-400'
+          valueClass={
+            isPositiveToday ? 'text-[#00a383] dark:text-[#00b894]' : 'text-[#e84118] dark:text-[#ff6b6b]'
           }
         />
       </div>

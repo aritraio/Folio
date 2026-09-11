@@ -99,7 +99,7 @@ export default function BudgetModal({ isOpen, onClose, budget, onSave, existingB
           error={errors.limit}
         />
 
-        <div className="pt-4 flex justify-end gap-3 border-t border-ivory-border dark:border-surface-dark-border mt-6">
+        <div className="pt-4 flex justify-end gap-3 border-t border-[#E5E5E5] dark:border-[#262626] mt-6">
           <Button type="button" variant="ghost" onClick={onClose}>
             Cancel
           </Button>

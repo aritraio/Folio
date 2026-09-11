@@ -3,26 +3,19 @@ import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Sector } from 'recha
 import { formatINR } from '@/utils/formatCurrency';
 
 /**
- * Custom tooltip for the donut chart.
+ * Terminal tooltip: #141414 bg, #262626 border, mono figures.
  */
 function DonutTooltip({ active, payload }) {
   if (!active || !payload?.length) return null;
   const { category, amount, percentage, color } = payload[0].payload;
   return (
-    <div
-      className="
-      bg-white dark:bg-surface-dark-card
-      border border-ivory-border dark:border-surface-dark-border
-      rounded-lg shadow-elevated dark:shadow-dark-elevated
-      px-4 py-3
-    "
-    >
+    <div className="bg-[#141414] border border-[#262626] rounded px-4 py-3">
       <div className="flex items-center gap-2 mb-1">
         <span className="w-2.5 h-2.5 rounded-full" style={{ background: color }} />
-        <span className="text-xs font-semibold text-zinc-900 dark:text-text-dark-primary">{category}</span>
+        <span className="text-xs font-semibold text-white">{category}</span>
       </div>
-      <p className="text-sm font-bold mono text-zinc-900 dark:text-text-dark-primary">{formatINR(amount)}</p>
-      <p className="text-xs text-text-secondary dark:text-text-dark-secondary">
+      <p className="text-sm font-bold font-mono tabular-nums text-white">{formatINR(amount)}</p>
+      <p className="text-xs text-[#8E9192] font-mono">
         {percentage.toFixed(1)}% of total
       </p>
     </div>
@@ -52,9 +45,8 @@ function renderActiveShape(props) {
 }
 
 /**
- * SpendingBreakdown — Donut chart + category legend for current month spending.
- *
- * @param {{ data: Array<{ category: string, amount: number, percentage: number, color: string }>, totalExpenses: number }} props
+ * SpendingBreakdown — Monochrome donut + category legend.
+ * Colors arrive pre-mapped to the terminal tonal gradient via CATEGORY_COLORS.
  */
 export default function SpendingBreakdown({ data = [], totalExpenses = 0 }) {
   const [activeIndex, setActiveIndex] = useState(-1);
@@ -70,8 +62,8 @@ export default function SpendingBreakdown({ data = [], totalExpenses = 0 }) {
   if (data.length === 0) {
     return (
       <section className="card p-6 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-        <h2 className="heading-sm text-zinc-900 dark:text-text-dark-primary mb-2">Spending Breakdown</h2>
-        <p className="text-sm text-text-secondary dark:text-text-dark-secondary">
+        <h2 className="heading-sm text-[#0A0A0A] dark:text-white mb-2">Spending Breakdown</h2>
+        <p className="text-sm text-[#8E9192]">
           No spending data available for this month.
         </p>
       </section>
@@ -86,8 +78,8 @@ export default function SpendingBreakdown({ data = [], totalExpenses = 0 }) {
     >
       {/* Header */}
       <div className="mb-5">
-        <h2 className="heading-sm text-zinc-900 dark:text-text-dark-primary">Spending Breakdown</h2>
-        <p className="text-xs text-text-secondary dark:text-text-dark-secondary mt-0.5">
+        <h2 className="heading-sm text-[#0A0A0A] dark:text-white">Spending Breakdown</h2>
+        <p className="text-xs text-[#8E9192] mt-0.5 font-mono uppercase tracking-widest">
           Category-wise this month
         </p>
       </div>
@@ -113,7 +105,7 @@ export default function SpendingBreakdown({ data = [], totalExpenses = 0 }) {
                 onMouseLeave={onPieLeave}
               >
                 {data.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
+                  <Cell key={`cell-${index}`} fill={entry.color} stroke="#0A0A0A" strokeWidth={1} />
                 ))}
               </Pie>
               <Tooltip content={<DonutTooltip />} />
@@ -121,10 +113,10 @@ export default function SpendingBreakdown({ data = [], totalExpenses = 0 }) {
           </ResponsiveContainer>
           {/* Center text */}
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-text-tertiary dark:text-text-dark-tertiary">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-[#8E9192] font-mono">
               Total
             </span>
-            <span className="text-sm font-bold mono text-zinc-900 dark:text-text-dark-primary">
+            <span className="text-sm font-bold font-mono tabular-nums text-[#0A0A0A] dark:text-white">
               {formatINR(totalExpenses)}
             </span>
           </div>
@@ -136,24 +128,24 @@ export default function SpendingBreakdown({ data = [], totalExpenses = 0 }) {
             <div
               key={item.category}
               className={`
-                flex items-center justify-between py-1.5 px-2 rounded-lg
+                flex items-center justify-between py-1.5 px-2 rounded
                 transition-colors duration-150
-                ${activeIndex === idx ? 'bg-ivory-muted dark:bg-surface-dark-elevated' : ''}
+                ${activeIndex === idx ? 'bg-[#F5F5F5] dark:bg-[#1E1E1E]' : ''}
               `}
               onMouseEnter={() => setActiveIndex(idx)}
               onMouseLeave={() => setActiveIndex(-1)}
             >
               <div className="flex items-center gap-2.5 min-w-0">
                 <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: item.color }} />
-                <span className="text-sm text-zinc-700 dark:text-text-dark-secondary truncate">
+                <span className="text-sm text-[#404040] dark:text-[#C4C7C8] truncate">
                   {item.category}
                 </span>
               </div>
               <div className="flex items-center gap-3 shrink-0">
-                <span className="text-xs text-text-tertiary dark:text-text-dark-tertiary w-10 text-right">
+                <span className="text-xs text-[#8E9192] w-10 text-right font-mono tabular-nums">
                   {item.percentage.toFixed(0)}%
                 </span>
-                <span className="text-sm font-semibold mono text-zinc-900 dark:text-text-dark-primary w-20 text-right">
+                <span className="text-sm font-semibold font-mono tabular-nums text-[#0A0A0A] dark:text-white w-20 text-right">
                   {formatINR(item.amount)}
                 </span>
               </div>

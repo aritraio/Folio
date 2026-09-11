@@ -1,12 +1,8 @@
 import React from 'react';
 
 /**
- * Badge — Small status/category pill.
- *
- * @param {'default'|'success'|'warning'|'danger'|'info'|'outline'} variant
- * @param {'sm'|'md'} size
- * @param {React.ReactNode} dot — optional leading color dot
- * @param {string} dotColor — CSS color for the dot (e.g. '#0D9488')
+ * Badge — Terminal status pill. Sharp 4px geometry.
+ * success/danger map to the ONLY chromatic signals (inflow/outflow).
  */
 export default function Badge({
   children,
@@ -17,18 +13,18 @@ export default function Badge({
   className = '',
   ...props
 }) {
-  const base = 'inline-flex items-center gap-1.5 font-sans font-medium rounded-full whitespace-nowrap';
+  const base = 'inline-flex items-center gap-1.5 font-sans font-medium rounded whitespace-nowrap';
 
   const variants = {
-    default: 'bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300',
+    default: 'bg-[#F5F5F5] text-[#404040] dark:bg-[#1E1E1E] dark:text-[#C4C7C8]',
     success:
-      'bg-brand-emerald-light text-brand-emerald-muted dark:bg-[rgba(52,211,153,0.15)] dark:text-emerald-400',
-    warning:
-      'bg-brand-amber-light text-brand-amber-muted dark:bg-[rgba(245,158,11,0.15)] dark:text-amber-400',
-    danger: 'bg-brand-red-light text-brand-red-muted dark:bg-[rgba(251,113,133,0.15)] dark:text-rose-400',
-    info: 'bg-sky-50 text-sky-700 dark:bg-[rgba(14,165,233,0.15)] dark:text-sky-400',
+      'bg-[rgba(0,163,131,0.08)] text-[#00a383] dark:bg-[rgba(0,184,148,0.12)] dark:text-[#00b894]',
+    warning: 'bg-[#F5F5F5] text-[#0A0A0A] dark:bg-[#1E1E1E] dark:text-white',
+    danger:
+      'bg-[rgba(232,65,24,0.08)] text-[#e84118] dark:bg-[rgba(255,107,107,0.12)] dark:text-[#ff6b6b]',
+    info: 'bg-transparent border border-[#E5E5E5] text-[#404040] dark:border-[#262626] dark:text-[#C4C7C8]',
     outline:
-      'bg-transparent border border-ivory-border text-zinc-600 dark:border-surface-dark-border dark:text-zinc-400',
+      'bg-transparent border border-[#E5E5E5] text-[#404040] dark:border-[#262626] dark:text-[#C4C7C8]',
   };
 
   const sizes = {

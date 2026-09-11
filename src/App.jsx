@@ -17,13 +17,13 @@ const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
 function PageFallback() {
   return (
     <div className="space-y-4 py-8" role="status" aria-label="Loading page">
-      <div className="h-8 w-48 rounded-lg bg-zinc-200/70 dark:bg-zinc-800/70 animate-pulse" />
+      <div className="h-8 w-48 rounded bg-[#E5E5E5]/70 dark:bg-[#1E1E1E]/70 animate-pulse" />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="h-28 rounded-xl bg-zinc-200/60 dark:bg-zinc-800/60 animate-pulse" />
-        <div className="h-28 rounded-xl bg-zinc-200/60 dark:bg-zinc-800/60 animate-pulse" />
-        <div className="h-28 rounded-xl bg-zinc-200/60 dark:bg-zinc-800/60 animate-pulse" />
+        <div className="h-28 rounded bg-[#E5E5E5]/60 dark:bg-[#1E1E1E]/60 animate-pulse" />
+        <div className="h-28 rounded bg-[#E5E5E5]/60 dark:bg-[#1E1E1E]/60 animate-pulse" />
+        <div className="h-28 rounded bg-[#E5E5E5]/60 dark:bg-[#1E1E1E]/60 animate-pulse" />
       </div>
-      <div className="h-64 rounded-xl bg-zinc-200/60 dark:bg-zinc-800/60 animate-pulse" />
+      <div className="h-64 rounded bg-[#E5E5E5]/60 dark:bg-[#1E1E1E]/60 animate-pulse" />
       <span className="sr-only">Loading…</span>
     </div>
   );

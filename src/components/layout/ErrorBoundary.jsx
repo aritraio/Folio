@@ -30,29 +30,29 @@ export default class ErrorBoundary extends React.Component {
       return (
         <div className="min-h-[50vh] flex items-center justify-center p-8" role="alert">
           <div className="card p-8 max-w-md text-center space-y-4">
-            <div className="w-12 h-12 mx-auto rounded-full bg-brand-red-light dark:bg-[rgba(251,113,133,0.12)] flex items-center justify-center">
-              <AlertTriangle className="w-6 h-6 text-brand-red" />
+            <div className="w-12 h-12 mx-auto rounded bg-[rgba(255,107,107,0.12)] border border-[#ff6b6b]/30 flex items-center justify-center">
+              <AlertTriangle className="w-6 h-6 text-[#ff6b6b]" />
             </div>
-            <h2 className="heading-sm text-zinc-900 dark:text-text-dark-primary">Something went wrong</h2>
+            <h2 className="heading-sm text-[#0A0A0A] dark:text-white">Something went wrong</h2>
             <p className="body-sm">
               This section crashed. Your data is still saved locally. Try reloading, or export a backup from
               Settings before clearing data.
             </p>
             {process.env.NODE_ENV !== 'production' && this.state.error && (
-              <pre className="text-xs text-left bg-zinc-100 dark:bg-surface-dark-elevated p-3 rounded-lg overflow-auto max-h-32">
+              <pre className="text-xs text-left font-mono bg-[#F5F5F5] dark:bg-[#0A0A0A] border border-[#E5E5E5] dark:border-[#262626] p-3 rounded overflow-auto max-h-32">
                 {String(this.state.error.message || this.state.error)}
               </pre>
             )}
             <div className="flex gap-3 justify-center pt-2">
               <button
                 onClick={this.handleReset}
-                className="px-4 py-2 rounded-lg bg-brand-amber text-white text-sm font-medium hover:bg-brand-amber-hover transition-colors"
+                className="px-4 py-2 rounded bg-[#0A0A0A] dark:bg-white text-white dark:text-[#0A0A0A] text-sm font-medium hover:opacity-80 transition-opacity"
               >
                 Reload section
               </button>
               <a
                 href="/settings"
-                className="px-4 py-2 rounded-lg border border-ivory-border dark:border-surface-dark-border text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-surface-dark-elevated transition-colors"
+                className="px-4 py-2 rounded border border-[#E5E5E5] dark:border-[#262626] text-sm font-medium text-[#404040] dark:text-[#C4C7C8] hover:bg-[#F5F5F5] dark:hover:bg-[#1E1E1E] transition-colors"
               >
                 Go to Settings
               </a>

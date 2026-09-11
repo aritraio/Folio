@@ -110,17 +110,17 @@ export default function SettingsPage() {
   return (
     <div className="space-y-6 pb-12">
       <div>
-        <p className="label mb-1">Preferences</p>
-        <h1 className="heading-lg text-zinc-900 dark:text-text-dark-primary">Settings</h1>
+        <p className="label mb-1 font-mono">Preferences</p>
+        <h1 className="heading-lg text-[#0A0A0A] dark:text-white">Settings</h1>
       </div>
 
       {alertMsg && (
         <div
           role={alertMsg.type === 'error' ? 'alert' : 'status'}
-          className={`p-4 rounded-lg text-sm font-medium ${
+          className={`p-4 rounded text-sm font-medium font-mono border ${
             alertMsg.type === 'success'
-              ? 'bg-brand-emerald/10 text-brand-emerald'
-              : 'bg-brand-red/10 text-brand-red'
+              ? 'bg-[rgba(0,184,148,0.12)] text-[#00a383] dark:text-[#00b894] border-[#00b894]/30'
+              : 'bg-[rgba(255,107,107,0.12)] text-[#e84118] dark:text-[#ff6b6b] border-[#ff6b6b]/30'
           }`}
         >
           {alertMsg.text}
@@ -129,16 +129,16 @@ export default function SettingsPage() {
 
       <section className="card p-6 md:p-8" aria-labelledby="settings-profile">
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-full bg-zinc-100 dark:bg-surface-dark flex items-center justify-center">
-            <User className="w-5 h-5 text-zinc-500 dark:text-text-dark-secondary" />
+          <div className="w-10 h-10 rounded border border-[#E5E5E5] dark:border-[#262626] bg-[#F5F5F5] dark:bg-[#1E1E1E] flex items-center justify-center">
+            <User className="w-5 h-5 text-[#0A0A0A] dark:text-white" />
           </div>
-          <h2 id="settings-profile" className="heading-sm text-zinc-900 dark:text-text-dark-primary">
+          <h2 id="settings-profile" className="heading-sm text-[#0A0A0A] dark:text-white">
             Profile
           </h2>
         </div>
         <div className="flex flex-col md:flex-row gap-8 items-start">
           <div
-            className="w-20 h-20 rounded-full bg-brand-amber/10 text-brand-amber flex items-center justify-center text-2xl font-serif shrink-0"
+            className="w-20 h-20 rounded bg-[#0A0A0A] text-white dark:bg-white dark:text-[#0A0A0A] flex items-center justify-center text-2xl font-mono font-bold shrink-0"
             aria-hidden="true"
           >
             {getInitials(settings.userName)}
@@ -163,10 +163,10 @@ export default function SettingsPage() {
 
       <section className="card p-6 md:p-8" aria-labelledby="settings-prefs">
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-full bg-zinc-100 dark:bg-surface-dark flex items-center justify-center">
-            <Palette className="w-5 h-5 text-zinc-500 dark:text-text-dark-secondary" />
+          <div className="w-10 h-10 rounded border border-[#E5E5E5] dark:border-[#262626] bg-[#F5F5F5] dark:bg-[#1E1E1E] flex items-center justify-center">
+            <Palette className="w-5 h-5 text-[#0A0A0A] dark:text-white" />
           </div>
-          <h2 id="settings-prefs" className="heading-sm text-zinc-900 dark:text-text-dark-primary">
+          <h2 id="settings-prefs" className="heading-sm text-[#0A0A0A] dark:text-white">
             Preferences
           </h2>
         </div>
@@ -200,17 +200,17 @@ export default function SettingsPage() {
 
       <section className="card p-6 md:p-8" aria-labelledby="settings-data">
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-full bg-zinc-100 dark:bg-surface-dark flex items-center justify-center">
-            <Database className="w-5 h-5 text-zinc-500 dark:text-text-dark-secondary" />
+          <div className="w-10 h-10 rounded border border-[#E5E5E5] dark:border-[#262626] bg-[#F5F5F5] dark:bg-[#1E1E1E] flex items-center justify-center">
+            <Database className="w-5 h-5 text-[#0A0A0A] dark:text-white" />
           </div>
-          <h2 id="settings-data" className="heading-sm text-zinc-900 dark:text-text-dark-primary">
+          <h2 id="settings-data" className="heading-sm text-[#0A0A0A] dark:text-white">
             Data Management
           </h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl">
           <div className="flex flex-col gap-3">
-            <h3 className="text-sm font-medium text-zinc-900 dark:text-text-dark-primary">Export Data</h3>
-            <p className="text-xs text-zinc-500 dark:text-text-dark-secondary leading-relaxed">
+            <h3 className="text-sm font-medium text-[#0A0A0A] dark:text-white">Export Data</h3>
+            <p className="text-xs text-[#8E9192] leading-relaxed">
               Download a versioned JSON backup of everything.
             </p>
             <Button variant="secondary" onClick={handleExport} className="mt-auto justify-center">
@@ -219,8 +219,8 @@ export default function SettingsPage() {
             </Button>
           </div>
           <div className="flex flex-col gap-3">
-            <h3 className="text-sm font-medium text-zinc-900 dark:text-text-dark-primary">Import Data</h3>
-            <p className="text-xs text-zinc-500 dark:text-text-dark-secondary leading-relaxed">
+            <h3 className="text-sm font-medium text-[#0A0A0A] dark:text-white">Import Data</h3>
+            <p className="text-xs text-[#8E9192] leading-relaxed">
               Restore from a backup. Validated first; a pre-import backup is auto-downloaded.
             </p>
             <Button variant="secondary" onClick={handleImportClick} className="mt-auto justify-center">
@@ -236,8 +236,8 @@ export default function SettingsPage() {
             />
           </div>
           <div className="flex flex-col gap-3">
-            <h3 className="text-sm font-medium text-zinc-900 dark:text-text-dark-primary">Reset to Demo</h3>
-            <p className="text-xs text-zinc-500 dark:text-text-dark-secondary leading-relaxed">
+            <h3 className="text-sm font-medium text-[#0A0A0A] dark:text-white">Reset to Demo</h3>
+            <p className="text-xs text-[#8E9192] leading-relaxed">
               Wipe current data and restore the demo dataset. A backup is downloaded first.
             </p>
             <Button
@@ -250,8 +250,8 @@ export default function SettingsPage() {
             </Button>
           </div>
           <div className="flex flex-col gap-3">
-            <h3 className="text-sm font-medium text-brand-red">Erase Everything</h3>
-            <p className="text-xs text-zinc-500 dark:text-text-dark-secondary leading-relaxed">
+            <h3 className="text-sm font-medium text-[#e84118] dark:text-[#ff6b6b]">Erase Everything</h3>
+            <p className="text-xs text-[#8E9192] leading-relaxed">
               Permanently delete all data with no re-seed. App shows empty states.
             </p>
             <Button
@@ -268,20 +268,20 @@ export default function SettingsPage() {
 
       <section className="card p-6 md:p-8" aria-labelledby="settings-about">
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-full bg-zinc-100 dark:bg-surface-dark flex items-center justify-center">
-            <Info className="w-5 h-5 text-zinc-500 dark:text-text-dark-secondary" />
+          <div className="w-10 h-10 rounded border border-[#E5E5E5] dark:border-[#262626] bg-[#F5F5F5] dark:bg-[#1E1E1E] flex items-center justify-center">
+            <Info className="w-5 h-5 text-[#0A0A0A] dark:text-white" />
           </div>
-          <h2 id="settings-about" className="heading-sm text-zinc-900 dark:text-text-dark-primary">
+          <h2 id="settings-about" className="heading-sm text-[#0A0A0A] dark:text-white">
             About
           </h2>
         </div>
-        <div className="flex flex-col gap-1 text-sm text-zinc-600 dark:text-text-dark-secondary">
-          <p className="font-medium text-zinc-900 dark:text-text-dark-primary mb-1">
-            Ledger — Personal Finance Tracker
+        <div className="flex flex-col gap-1 text-sm text-[#404040] dark:text-[#C4C7C8]">
+          <p className="font-medium text-[#0A0A0A] dark:text-white mb-1 font-mono">
+            FOLIO — Personal Finance Terminal
           </p>
-          <p>Version 1.0.0 · Schema v2 · Local-first (localStorage)</p>
+          <p className="font-mono text-xs">Version 1.0.0 · Schema v2 · Local-first (localStorage)</p>
           <p>A personal finance dashboard built with React + Vite.</p>
-          <p className="mt-2 text-xs flex items-center gap-1">
+          <p className="mt-2 text-xs flex items-center gap-1 font-mono">
             <Eraser className="w-3 h-3" /> Backups include a schema version for safe restores.
           </p>
         </div>

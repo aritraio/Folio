@@ -1,11 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 
 /**
- * Tooltip — Lightweight tooltip for chart hover, icon explanations, etc.
- *
- * @param {string} content — tooltip text
- * @param {'top'|'bottom'|'left'|'right'} position
- * @param {number} delay — show delay in ms (default 200)
+ * Tooltip — Terminal tooltip: #141414 bg, #262626 border, mono figures.
  */
 export default function Tooltip({ children, content, position = 'top', delay = 200, className = '' }) {
   const [visible, setVisible] = useState(false);
@@ -32,12 +28,12 @@ export default function Tooltip({ children, content, position = 'top', delay = 2
   };
 
   const arrowClasses = {
-    top: 'top-full left-1/2 -translate-x-1/2 border-t-zinc-800 dark:border-t-zinc-200 border-l-transparent border-r-transparent border-b-transparent',
+    top: 'top-full left-1/2 -translate-x-1/2 border-t-[#141414] border-l-transparent border-r-transparent border-b-transparent',
     bottom:
-      'bottom-full left-1/2 -translate-x-1/2 border-b-zinc-800 dark:border-b-zinc-200 border-l-transparent border-r-transparent border-t-transparent',
-    left: 'left-full top-1/2 -translate-y-1/2 border-l-zinc-800 dark:border-l-zinc-200 border-t-transparent border-b-transparent border-r-transparent',
+      'bottom-full left-1/2 -translate-x-1/2 border-b-[#141414] border-l-transparent border-r-transparent border-t-transparent',
+    left: 'left-full top-1/2 -translate-y-1/2 border-l-[#141414] border-t-transparent border-b-transparent border-r-transparent',
     right:
-      'right-full top-1/2 -translate-y-1/2 border-r-zinc-800 dark:border-r-zinc-200 border-t-transparent border-b-transparent border-l-transparent',
+      'right-full top-1/2 -translate-y-1/2 border-r-[#141414] border-t-transparent border-b-transparent border-l-transparent',
   };
 
   if (!content) return children;
@@ -63,12 +59,11 @@ export default function Tooltip({ children, content, position = 'top', delay = 2
         >
           <div
             className="
-              px-2.5 py-1.5 rounded-md
-              bg-zinc-800 dark:bg-zinc-200
-              text-white dark:text-zinc-900
+              px-2.5 py-1.5 rounded
+              bg-[#141414] text-white
+              border border-[#262626]
               text-xs font-medium leading-tight
               whitespace-nowrap
-              shadow-elevated
             "
           >
             {content}

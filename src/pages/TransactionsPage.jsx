@@ -139,8 +139,8 @@ export default function TransactionsPage() {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <p className="label mb-1 text-zinc-500">{formatMoney(spentThisMonth)} spent this month</p>
-          <h1 className="heading-lg text-zinc-900 dark:text-text-dark-primary">Transactions</h1>
+          <p className="label mb-1 font-mono">{formatMoney(spentThisMonth)} spent this month</p>
+          <h1 className="heading-lg text-[#0A0A0A] dark:text-white">Transactions</h1>
         </div>
         <Button variant="primary" icon={<Plus className="w-4 h-4" />} onClick={handleAddClick}>
           Add Transaction
@@ -165,7 +165,7 @@ export default function TransactionsPage() {
 
       {filteredTransactions.length > PAGE_SIZE && (
         <nav className="flex items-center justify-between pt-2" aria-label="Transaction pages">
-          <p className="text-xs text-zinc-500 dark:text-zinc-400">
+          <p className="text-xs text-[#8E9192] font-mono tabular-nums">
             Showing {(safePage - 1) * PAGE_SIZE + 1}–
             {Math.min(safePage * PAGE_SIZE, filteredTransactions.length)} of {filteredTransactions.length}
           </p>
@@ -177,7 +177,7 @@ export default function TransactionsPage() {
             >
               Previous
             </Button>
-            <span className="px-3 py-2 text-sm font-medium tabular-nums" aria-current="page">
+            <span className="px-3 py-2 text-sm font-medium tabular-nums font-mono text-[#0A0A0A] dark:text-white" aria-current="page">
               {safePage} / {totalPages}
             </span>
             <Button

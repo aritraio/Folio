@@ -87,31 +87,31 @@ export default function AccountsPage() {
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <p className="label mb-1 text-zinc-500">Finance</p>
-          <h1 className="heading-lg text-zinc-900 dark:text-text-dark-primary mb-6">Accounts</h1>
+          <p className="label mb-1 font-mono">Finance</p>
+          <h1 className="heading-lg text-[#0A0A0A] dark:text-white mb-6">Accounts</h1>
 
           <div className="flex flex-wrap gap-x-8 gap-y-4">
             <div>
-              <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-1 font-medium tracking-wide">
+              <p className="text-xs text-[#8E9192] mb-1 font-medium tracking-wide font-mono uppercase">
                 TOTAL ASSETS
               </p>
-              <p className="text-2xl font-mono text-zinc-900 dark:text-text-dark-primary">
+              <p className="text-2xl font-mono tabular-nums font-bold text-[#0A0A0A] dark:text-white">
                 {formatMoney(totalAssets)}
               </p>
             </div>
             <div>
-              <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-1 font-medium tracking-wide">
+              <p className="text-xs text-[#8E9192] mb-1 font-medium tracking-wide font-mono uppercase">
                 TOTAL LIABILITIES
               </p>
-              <p className="text-2xl font-mono text-zinc-900 dark:text-text-dark-primary">
+              <p className="text-2xl font-mono tabular-nums font-bold text-[#0A0A0A] dark:text-white">
                 {formatMoney(totalLiabilities)}
               </p>
             </div>
-            <div className="pl-6 border-l border-ivory-border dark:border-surface-dark-border">
-              <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-1 font-medium tracking-wide">
+            <div className="pl-6 border-l border-[#E5E5E5] dark:border-[#262626]">
+              <p className="text-xs text-[#8E9192] mb-1 font-medium tracking-wide font-mono uppercase">
                 NET WORTH
               </p>
-              <p className="text-2xl font-mono text-brand-emerald dark:text-emerald-400">
+              <p className="text-2xl font-mono tabular-nums font-bold text-[#00a383] dark:text-[#00b894]">
                 {formatMoney(netWorth)}
               </p>
             </div>
@@ -124,20 +124,20 @@ export default function AccountsPage() {
       </div>
 
       {deleteError && !deleteState.open && (
-        <div className="p-3 rounded-lg text-sm bg-brand-red/10 text-brand-red" role="alert">
+        <div className="p-3 rounded text-sm bg-[rgba(255,107,107,0.12)] text-[#ff6b6b]" role="alert">
           {deleteError}
         </div>
       )}
 
       <div>
-        <h2 className="heading-sm text-zinc-800 dark:text-text-dark-primary mb-4 flex items-center gap-2">
+        <h2 className="heading-sm text-[#0A0A0A] dark:text-white mb-4 flex items-center gap-2">
           Assets
-          <span className="text-xs font-normal text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-surface-dark-elevated px-2 py-0.5 rounded-full">
+          <span className="text-xs font-normal font-mono text-[#8E9192] bg-[#F5F5F5] dark:bg-[#1E1E1E] border border-[#E5E5E5] dark:border-[#262626] px-2 py-0.5 rounded">
             {assetsAccounts.length}
           </span>
         </h2>
         {assetsAccounts.length === 0 ? (
-          <p className="text-sm text-zinc-500">No asset accounts found.</p>
+          <p className="text-sm text-[#8E9192]">No asset accounts found.</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {assetsAccounts.map((account) => (
@@ -153,14 +153,14 @@ export default function AccountsPage() {
       </div>
 
       <div>
-        <h2 className="heading-sm text-zinc-800 dark:text-text-dark-primary mb-4 flex items-center gap-2">
+        <h2 className="heading-sm text-[#0A0A0A] dark:text-white mb-4 flex items-center gap-2">
           Liabilities
-          <span className="text-xs font-normal text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-surface-dark-elevated px-2 py-0.5 rounded-full">
+          <span className="text-xs font-normal font-mono text-[#8E9192] bg-[#F5F5F5] dark:bg-[#1E1E1E] border border-[#E5E5E5] dark:border-[#262626] px-2 py-0.5 rounded">
             {liabilitiesAccounts.length}
           </span>
         </h2>
         {liabilitiesAccounts.length === 0 ? (
-          <p className="text-sm text-zinc-500">No liability accounts found.</p>
+          <p className="text-sm text-[#8E9192]">No liability accounts found.</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {liabilitiesAccounts.map((account) => (
@@ -199,7 +199,7 @@ export default function AccountsPage() {
               options={otherAccounts.map((a) => ({ value: a.id, label: a.name }))}
             />
             {deleteError && (
-              <p className="mt-2 text-sm text-brand-red" role="alert">
+              <p className="mt-2 text-sm text-[#ff6b6b]" role="alert">
                 {deleteError}
               </p>
             )}

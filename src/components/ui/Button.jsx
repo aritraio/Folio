@@ -2,7 +2,8 @@ import React from 'react';
 import { Loader2 } from 'lucide-react';
 
 /**
- * Button — Primary, secondary, ghost, destructive variants; sizes sm/md/lg.
+ * Button — Terminal variants; sharp 4px geometry, no glow shadows.
+ * Primary is high-contrast: white on dark, black on light.
  *
  * @param {'primary'|'secondary'|'ghost'|'destructive'} variant
  * @param {'sm'|'md'|'lg'} size
@@ -23,39 +24,42 @@ export default function Button({
 }) {
   const base = [
     'inline-flex items-center justify-center gap-2',
-    'font-sans font-medium rounded-lg max-md:min-h-[44px]',
-    'transition-all duration-200 ease-out-expo',
-    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-amber',
+    'font-sans font-medium rounded max-md:min-h-[44px]',
+    'transition-colors duration-150',
+    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white dark:focus-visible:outline-white',
     'disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none',
     'select-none cursor-pointer',
   ].join(' ');
 
   const variants = {
     primary: [
-      'bg-brand-amber text-white',
-      'hover:bg-brand-amber-hover active:scale-[0.98]',
-      'shadow-sm hover:shadow-md',
+      'bg-[#0A0A0A] text-white border border-[#0A0A0A]',
+      'hover:bg-[#404040] hover:border-[#404040]',
+      'dark:bg-white dark:text-[#0A0A0A] dark:border-white',
+      'dark:hover:bg-[#E4E4E7] dark:hover:border-[#E4E4E7]',
+      'active:scale-[0.98]',
     ].join(' '),
     secondary: [
-      'bg-white text-zinc-800 border border-ivory-border',
-      'hover:bg-ivory-muted hover:border-zinc-300 active:scale-[0.98]',
-      'dark:bg-surface-dark-card dark:text-text-dark-primary dark:border-surface-dark-border',
-      'dark:hover:bg-surface-dark-elevated',
+      'bg-transparent text-[#0A0A0A] border border-[#E5E5E5]',
+      'hover:bg-[#F5F5F5] hover:border-[#CCCCCC] active:scale-[0.98]',
+      'dark:bg-transparent dark:text-white dark:border-[#262626]',
+      'dark:hover:bg-[#1E1E1E] dark:hover:border-[#404040]',
     ].join(' '),
     ghost: [
-      'bg-transparent text-zinc-600',
-      'hover:bg-ivory-muted hover:text-zinc-900 active:scale-[0.98]',
-      'dark:text-text-dark-secondary dark:hover:bg-surface-dark-elevated dark:hover:text-text-dark-primary',
+      'bg-transparent text-[#404040] border border-transparent',
+      'hover:bg-[#F5F5F5] hover:text-[#0A0A0A] active:scale-[0.98]',
+      'dark:text-[#C4C7C8] dark:hover:bg-[#1E1E1E] dark:hover:text-white',
     ].join(' '),
     destructive: [
-      'bg-brand-red text-white',
-      'hover:bg-brand-red-hover active:scale-[0.98]',
-      'shadow-sm hover:shadow-md',
+      'bg-[#ff6b6b] text-[#0A0A0A] border border-[#ff6b6b]',
+      'hover:opacity-90 active:scale-[0.98]',
+      'dark:bg-[#ff6b6b] dark:text-[#0A0A0A] dark:border-[#ff6b6b]',
+      'dark:hover:opacity-90',
     ].join(' '),
   };
 
   const sizes = {
-    sm: 'text-xs px-3 py-1.5 rounded-md',
+    sm: 'text-xs px-3 py-1.5 rounded',
     md: 'text-sm px-4 py-2.5',
     lg: 'text-base px-6 py-3',
   };

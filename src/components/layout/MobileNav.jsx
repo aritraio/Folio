@@ -3,7 +3,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import {
   Menu,
   X,
-  Wallet,
+  Terminal,
   LayoutDashboard,
   ArrowLeftRight,
   Landmark,
@@ -24,16 +24,7 @@ const NAV_ITEMS = [
 ];
 
 /**
- * MobileNav — Hamburger menu with slide-out drawer for mobile viewports.
- *
- * Features:
- * - Hamburger toggle (visible below lg breakpoint)
- * - Full-height slide-out drawer from the left
- * - Overlay backdrop with click-to-close
- * - Close on Escape key
- * - Focus trap inside drawer
- * - Auto-close on route change
- * - Accessible: aria-modal, aria-label, focus management
+ * MobileNav — Terminal slide-out drawer. #111111 bg, 1px #262626 border.
  */
 export default function MobileNav() {
   const [isOpen, setIsOpen] = useState(false);
@@ -119,9 +110,10 @@ export default function MobileNav() {
         onClick={open}
         className="
           lg:hidden
-          p-2 rounded-lg
-          text-zinc-600 dark:text-zinc-400
-          hover:bg-ivory-muted dark:hover:bg-surface-dark-elevated
+          p-2 rounded
+          text-[#8E9192]
+          hover:bg-[#F5F5F5] dark:hover:bg-[#1E1E1E]
+          hover:text-[#0A0A0A] dark:hover:text-white
           transition-colors duration-150
         "
         aria-label="Open navigation menu"
@@ -136,7 +128,7 @@ export default function MobileNav() {
         <div className="fixed inset-0 z-50 lg:hidden">
           {/* Backdrop */}
           <div
-            className="absolute inset-0 bg-black/40 dark:bg-black/60 animate-backdrop-fade"
+            className="absolute inset-0 bg-black/60 animate-backdrop-fade"
             onClick={close}
             aria-hidden="true"
           />
@@ -148,9 +140,8 @@ export default function MobileNav() {
             className="
               absolute top-0 left-0 bottom-0
               w-72 max-w-[80vw]
-              bg-white dark:bg-surface-dark-card
-              border-r border-ivory-border dark:border-surface-dark-border
-              shadow-modal
+              bg-white dark:bg-[#111111]
+              border-r border-[#E5E5E5] dark:border-[#262626]
               flex flex-col
               animate-slide-in-left
             "
@@ -159,22 +150,22 @@ export default function MobileNav() {
             aria-label="Navigation menu"
           >
             {/* Drawer Header */}
-            <div className="flex items-center justify-between px-5 h-16 border-b border-ivory-border dark:border-surface-dark-border">
+            <div className="flex items-center justify-between px-5 h-16 border-b border-[#E5E5E5] dark:border-[#262626]">
               <NavLink to="/" className="flex items-center gap-2.5" onClick={close}>
-                <div className="p-1.5 rounded-lg bg-amber-50 dark:bg-[rgba(245,158,11,0.12)] text-brand-amber">
-                  <Wallet className="w-5 h-5" />
+                <div className="p-1.5 rounded bg-[#0A0A0A] text-white dark:bg-white dark:text-[#0A0A0A]">
+                  <Terminal className="w-5 h-5" />
                 </div>
-                <span className="font-serif-display text-lg font-bold tracking-tight text-zinc-900 dark:text-text-dark-primary">
-                  Ledger
+                <span className="font-sans text-lg font-semibold tracking-tight text-[#0A0A0A] dark:text-white">
+                  FOLIO
                 </span>
               </NavLink>
               <button
                 onClick={close}
                 className="
-                  p-2 rounded-lg
-                  text-zinc-400 hover:text-zinc-600
-                  dark:text-zinc-500 dark:hover:text-zinc-300
-                  hover:bg-zinc-100 dark:hover:bg-surface-dark-elevated
+                  p-2 rounded
+                  text-[#8E9192] hover:text-[#0A0A0A]
+                  dark:hover:text-white
+                  hover:bg-[#F5F5F5] dark:hover:bg-[#1E1E1E]
                   transition-colors duration-150
                 "
                 aria-label="Close navigation menu"
@@ -193,13 +184,14 @@ export default function MobileNav() {
                       end={to === '/'}
                       onClick={close}
                       className={({ isActive }) => `
-                        flex items-center gap-3 px-3 py-2.5 rounded-lg
+                        flex items-center gap-3 px-3 py-2.5 rounded
                         text-sm font-medium
-                        transition-all duration-150
+                        border
+                        transition-colors duration-150
                         ${
                           isActive
-                            ? 'bg-amber-50 dark:bg-[rgba(245,158,11,0.12)] text-brand-amber dark:text-amber-400'
-                            : 'text-zinc-700 dark:text-text-dark-secondary hover:bg-ivory-muted dark:hover:bg-surface-dark-elevated hover:text-zinc-900 dark:hover:text-text-dark-primary'
+                            ? 'bg-[#F5F5F5] border-[#E5E5E5] text-[#0A0A0A] dark:bg-[#1E1E1E] dark:border-[#404040] dark:text-white'
+                            : 'border-transparent text-[#404040] dark:text-[#C4C7C8] hover:bg-[#F5F5F5] dark:hover:bg-[#1E1E1E] hover:text-[#0A0A0A] dark:hover:text-white'
                         }
                       `}
                     >
@@ -212,26 +204,29 @@ export default function MobileNav() {
             </nav>
 
             {/* Drawer Footer */}
-            <div className="px-5 py-4 border-t border-ivory-border dark:border-surface-dark-border">
+            <div className="px-5 py-4 border-t border-[#E5E5E5] dark:border-[#262626]">
               <div className="flex items-center gap-3">
                 <div
                   className="
-                  w-8 h-8 rounded-full
-                  bg-gradient-to-br from-amber-400 to-orange-500
+                  w-8 h-8 rounded
+                  bg-[#0A0A0A] text-white
+                  dark:bg-white dark:text-[#0A0A0A]
                   flex items-center justify-center
-                  text-white text-xs font-bold
-                  shadow-sm
+                  text-xs font-bold font-mono
                 "
                 >
                   A
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-zinc-900 dark:text-text-dark-primary truncate">
+                  <p className="text-sm font-medium text-[#0A0A0A] dark:text-white truncate">
                     Aritra
                   </p>
-                  <p className="text-xs text-zinc-500 truncate">aritra@example.com</p>
+                  <p className="text-xs text-[#8E9192] truncate font-mono">aritra@example.com</p>
                 </div>
               </div>
+              <p className="mt-3 text-[11px] text-[#8E9192] font-mono text-center">
+                Made by Aritra &amp; Dishari with ❤️
+              </p>
             </div>
           </aside>
         </div>

@@ -3,13 +3,7 @@ import { Inbox } from 'lucide-react';
 import Button from './Button';
 
 /**
- * EmptyState — Illustration placeholder + message + CTA.
- *
- * @param {React.ReactNode} icon — optional custom icon (defaults to Inbox)
- * @param {string} title — heading text
- * @param {string} description — subtitle/description
- * @param {string} actionLabel — CTA button label
- * @param {() => void} onAction — CTA click handler
+ * EmptyState — Terminal placeholder + message + CTA.
  */
 export default function EmptyState({
   icon,
@@ -30,17 +24,18 @@ export default function EmptyState({
       {/* Icon */}
       <div
         className="
-          w-16 h-16 rounded-2xl
-          bg-ivory-muted dark:bg-surface-dark-elevated
+          w-16 h-16 rounded
+          bg-[#F5F5F5] dark:bg-[#1E1E1E]
+          border border-[#E5E5E5] dark:border-[#262626]
           flex items-center justify-center
           mb-5
         "
       >
-        {icon || <Inbox className="w-7 h-7 text-zinc-400 dark:text-zinc-500" />}
+        {icon || <Inbox className="w-7 h-7 text-[#8E9192]" />}
       </div>
 
       {/* Title */}
-      <h3 className="heading-sm text-zinc-800 dark:text-text-dark-primary mb-2">{title}</h3>
+      <h3 className="heading-sm text-[#0A0A0A] dark:text-white mb-2">{title}</h3>
 
       {/* Description */}
       <p className="body-sm max-w-sm mb-6">{description}</p>

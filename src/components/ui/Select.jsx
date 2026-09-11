@@ -2,13 +2,7 @@ import React, { forwardRef } from 'react';
 import { ChevronDown } from 'lucide-react';
 
 /**
- * Select — Dropdown select with label, error state.
- *
- * @param {string} label
- * @param {string} error
- * @param {string} placeholder — e.g. "Select a category"
- * @param {{ value: string, label: string }[]} options
- * @param {boolean} fullWidth
+ * Select — Terminal dropdown. Dark input bg, 1px border, white focus ring.
  */
 const Select = forwardRef(function Select(
   {
@@ -31,7 +25,7 @@ const Select = forwardRef(function Select(
       {label && (
         <label
           htmlFor={selectId}
-          className="block text-sm font-medium text-zinc-700 dark:text-text-dark-secondary mb-1.5"
+          className="block text-sm font-medium text-[#404040] dark:text-[#C4C7C8] mb-1.5"
         >
           {label}
         </label>
@@ -43,18 +37,18 @@ const Select = forwardRef(function Select(
           id={selectId}
           className={`
             w-full px-3.5 py-2.5 pr-10
-            text-sm font-sans text-zinc-900 dark:text-text-dark-primary
-            bg-white dark:bg-surface-dark-elevated
-            border rounded-lg max-md:min-h-[44px]
+            text-sm font-sans text-[#0A0A0A] dark:text-white
+            bg-white dark:bg-[#0A0A0A]
+            border rounded max-md:min-h-[44px]
             appearance-none cursor-pointer
             ${
               error
-                ? 'border-brand-red focus:ring-brand-red/20 focus:border-brand-red'
-                : 'border-ivory-border dark:border-surface-dark-border focus:ring-brand-amber/20 focus:border-brand-amber'
+                ? 'border-[#ff6b6b] focus:ring-[#ff6b6b]/20 focus:border-[#ff6b6b]'
+                : 'border-[#E5E5E5] dark:border-[#262626] focus:ring-white/20 focus:border-[#0A0A0A] dark:focus:border-white'
             }
-            transition-all duration-150
+            transition-colors duration-150
             focus:outline-none focus:ring-2
-            disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-ivory-muted
+            disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-[#F5F5F5] dark:disabled:bg-[#1E1E1E]
             ${className}
           `}
           aria-invalid={error ? 'true' : undefined}
@@ -74,18 +68,18 @@ const Select = forwardRef(function Select(
         </select>
 
         {/* Custom chevron */}
-        <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-zinc-400 dark:text-zinc-500">
+        <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-[#8E9192]">
           <ChevronDown className="w-4 h-4" />
         </div>
       </div>
 
       {error && (
-        <p id={`${selectId}-error`} className="mt-1.5 text-xs text-brand-red font-medium" role="alert">
+        <p id={`${selectId}-error`} className="mt-1.5 text-xs text-[#ff6b6b] font-medium" role="alert">
           {error}
         </p>
       )}
       {hint && !error && (
-        <p id={`${selectId}-hint`} className="mt-1.5 text-xs text-zinc-500 dark:text-zinc-500">
+        <p id={`${selectId}-hint`} className="mt-1.5 text-xs text-[#8E9192]">
           {hint}
         </p>
       )}

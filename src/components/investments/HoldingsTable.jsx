@@ -3,7 +3,7 @@ import { TrendingUp, TrendingDown, Pencil, Trash2 } from 'lucide-react';
 import { formatINR, formatPercent } from '@/utils/formatCurrency';
 
 /**
- * Mobile card view of a single holding.
+ * Mobile card view of a single holding — terminal.
  */
 function HoldingCard({ holding, onEdit, onDelete }) {
   const invested = Number(holding.investedValue) || 0;
@@ -16,22 +16,22 @@ function HoldingCard({ holding, onEdit, onDelete }) {
     <div className="card p-4 space-y-3">
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
-          <p className="text-sm font-semibold text-zinc-900 dark:text-text-dark-primary truncate">
+          <p className="text-sm font-semibold text-[#0A0A0A] dark:text-white truncate">
             {holding.name}
           </p>
-          <p className="text-xs text-text-secondary dark:text-text-dark-secondary">{holding.category}</p>
+          <p className="text-xs text-[#8E9192] font-mono">{holding.category}</p>
         </div>
         <div className="flex items-center gap-1 shrink-0">
           <button
             onClick={() => onEdit(holding)}
-            className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-600 hover:bg-ivory-muted dark:hover:text-zinc-300 dark:hover:bg-surface-dark-elevated transition-colors"
+            className="p-1.5 rounded text-[#8E9192] hover:text-[#0A0A0A] hover:bg-[#F5F5F5] dark:hover:text-white dark:hover:bg-[#1E1E1E] transition-colors"
             aria-label={`Edit ${holding.name}`}
           >
             <Pencil className="w-3.5 h-3.5" />
           </button>
           <button
             onClick={() => onDelete(holding.id)}
-            className="p-1.5 rounded-lg text-zinc-400 hover:text-brand-red hover:bg-rose-50 dark:hover:text-rose-400 dark:hover:bg-rose-500/10 transition-colors"
+            className="p-1.5 rounded text-[#8E9192] hover:text-[#ff6b6b] hover:bg-[rgba(255,107,107,0.12)] transition-colors"
             aria-label={`Delete ${holding.name}`}
           >
             <Trash2 className="w-3.5 h-3.5" />
@@ -41,37 +41,37 @@ function HoldingCard({ holding, onEdit, onDelete }) {
 
       <div className="grid grid-cols-2 gap-3 text-xs">
         <div>
-          <span className="text-text-tertiary dark:text-text-dark-tertiary">Units</span>
-          <p className="font-semibold mono text-zinc-900 dark:text-text-dark-primary">{holding.units}</p>
+          <span className="text-[#8E9192] font-mono uppercase tracking-widest">Units</span>
+          <p className="font-semibold font-mono tabular-nums text-[#0A0A0A] dark:text-white">{holding.units}</p>
         </div>
         <div>
-          <span className="text-text-tertiary dark:text-text-dark-tertiary">Avg Price</span>
-          <p className="font-semibold mono text-zinc-900 dark:text-text-dark-primary">
+          <span className="text-[#8E9192] font-mono uppercase tracking-widest">Avg Price</span>
+          <p className="font-semibold font-mono tabular-nums text-[#0A0A0A] dark:text-white">
             {formatINR(holding.avgPrice)}
           </p>
         </div>
         <div>
-          <span className="text-text-tertiary dark:text-text-dark-tertiary">Invested</span>
-          <p className="font-semibold mono text-zinc-900 dark:text-text-dark-primary">
+          <span className="text-[#8E9192] font-mono uppercase tracking-widest">Invested</span>
+          <p className="font-semibold font-mono tabular-nums text-[#0A0A0A] dark:text-white">
             {formatINR(invested)}
           </p>
         </div>
         <div>
-          <span className="text-text-tertiary dark:text-text-dark-tertiary">Current</span>
-          <p className="font-semibold mono text-zinc-900 dark:text-text-dark-primary">{formatINR(current)}</p>
+          <span className="text-[#8E9192] font-mono uppercase tracking-widest">Current</span>
+          <p className="font-semibold font-mono tabular-nums text-[#0A0A0A] dark:text-white">{formatINR(current)}</p>
         </div>
       </div>
 
-      <div className="flex items-center justify-between pt-2 border-t border-ivory-border dark:border-surface-dark-border">
-        <span className="text-xs text-text-tertiary dark:text-text-dark-tertiary">Return</span>
+      <div className="flex items-center justify-between pt-2 border-t border-[#E5E5E5] dark:border-[#262626]">
+        <span className="text-xs text-[#8E9192] font-mono uppercase tracking-widest">Return</span>
         <div className="flex items-center gap-1.5">
           {isPositive ? (
-            <TrendingUp className="w-3.5 h-3.5 text-brand-emerald dark:text-emerald-400" />
+            <TrendingUp className="w-3.5 h-3.5 text-[#00b894]" />
           ) : (
-            <TrendingDown className="w-3.5 h-3.5 text-brand-red dark:text-rose-400" />
+            <TrendingDown className="w-3.5 h-3.5 text-[#ff6b6b]" />
           )}
           <span
-            className={`text-sm font-bold mono ${isPositive ? 'text-brand-emerald dark:text-emerald-400' : 'text-brand-red dark:text-rose-400'}`}
+            className={`text-sm font-bold font-mono tabular-nums ${isPositive ? 'text-[#00a383] dark:text-[#00b894]' : 'text-[#e84118] dark:text-[#ff6b6b]'}`}
           >
             {isPositive ? '+' : '−'}
             {formatINR(Math.abs(returnAmt))} ({formatPercent(returnPct)})
@@ -84,8 +84,6 @@ function HoldingCard({ holding, onEdit, onDelete }) {
 
 /**
  * HoldingsTable — Desktop table + mobile card layout for investment holdings.
- *
- * @param {{ holdings: Array, onEdit: (holding) => void, onDelete: (id: string) => void }} props
  */
 export default function HoldingsTable({ holdings = [], onEdit, onDelete }) {
   if (holdings.length === 0) return null;
@@ -93,8 +91,8 @@ export default function HoldingsTable({ holdings = [], onEdit, onDelete }) {
   return (
     <section className="animate-fade-in-up" aria-label="Holdings table" style={{ animationDelay: '0.2s' }}>
       <div className="mb-4">
-        <h2 className="heading-sm text-zinc-900 dark:text-text-dark-primary">Holdings</h2>
-        <p className="text-xs text-text-secondary dark:text-text-dark-secondary mt-0.5">
+        <h2 className="heading-sm text-[#0A0A0A] dark:text-white">Holdings</h2>
+        <p className="text-xs text-[#8E9192] mt-0.5 font-mono uppercase tracking-widest">
           {holdings.length} {holdings.length === 1 ? 'asset' : 'assets'} in your portfolio
         </p>
       </div>
@@ -104,29 +102,29 @@ export default function HoldingsTable({ holdings = [], onEdit, onDelete }) {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-ivory-border dark:border-surface-dark-border">
-                <th className="text-left px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-text-secondary dark:text-text-dark-secondary">
+              <tr className="border-b border-[#E5E5E5] dark:border-[#262626] bg-[#F5F5F5] dark:bg-[#0A0A0A]">
+                <th className="text-left px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-[#8E9192] font-mono">
                   Asset
                 </th>
-                <th className="text-right px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-text-secondary dark:text-text-dark-secondary">
+                <th className="text-right px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-[#8E9192] font-mono">
                   Units
                 </th>
-                <th className="text-right px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-text-secondary dark:text-text-dark-secondary">
+                <th className="text-right px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-[#8E9192] font-mono">
                   Avg Price
                 </th>
-                <th className="text-right px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-text-secondary dark:text-text-dark-secondary">
+                <th className="text-right px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-[#8E9192] font-mono">
                   Current Price
                 </th>
-                <th className="text-right px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-text-secondary dark:text-text-dark-secondary">
+                <th className="text-right px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-[#8E9192] font-mono">
                   Invested
                 </th>
-                <th className="text-right px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-text-secondary dark:text-text-dark-secondary">
+                <th className="text-right px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-[#8E9192] font-mono">
                   Current Value
                 </th>
-                <th className="text-right px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-text-secondary dark:text-text-dark-secondary">
+                <th className="text-right px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-[#8E9192] font-mono">
                   Return
                 </th>
-                <th className="text-right px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-text-secondary dark:text-text-dark-secondary">
+                <th className="text-right px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-[#8E9192] font-mono">
                   Return %
                 </th>
                 <th className="px-4 py-3 w-20"></th>
@@ -143,41 +141,41 @@ export default function HoldingsTable({ holdings = [], onEdit, onDelete }) {
                 return (
                   <tr
                     key={h.id}
-                    className="border-b border-ivory-border/60 dark:border-surface-dark-border/60 last:border-0 hover:bg-ivory-muted/50 dark:hover:bg-surface-dark-elevated/50 transition-colors"
+                    className="border-b border-[#E5E5E5]/60 dark:border-[#262626]/60 last:border-0 hover:bg-[#F5F5F5]/50 dark:hover:bg-[#1E1E1E]/50 transition-colors"
                   >
                     <td className="px-4 py-3.5">
                       <div>
-                        <p className="font-medium text-zinc-900 dark:text-text-dark-primary truncate max-w-[200px]">
+                        <p className="font-medium text-[#0A0A0A] dark:text-white truncate max-w-[200px]">
                           {h.name}
                         </p>
-                        <p className="text-xs text-text-tertiary dark:text-text-dark-tertiary mt-0.5">
+                        <p className="text-xs text-[#8E9192] mt-0.5 font-mono">
                           {h.category}
                         </p>
                       </div>
                     </td>
-                    <td className="px-4 py-3.5 text-right mono text-zinc-900 dark:text-text-dark-primary">
+                    <td className="px-4 py-3.5 text-right font-mono tabular-nums text-[#0A0A0A] dark:text-white">
                       {h.units}
                     </td>
-                    <td className="px-4 py-3.5 text-right mono text-zinc-900 dark:text-text-dark-primary">
+                    <td className="px-4 py-3.5 text-right font-mono tabular-nums text-[#0A0A0A] dark:text-white">
                       {formatINR(h.avgPrice)}
                     </td>
-                    <td className="px-4 py-3.5 text-right mono text-zinc-900 dark:text-text-dark-primary">
+                    <td className="px-4 py-3.5 text-right font-mono tabular-nums text-[#0A0A0A] dark:text-white">
                       {formatINR(h.currentPrice)}
                     </td>
-                    <td className="px-4 py-3.5 text-right mono text-zinc-900 dark:text-text-dark-primary">
+                    <td className="px-4 py-3.5 text-right font-mono tabular-nums text-[#0A0A0A] dark:text-white">
                       {formatINR(invested)}
                     </td>
-                    <td className="px-4 py-3.5 text-right mono font-semibold text-zinc-900 dark:text-text-dark-primary">
+                    <td className="px-4 py-3.5 text-right font-mono tabular-nums font-semibold text-[#0A0A0A] dark:text-white">
                       {formatINR(current)}
                     </td>
                     <td
-                      className={`px-4 py-3.5 text-right mono font-semibold ${isPositive ? 'text-brand-emerald dark:text-emerald-400' : 'text-brand-red dark:text-rose-400'}`}
+                      className={`px-4 py-3.5 text-right font-mono tabular-nums font-semibold ${isPositive ? 'text-[#00a383] dark:text-[#00b894]' : 'text-[#e84118] dark:text-[#ff6b6b]'}`}
                     >
                       {isPositive ? '+' : '−'}
                       {formatINR(Math.abs(returnAmt))}
                     </td>
                     <td
-                      className={`px-4 py-3.5 text-right mono font-semibold ${isPositive ? 'text-brand-emerald dark:text-emerald-400' : 'text-brand-red dark:text-rose-400'}`}
+                      className={`px-4 py-3.5 text-right font-mono tabular-nums font-semibold ${isPositive ? 'text-[#00a383] dark:text-[#00b894]' : 'text-[#e84118] dark:text-[#ff6b6b]'}`}
                     >
                       {formatPercent(returnPct)}
                     </td>
@@ -185,14 +183,14 @@ export default function HoldingsTable({ holdings = [], onEdit, onDelete }) {
                       <div className="flex items-center justify-end gap-1">
                         <button
                           onClick={() => onEdit(h)}
-                          className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-600 hover:bg-ivory-muted dark:hover:text-zinc-300 dark:hover:bg-surface-dark-elevated transition-colors"
+                          className="p-1.5 rounded text-[#8E9192] hover:text-[#0A0A0A] hover:bg-[#F5F5F5] dark:hover:text-white dark:hover:bg-[#1E1E1E] transition-colors"
                           aria-label={`Edit ${h.name}`}
                         >
                           <Pencil className="w-3.5 h-3.5" />
                         </button>
                         <button
                           onClick={() => onDelete(h.id)}
-                          className="p-1.5 rounded-lg text-zinc-400 hover:text-brand-red hover:bg-rose-50 dark:hover:text-rose-400 dark:hover:bg-rose-500/10 transition-colors"
+                          className="p-1.5 rounded text-[#8E9192] hover:text-[#ff6b6b] hover:bg-[rgba(255,107,107,0.12)] transition-colors"
                           aria-label={`Delete ${h.name}`}
                         >
                           <Trash2 className="w-3.5 h-3.5" />

@@ -4,25 +4,18 @@ import { formatINR, formatCompact } from '@/utils/formatCurrency';
 import { calcCategoryBreakdown } from '@/utils/calculations';
 
 /**
- * Custom tooltip for grouped category comparison chart.
+ * Terminal tooltip: #141414 bg, #262626 border, mono figures.
  */
 function CategoryComparisonTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null;
   return (
-    <div
-      className="
-      bg-white dark:bg-surface-dark-card
-      border border-ivory-border dark:border-surface-dark-border
-      rounded-lg shadow-elevated dark:shadow-dark-elevated
-      px-4 py-3 space-y-1.5
-    "
-    >
-      <p className="text-xs font-semibold text-text-secondary dark:text-text-dark-secondary">{label}</p>
+    <div className="bg-[#141414] border border-[#262626] rounded px-4 py-3 space-y-1.5">
+      <p className="text-xs font-semibold text-[#8E9192] font-mono">{label}</p>
       {payload.map((entry) => (
         <div key={entry.name} className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full" style={{ background: entry.color }} />
-          <span className="text-xs text-text-secondary dark:text-text-dark-secondary">{entry.name}:</span>
-          <span className="text-sm font-semibold mono text-zinc-900 dark:text-text-dark-primary">
+          <span className="w-2 h-2 rounded-full" style={{ background: entry.fill || entry.color }} />
+          <span className="text-xs text-[#8E9192]">{entry.name}:</span>
+          <span className="text-sm font-semibold font-mono tabular-nums text-white">
             {formatINR(entry.value)}
           </span>
         </div>
@@ -31,22 +24,11 @@ function CategoryComparisonTooltip({ active, payload, label }) {
   );
 }
 
-const CATEGORY_COLORS = [
-  '#D97706', // amber
-  '#0D9488', // teal
-  '#7C3AED', // violet
-  '#E11D48', // rose
-  '#0EA5E9', // sky
-  '#84CC16', // lime
-  '#F97316', // orange
-  '#6366F1', // indigo
-];
+/* High-contrast monochromatic tonal gradient — no rainbow */
+const MONO_STACK = ['#FFFFFF', '#E4E4E7', '#A1A1AA', '#71717A', '#52525B', '#3F3F46'];
 
 /**
- * CategoryComparisonChart — Stacked bar chart comparing category spending
- * across the last N months. Shows top categories only.
- *
- * @param {{ transactions: Array, months: Array<{ monthKey: string, shortLabel: string }> }} props
+ * CategoryComparisonChart — Stacked bars in monochrome tones.
  */
 export default function CategoryComparisonChart({ transactions = [], months = [] }) {
   const { chartData, categories } = useMemo(() => {
@@ -92,8 +74,8 @@ export default function CategoryComparisonChart({ transactions = [], months = []
       style={{ animationDelay: '0.2s' }}
     >
       <div className="mb-5">
-        <h2 className="heading-sm text-zinc-900 dark:text-text-dark-primary">Category Comparison</h2>
-        <p className="text-xs text-text-secondary dark:text-text-dark-secondary mt-0.5">
+        <h2 className="heading-sm text-[#0A0A0A] dark:text-white">Category Comparison</h2>
+        <p className="text-xs text-[#8E9192] mt-0.5 font-mono uppercase tracking-widest">
           Spending by category across months
         </p>
       </div>
@@ -101,29 +83,29 @@ export default function CategoryComparisonChart({ transactions = [], months = []
       <div className="h-[300px]">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={chartData} margin={{ top: 4, right: 4, left: -16, bottom: 0 }} barGap={2}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-border-subtle)" />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#262626" />
             <XAxis
               dataKey="name"
               axisLine={false}
               tickLine={false}
-              tick={{ fontSize: 11, fill: 'var(--color-text-secondary)' }}
+              tick={{ fontSize: 11, fill: '#8E9192', fontFamily: 'JetBrains Mono, monospace' }}
               dy={8}
             />
             <YAxis
               axisLine={false}
               tickLine={false}
-              tick={{ fontSize: 11, fill: 'var(--color-text-secondary)' }}
+              tick={{ fontSize: 11, fill: '#8E9192', fontFamily: 'JetBrains Mono, monospace' }}
               tickFormatter={(v) => formatCompact(v)}
               dx={-4}
             />
-            <Tooltip content={<CategoryComparisonTooltip />} />
+            <Tooltip content={<CategoryComparisonTooltip />} cursor={{ fill: 'rgba(255,255,255,0.04)' }} />
             {categories.map((cat, idx) => (
               <Bar
                 key={cat}
                 dataKey={cat}
                 stackId="categories"
-                fill={CATEGORY_COLORS[idx % CATEGORY_COLORS.length]}
-                radius={idx === categories.length - 1 ? [4, 4, 0, 0] : [0, 0, 0, 0]}
+                fill={MONO_STACK[idx % MONO_STACK.length]}
+                radius={idx === categories.length - 1 ? [2, 2, 0, 0] : [0, 0, 0, 0]}
                 maxBarSize={40}
               />
             ))}
@@ -132,14 +114,14 @@ export default function CategoryComparisonChart({ transactions = [], months = []
       </div>
 
       {/* Legend */}
-      <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 mt-4 pt-3 border-t border-ivory-border dark:border-surface-dark-border">
+      <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 mt-4 pt-3 border-t border-[#E5E5E5] dark:border-[#262626]">
         {categories.map((cat, idx) => (
           <div key={cat} className="flex items-center gap-1.5">
             <span
               className="w-2.5 h-2.5 rounded-sm shrink-0"
-              style={{ background: CATEGORY_COLORS[idx % CATEGORY_COLORS.length] }}
+              style={{ background: MONO_STACK[idx % MONO_STACK.length] }}
             />
-            <span className="text-xs text-text-secondary dark:text-text-dark-secondary">{cat}</span>
+            <span className="text-xs text-[#8E9192]">{cat}</span>
           </div>
         ))}
       </div>

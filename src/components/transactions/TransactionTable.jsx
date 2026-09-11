@@ -36,11 +36,11 @@ export default function TransactionTable({ transactions, onEdit, onDelete, accou
 
   const SortIcon = ({ columnKey }) => {
     if (sortConfig.key !== columnKey)
-      return <ArrowUpDown className="w-3 h-3 text-zinc-300 dark:text-zinc-600" />;
+      return <ArrowUpDown className="w-3 h-3 text-[#8E9192]" />;
     return sortConfig.direction === 'asc' ? (
-      <ArrowUp className="w-3 h-3 text-brand-amber" />
+      <ArrowUp className="w-3 h-3 text-[#0A0A0A] dark:text-white" />
     ) : (
-      <ArrowDown className="w-3 h-3 text-brand-amber" />
+      <ArrowDown className="w-3 h-3 text-[#0A0A0A] dark:text-white" />
     );
   };
 
@@ -60,9 +60,9 @@ export default function TransactionTable({ transactions, onEdit, onDelete, accou
       <div className="w-full overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="hidden md:table-row bg-zinc-50 dark:bg-surface-dark-elevated border-b border-ivory-border dark:border-surface-dark-border text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+            <tr className="hidden md:table-row bg-[#F5F5F5] dark:bg-[#0A0A0A] border-b border-[#E5E5E5] dark:border-[#262626] text-xs font-semibold text-[#8E9192] uppercase tracking-wider font-mono">
               <th
-                className="py-3 pl-4 pr-3 cursor-pointer hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors"
+                className="py-3 pl-4 pr-3 cursor-pointer hover:text-[#0A0A0A] dark:hover:text-white transition-colors"
                 onClick={() => handleSort('date')}
               >
                 <div className="flex items-center gap-1.5">
@@ -74,7 +74,7 @@ export default function TransactionTable({ transactions, onEdit, onDelete, accou
               <th className="py-3 px-3">Category</th>
               <th className="py-3 px-3">Account</th>
               <th
-                className="py-3 px-3 text-right cursor-pointer hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors"
+                className="py-3 px-3 text-right cursor-pointer hover:text-[#0A0A0A] dark:hover:text-white transition-colors"
                 onClick={() => handleSort('amount')}
               >
                 <div className="flex items-center justify-end gap-1.5">

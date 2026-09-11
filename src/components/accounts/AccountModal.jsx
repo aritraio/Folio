@@ -117,14 +117,14 @@ export default function AccountModal({ isOpen, onClose, account, onSave }) {
             type="number"
             min="0"
             step="0.01"
-            icon={<span className="text-sm">₹</span>}
+            icon={<span className="text-sm font-mono">₹</span>}
             value={formData.balance}
             onChange={(e) => setFormData({ ...formData, balance: e.target.value })}
             error={errors.balance}
           />
         </div>
 
-        <div className="pt-4 flex justify-end gap-3 border-t border-ivory-border dark:border-surface-dark-border mt-6">
+        <div className="pt-4 flex justify-end gap-3 border-t border-[#E5E5E5] dark:border-[#262626] mt-6">
           <Button type="button" variant="ghost" onClick={onClose}>
             Cancel
           </Button>

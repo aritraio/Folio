@@ -128,18 +128,18 @@ export default function GlobalSearch({ isOpen, onClose }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center pt-[10vh] sm:pt-[15vh] px-4 backdrop-blur-sm bg-zinc-900/40 dark:bg-black/60"
+      className="fixed inset-0 z-50 flex items-start justify-center pt-[10vh] sm:pt-[15vh] px-4 bg-black/60"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-label="Global search"
     >
       <div
-        className="w-full max-w-2xl bg-white dark:bg-surface-dark-card rounded-2xl shadow-modal overflow-hidden animate-fade-in-scale motion-reduce:animate-none border border-ivory-border dark:border-surface-dark-border"
+        className="w-full max-w-2xl bg-white dark:bg-[#141414] rounded-md overflow-hidden animate-fade-in-scale motion-reduce:animate-none border border-[#E5E5E5] dark:border-[#262626]"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center px-4 border-b border-ivory-border dark:border-surface-dark-border">
-          <Search className="w-5 h-5 text-zinc-400 dark:text-zinc-500 shrink-0" aria-hidden="true" />
+        <div className="flex items-center px-4 border-b border-[#E5E5E5] dark:border-[#262626]">
+          <Search className="w-5 h-5 text-[#8E9192] shrink-0" aria-hidden="true" />
           <input
             ref={inputRef}
             type="text"
@@ -147,7 +147,7 @@ export default function GlobalSearch({ isOpen, onClose }) {
             aria-expanded={hasResults}
             aria-controls="global-search-results"
             aria-label="Search transactions, accounts, budgets, investments"
-            className="w-full bg-transparent border-0 py-4 px-3 text-lg text-zinc-900 dark:text-text-dark-primary placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-0"
+            className="w-full bg-transparent border-0 py-4 px-3 text-lg text-[#0A0A0A] dark:text-white placeholder-[#8E9192] focus:outline-none focus:ring-0"
             placeholder="Search transactions, accounts, budgets…"
             value={query}
             onChange={(e) => {
@@ -163,7 +163,7 @@ export default function GlobalSearch({ isOpen, onClose }) {
                 setTimeout(() => inputRef.current?.focus(), 10);
               }}
               aria-label="Clear search"
-              className="p-1.5 rounded-md text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 dark:hover:text-zinc-300 dark:hover:bg-surface-dark-elevated transition-colors"
+              className="p-1.5 rounded text-[#8E9192] hover:text-[#0A0A0A] hover:bg-[#F5F5F5] dark:hover:text-white dark:hover:bg-[#1E1E1E] transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -172,7 +172,7 @@ export default function GlobalSearch({ isOpen, onClose }) {
 
         <div className="max-h-[60vh] overflow-y-auto" id="global-search-results" role="listbox">
           {hasQuery && !hasResults ? (
-            <div className="px-6 py-12 text-center text-zinc-500 dark:text-zinc-400">
+            <div className="px-6 py-12 text-center text-[#8E9192]">
               <p>No results found for &ldquo;{query}&rdquo;</p>
             </div>
           ) : (
@@ -183,27 +183,29 @@ export default function GlobalSearch({ isOpen, onClose }) {
                     <button
                       className={`w-full text-left px-4 py-3 flex items-center justify-between group transition-colors ${
                         idx === selectedIndex
-                          ? 'bg-ivory-muted dark:bg-surface-dark-elevated'
-                          : 'hover:bg-ivory-muted/50 dark:hover:bg-surface-dark-elevated/50'
+                          ? 'bg-[#F5F5F5] dark:bg-[#1E1E1E]'
+                          : 'hover:bg-[#F5F5F5]/50 dark:hover:bg-[#1E1E1E]/50'
                       }`}
                       onMouseEnter={() => setSelectedIndex(idx)}
                       onClick={() => handleSelect(item)}
                     >
                       <div className="flex items-center gap-3 overflow-hidden">
                         <div
-                          className={`w-2 h-2 rounded-full shrink-0 ${
-                            item.data.type === 'expense'
-                              ? 'bg-brand-red'
-                              : item.data.type === 'income'
-                                ? 'bg-brand-emerald'
-                                : 'bg-brand-amber'
-                          }`}
+                          className="w-2 h-2 rounded-full shrink-0"
+                          style={{
+                            background:
+                              item.data.type === 'expense'
+                                ? '#ff6b6b'
+                                : item.data.type === 'income'
+                                  ? '#00b894'
+                                  : '#8E9192',
+                          }}
                         />
                         <div className="truncate">
-                          <div className="text-sm font-semibold text-zinc-900 dark:text-text-dark-primary truncate">
+                          <div className="text-sm font-semibold text-[#0A0A0A] dark:text-white truncate">
                             {item.data.merchant || item.data.description}
                           </div>
-                          <div className="text-xs text-zinc-500 dark:text-zinc-400 truncate flex items-center gap-2">
+                          <div className="text-xs text-[#8E9192] truncate flex items-center gap-2">
                             <span>{item.data.category}</span>
                             <span>•</span>
                             <span>{formatDate(item.data.date)}</span>
@@ -212,12 +214,12 @@ export default function GlobalSearch({ isOpen, onClose }) {
                       </div>
                       <div className="flex items-center gap-4 shrink-0">
                         <span
-                          className={`font-mono font-medium ${
+                          className={`font-mono font-medium tabular-nums ${
                             item.data.type === 'expense'
-                              ? 'text-zinc-900 dark:text-text-dark-primary'
+                              ? 'text-[#ff6b6b]'
                               : item.data.type === 'income'
-                                ? 'text-brand-emerald'
-                                : 'text-zinc-500'
+                                ? 'text-[#00b894]'
+                                : 'text-[#8E9192]'
                           }`}
                         >
                           {item.data.type === 'expense' ? '−' : item.data.type === 'income' ? '+' : ''}
@@ -226,8 +228,8 @@ export default function GlobalSearch({ isOpen, onClose }) {
                         <ArrowRight
                           className={`w-4 h-4 transition-colors ${
                             idx === selectedIndex
-                              ? 'text-zinc-400 dark:text-zinc-300'
-                              : 'text-transparent group-hover:text-zinc-300 dark:group-hover:text-zinc-600'
+                              ? 'text-[#8E9192]'
+                              : 'text-transparent group-hover:text-[#8E9192]'
                           }`}
                         />
                       </div>
@@ -236,17 +238,17 @@ export default function GlobalSearch({ isOpen, onClose }) {
                     <button
                       className={`w-full text-left px-4 py-3 flex items-center justify-between group transition-colors ${
                         idx === selectedIndex
-                          ? 'bg-ivory-muted dark:bg-surface-dark-elevated'
-                          : 'hover:bg-ivory-muted/50 dark:hover:bg-surface-dark-elevated/50'
+                          ? 'bg-[#F5F5F5] dark:bg-[#1E1E1E]'
+                          : 'hover:bg-[#F5F5F5]/50 dark:hover:bg-[#1E1E1E]/50'
                       }`}
                       onMouseEnter={() => setSelectedIndex(idx)}
                       onClick={() => handleSelect(item)}
                     >
                       <div className="truncate">
-                        <div className="text-xs uppercase tracking-wider text-zinc-400 mb-0.5">
+                        <div className="text-xs uppercase tracking-wider text-[#8E9192] mb-0.5 font-mono">
                           {item.kind}
                         </div>
-                        <div className="text-sm font-semibold text-zinc-900 dark:text-text-dark-primary truncate">
+                        <div className="text-sm font-semibold text-[#0A0A0A] dark:text-white truncate">
                           {item.kind === 'account'
                             ? item.data.name
                             : item.kind === 'budget'
@@ -254,19 +256,19 @@ export default function GlobalSearch({ isOpen, onClose }) {
                               : item.data.name}
                         </div>
                       </div>
-                      <ArrowRight className="w-4 h-4 text-zinc-400" />
+                      <ArrowRight className="w-4 h-4 text-[#8E9192]" />
                     </button>
                   )}
                 </li>
               ))}
               {hasQuery && hasResults && (
-                <li className="px-4 py-2 border-t border-ivory-border dark:border-surface-dark-border mt-2">
+                <li className="px-4 py-2 border-t border-[#E5E5E5] dark:border-[#262626] mt-2">
                   <button
                     onClick={() => {
                       navigate(`/transactions?search=${encodeURIComponent(query.trim())}`);
                       onClose();
                     }}
-                    className="w-full py-2 text-sm text-center font-medium text-brand-amber hover:text-amber-600 dark:text-amber-400 dark:hover:text-amber-300 transition-colors"
+                    className="w-full py-2 text-sm text-center font-medium text-[#0A0A0A] dark:text-white hover:opacity-70 underline underline-offset-2 transition-opacity"
                   >
                     View all results for &ldquo;{query.trim()}&rdquo;
                   </button>
@@ -276,25 +278,25 @@ export default function GlobalSearch({ isOpen, onClose }) {
           )}
         </div>
 
-        <div className="px-4 py-3 bg-zinc-50 dark:bg-surface-dark text-xs text-zinc-500 dark:text-zinc-400 border-t border-ivory-border dark:border-surface-dark-border flex items-center justify-between">
+        <div className="px-4 py-3 bg-[#F5F5F5] dark:bg-[#0A0A0A] text-xs text-[#8E9192] border-t border-[#E5E5E5] dark:border-[#262626] flex items-center justify-between">
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1">
-              <kbd className="px-1.5 py-0.5 bg-zinc-200 dark:bg-zinc-700 rounded text-zinc-600 dark:text-zinc-300">
+              <kbd className="px-1.5 py-0.5 bg-white dark:bg-[#1E1E1E] border border-[#E5E5E5] dark:border-[#262626] rounded text-[#404040] dark:text-[#C4C7C8] font-mono">
                 ↑
               </kbd>{' '}
-              <kbd className="px-1.5 py-0.5 bg-zinc-200 dark:bg-zinc-700 rounded text-zinc-600 dark:text-zinc-300">
+              <kbd className="px-1.5 py-0.5 bg-white dark:bg-[#1E1E1E] border border-[#E5E5E5] dark:border-[#262626] rounded text-[#404040] dark:text-[#C4C7C8] font-mono">
                 ↓
               </kbd>{' '}
               to navigate
             </span>
             <span className="flex items-center gap-1">
-              <kbd className="px-1.5 py-0.5 bg-zinc-200 dark:bg-zinc-700 rounded text-zinc-600 dark:text-zinc-300">
+              <kbd className="px-1.5 py-0.5 bg-white dark:bg-[#1E1E1E] border border-[#E5E5E5] dark:border-[#262626] rounded text-[#404040] dark:text-[#C4C7C8] font-mono">
                 Enter
               </kbd>{' '}
               to select
             </span>
             <span className="flex items-center gap-1">
-              <kbd className="px-1.5 py-0.5 bg-zinc-200 dark:bg-zinc-700 rounded text-zinc-600 dark:text-zinc-300">
+              <kbd className="px-1.5 py-0.5 bg-white dark:bg-[#1E1E1E] border border-[#E5E5E5] dark:border-[#262626] rounded text-[#404040] dark:text-[#C4C7C8] font-mono">
                 Esc
               </kbd>{' '}
               to close

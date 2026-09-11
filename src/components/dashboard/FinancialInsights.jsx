@@ -6,7 +6,7 @@ import {
   ShoppingBag,
   ArrowDownRight,
   ArrowUpRight,
-  Lightbulb,
+  Terminal,
 } from 'lucide-react';
 import { formatINR, formatPercent, formatCompact } from '@/utils/formatCurrency';
 import {
@@ -19,30 +19,34 @@ import {
 import { format, subMonths } from 'date-fns';
 
 /**
- * Single insight card.
+ * Single insight card — terminal surface, monochrome icon chip.
  */
-function InsightCard({ icon: Icon, iconBg, iconColor, title, description }) {
+function InsightCard({ icon: Icon, title, description, signal }) {
   return (
     <div
       className="
       flex items-start gap-3.5
-      p-3.5 rounded-xl
-      bg-ivory-muted/50 dark:bg-surface-dark-elevated/50
-      hover:bg-ivory-muted dark:hover:bg-surface-dark-elevated
+      p-3.5 rounded
+      bg-[#F5F5F5] dark:bg-[#0A0A0A]
+      border border-[#E5E5E5] dark:border-[#262626]
+      hover:border-[#CCCCCC] dark:hover:border-[#404040]
       transition-colors duration-150
     "
     >
-      <div
-        className={`
-        shrink-0 p-2 rounded-lg
-        ${iconBg}
-      `}
-      >
-        <Icon className={`w-4 h-4 ${iconColor}`} />
+      <div className="shrink-0 p-2 rounded border border-[#E5E5E5] dark:border-[#262626] bg-white dark:bg-[#1E1E1E]">
+        <Icon
+          className={`w-4 h-4 ${
+            signal === 'in'
+              ? 'text-[#00a383] dark:text-[#00b894]'
+              : signal === 'out'
+                ? 'text-[#e84118] dark:text-[#ff6b6b]'
+                : 'text-[#0A0A0A] dark:text-white'
+          }`}
+        />
       </div>
       <div className="min-w-0">
-        <p className="text-sm font-medium text-zinc-800 dark:text-text-dark-primary mb-0.5">{title}</p>
-        <p className="text-xs text-text-secondary dark:text-text-dark-secondary leading-relaxed">
+        <p className="text-sm font-medium text-[#0A0A0A] dark:text-white mb-0.5">{title}</p>
+        <p className="text-xs text-[#8E9192] leading-relaxed">
           {description}
         </p>
       </div>
@@ -52,12 +56,6 @@ function InsightCard({ icon: Icon, iconBg, iconColor, title, description }) {
 
 /**
  * FinancialInsights — Auto-generated data-driven insight cards.
- *
- * @param {{
- *   transactions: Array,
- *   netWorth: number,
- *   prevNetWorth: number,
- * }} props
  */
 export default function FinancialInsights({ transactions = [], netWorth = 0, prevNetWorth = 0 }) {
   const insights = useMemo(() => {
@@ -83,11 +81,7 @@ export default function FinancialInsights({ transactions = [], netWorth = 0, pre
       const absChange = Math.abs(expenseChange);
       result.push({
         icon: expenseChange > 0 ? ArrowUpRight : ArrowDownRight,
-        iconBg:
-          expenseChange > 0
-            ? 'bg-brand-red-light dark:bg-[rgba(251,113,133,0.12)]'
-            : 'bg-brand-emerald-light dark:bg-[rgba(52,211,153,0.12)]',
-        iconColor: expenseChange > 0 ? 'text-brand-red' : 'text-brand-emerald',
+        signal: expenseChange > 0 ? 'out' : 'in',
         title: `Spending ${direction} ${absChange.toFixed(1)}%`,
         description: `Your expenses ${direction} from ${formatINR(lastExpenses)} last month to ${formatINR(currentExpenses)} this month.`,
       });
@@ -99,11 +93,7 @@ export default function FinancialInsights({ transactions = [], netWorth = 0, pre
         savingsRate >= 30 ? 'Excellent' : savingsRate >= 20 ? 'Good' : savingsRate >= 10 ? 'Fair' : 'Low';
       result.push({
         icon: PiggyBank,
-        iconBg:
-          savingsRate >= 20
-            ? 'bg-brand-emerald-light dark:bg-[rgba(52,211,153,0.12)]'
-            : 'bg-amber-50 dark:bg-[rgba(245,158,11,0.12)]',
-        iconColor: savingsRate >= 20 ? 'text-brand-emerald' : 'text-brand-amber',
+        signal: savingsRate >= 20 ? 'in' : savingsRate >= 0 ? 'neutral' : 'out',
         title: `${rateLabel} savings rate: ${formatPercent(savingsRate)}`,
         description: `You saved ${formatINR(currentIncome - currentExpenses)} of ${formatINR(currentIncome)} income this month.`,
       });
@@ -116,8 +106,7 @@ export default function FinancialInsights({ transactions = [], netWorth = 0, pre
       if (topItem) {
         result.push({
           icon: ShoppingBag,
-          iconBg: 'bg-blue-50 dark:bg-[rgba(59,130,246,0.12)]',
-          iconColor: 'text-blue-500',
+          signal: 'neutral',
           title: `Top category: ${topItem.category}`,
           description: `${topItem.category} accounts for ${topItem.percentage.toFixed(0)}% of spending at ${formatINR(topItem.amount)}.`,
         });
@@ -130,10 +119,7 @@ export default function FinancialInsights({ transactions = [], netWorth = 0, pre
       const growing = netWorthChange > 0;
       result.push({
         icon: growing ? TrendingUp : TrendingDown,
-        iconBg: growing
-          ? 'bg-brand-emerald-light dark:bg-[rgba(52,211,153,0.12)]'
-          : 'bg-brand-red-light dark:bg-[rgba(251,113,133,0.12)]',
-        iconColor: growing ? 'text-brand-emerald' : 'text-brand-red',
+        signal: growing ? 'in' : 'out',
         title: `Net worth ${growing ? 'grew' : 'declined'} ${formatPercent(Math.abs(nwPercent))}`,
         description: `Your net worth changed by ${formatINR(Math.abs(netWorthChange))} compared to last month, now at ${formatCompact(netWorth)}.`,
       });
@@ -152,8 +138,8 @@ export default function FinancialInsights({ transactions = [], netWorth = 0, pre
     >
       {/* Header */}
       <div className="flex items-center gap-2 mb-5">
-        <Lightbulb className="w-4 h-4 text-brand-amber" />
-        <h2 className="heading-sm text-zinc-900 dark:text-text-dark-primary">Insights</h2>
+        <Terminal className="w-4 h-4 text-[#0A0A0A] dark:text-white" />
+        <h2 className="heading-sm text-[#0A0A0A] dark:text-white">Insights</h2>
       </div>
 
       {/* Insight cards */}

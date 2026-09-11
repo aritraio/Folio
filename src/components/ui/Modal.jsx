@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useCallback } from 'react';
 import { X } from 'lucide-react';
 
 /**
- * Modal — Accessible overlay with full focus trap, Escape, backdrop click.
+ * Modal — Terminal overlay. Surface #141414, 1px #262626, sharp 6px.
  */
 export default function Modal({
   isOpen,
@@ -101,11 +101,11 @@ export default function Modal({
         ref={contentRef}
         className={`
           w-full ${sizes[size]}
-          bg-white dark:bg-surface-dark-card
-          shadow-modal
+          bg-white dark:bg-[#141414]
+          border border-[#E5E5E5] dark:border-[#262626]
           overflow-y-auto
-          md:rounded-2xl md:max-h-[90vh] md:animate-fade-in-scale motion-reduce:animate-none
-          max-md:rounded-t-2xl max-md:rounded-b-none max-md:max-h-[95vh] max-md:animate-slide-up motion-reduce:animate-none
+          md:rounded-md md:max-h-[90vh] md:animate-fade-in-scale motion-reduce:animate-none
+          max-md:rounded-t-md max-md:rounded-b-none max-md:max-h-[95vh] max-md:animate-slide-up motion-reduce:animate-none
           ${className}
         `}
         role="dialog"
@@ -113,9 +113,9 @@ export default function Modal({
         aria-labelledby={title ? 'modal-title' : undefined}
       >
         {(title || showClose) && (
-          <div className="flex items-center justify-between px-6 pt-6 pb-4">
+          <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-[#E5E5E5] dark:border-[#262626]">
             {title && (
-              <h2 id="modal-title" className="heading-sm text-zinc-900 dark:text-text-dark-primary">
+              <h2 id="modal-title" className="heading-sm text-[#0A0A0A] dark:text-white">
                 {title}
               </h2>
             )}
@@ -123,9 +123,9 @@ export default function Modal({
               <button
                 onClick={onClose}
                 className="
-                  p-1.5 rounded-lg
-                  text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100
-                  dark:text-zinc-500 dark:hover:text-zinc-300 dark:hover:bg-surface-dark-elevated
+                  p-1.5 rounded
+                  text-[#8E9192] hover:text-[#0A0A0A] hover:bg-[#F5F5F5]
+                  dark:hover:text-white dark:hover:bg-[#1E1E1E]
                   transition-colors duration-150
                 "
                 aria-label="Close modal"
@@ -136,7 +136,7 @@ export default function Modal({
           </div>
         )}
 
-        <div className="px-6 pb-6">{children}</div>
+        <div className="px-6 pb-6 pt-5">{children}</div>
       </div>
     </div>
   );

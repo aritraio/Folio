@@ -3,21 +3,14 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { formatINR, formatCompact } from '@/utils/formatCurrency';
 
 /**
- * Custom tooltip for net worth growth chart.
+ * Terminal tooltip: #141414 bg, #262626 border, mono figures.
  */
 function NetWorthTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null;
   return (
-    <div
-      className="
-      bg-white dark:bg-surface-dark-card
-      border border-ivory-border dark:border-surface-dark-border
-      rounded-lg shadow-elevated dark:shadow-dark-elevated
-      px-4 py-3
-    "
-    >
-      <p className="text-xs font-semibold text-text-secondary dark:text-text-dark-secondary mb-1">{label}</p>
-      <p className="text-base font-bold mono text-zinc-900 dark:text-text-dark-primary">
+    <div className="bg-[#141414] border border-[#262626] rounded px-4 py-3">
+      <p className="text-xs font-semibold text-[#8E9192] mb-1 font-mono">{label}</p>
+      <p className="text-base font-bold font-mono tabular-nums text-white">
         {formatINR(payload[0].value)}
       </p>
     </div>
@@ -25,10 +18,7 @@ function NetWorthTooltip({ active, payload, label }) {
 }
 
 /**
- * NetWorthGrowthChart — Area chart showing net worth growth over time.
- * Styled consistently with the dashboard NetWorthChart but for analytics context.
- *
- * @param {{ data: Array<{ label: string, shortLabel: string, netWorth: number }> }} props
+ * NetWorthGrowthChart — Monochrome area: white stroke, white gradient.
  */
 export default function NetWorthGrowthChart({ data = [] }) {
   const chartData = data.map((d) => ({
@@ -43,8 +33,8 @@ export default function NetWorthGrowthChart({ data = [] }) {
       style={{ animationDelay: '0.3s' }}
     >
       <div className="mb-5">
-        <h2 className="heading-sm text-zinc-900 dark:text-text-dark-primary">Net Worth Growth</h2>
-        <p className="text-xs text-text-secondary dark:text-text-dark-secondary mt-0.5">
+        <h2 className="heading-sm text-[#0A0A0A] dark:text-white">Net Worth Growth</h2>
+        <p className="text-xs text-[#8E9192] mt-0.5 font-mono uppercase tracking-widest">
           Portfolio value trajectory
         </p>
       </div>
@@ -54,22 +44,22 @@ export default function NetWorthGrowthChart({ data = [] }) {
           <AreaChart data={chartData} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
             <defs>
               <linearGradient id="analyticsNWGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#0D9488" stopOpacity={0.25} />
-                <stop offset="95%" stopColor="#0D9488" stopOpacity={0.02} />
+                <stop offset="0%" stopColor="#FFFFFF" stopOpacity={0.05} />
+                <stop offset="100%" stopColor="#FFFFFF" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-border-subtle)" />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#262626" />
             <XAxis
               dataKey="name"
               axisLine={false}
               tickLine={false}
-              tick={{ fontSize: 11, fill: 'var(--color-text-secondary)' }}
+              tick={{ fontSize: 11, fill: '#8E9192', fontFamily: 'JetBrains Mono, monospace' }}
               dy={8}
             />
             <YAxis
               axisLine={false}
               tickLine={false}
-              tick={{ fontSize: 11, fill: 'var(--color-text-secondary)' }}
+              tick={{ fontSize: 11, fill: '#8E9192', fontFamily: 'JetBrains Mono, monospace' }}
               tickFormatter={(v) => formatCompact(v)}
               dx={-4}
             />
@@ -77,16 +67,11 @@ export default function NetWorthGrowthChart({ data = [] }) {
             <Area
               type="monotone"
               dataKey="value"
-              stroke="#0D9488"
-              strokeWidth={2.5}
+              stroke="#FFFFFF"
+              strokeWidth={2}
               fill="url(#analyticsNWGradient)"
               dot={false}
-              activeDot={{
-                r: 5,
-                strokeWidth: 2,
-                stroke: '#0D9488',
-                fill: 'var(--color-bg-secondary)',
-              }}
+              activeDot={{ r: 4, strokeWidth: 2, stroke: '#FFFFFF', fill: '#0A0A0A' }}
             />
           </AreaChart>
         </ResponsiveContainer>

@@ -4,30 +4,28 @@ import { formatINR, formatPercent, formatCompact } from '@/utils/formatCurrency'
 
 /**
  * Single metric card used inside the metrics strip.
+ * Terminal: 1px dividers, mono figures, inflow/outflow pill badges.
  */
-function MetricBlock({ label, icon: Icon, iconBg, iconColor, value, subValue, subColor }) {
+function MetricBlock({ label, icon: Icon, value, subValue, subPill }) {
   return (
     <div className="flex items-start gap-3.5 py-4 px-1 min-w-0">
-      <div
-        className={`
-        shrink-0 p-2.5 rounded-xl
-        ${iconBg}
-      `}
-      >
-        <Icon className={`w-4.5 h-4.5 ${iconColor}`} />
+      <div className="shrink-0 p-2.5 rounded border border-[#E5E5E5] dark:border-[#262626] bg-[#F5F5F5] dark:bg-[#1E1E1E]">
+        <Icon className="w-4 h-4 text-[#0A0A0A] dark:text-white" />
       </div>
       <div className="min-w-0">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-text-secondary dark:text-text-dark-secondary mb-1">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[#404040] dark:text-[#C4C7C8] mb-1 font-mono">
           {label}
         </p>
-        <p className="text-lg font-semibold mono text-zinc-900 dark:text-text-dark-primary truncate">
+        <p className="text-lg font-bold font-mono tabular-nums text-[#0A0A0A] dark:text-white truncate">
           {value}
         </p>
         {subValue && (
-          <p
-            className={`text-xs font-medium mt-0.5 ${subColor || 'text-text-tertiary dark:text-text-dark-tertiary'}`}
-          >
-            {subValue}
+          <p className="mt-1">
+            <span
+              className={`inline-flex items-center text-xs font-medium font-mono tabular-nums px-2 py-0.5 rounded ${subPill || 'text-[#8E9192]'}`}
+            >
+              {subValue}
+            </span>
           </p>
         )}
       </div>
@@ -35,19 +33,13 @@ function MetricBlock({ label, icon: Icon, iconBg, iconColor, value, subValue, su
   );
 }
 
+const PILL_IN =
+  'bg-[rgba(0,163,131,0.08)] text-[#00a383] dark:bg-[rgba(0,184,148,0.12)] dark:text-[#00b894]';
+const PILL_OUT =
+  'bg-[rgba(232,65,24,0.08)] text-[#e84118] dark:bg-[rgba(255,107,107,0.12)] dark:text-[#ff6b6b]';
+
 /**
  * FinancialMetrics — Horizontal strip of 5 key financial metrics.
- *
- * @param {{
- *   netWorth: number,
- *   netWorthChange: number,
- *   income: number,
- *   expenses: number,
- *   savings: number,
- *   savingsRate: number,
- *   investmentValue: number,
- *   investmentReturn: number
- * }} props
  */
 export default function FinancialMetrics({
   netWorth = 0,
@@ -66,48 +58,38 @@ export default function FinancialMetrics({
     {
       label: 'Net Worth',
       icon: Wallet,
-      iconBg: 'bg-amber-50 dark:bg-[rgba(245,158,11,0.12)]',
-      iconColor: 'text-brand-amber',
       value: formatCompact(netWorth),
-      subValue: `${formatPercent(netWorthChangePercent)} this month`,
-      subColor: netWorthChange >= 0 ? 'text-brand-emerald' : 'text-brand-red',
+      subValue: `${netWorthChange >= 0 ? '+' : '−'}${formatPercent(Math.abs(netWorthChangePercent))} this month`,
+      subPill: netWorthChange >= 0 ? PILL_IN : PILL_OUT,
     },
     {
-      label: 'Income',
+      label: 'Inflow',
       icon: ArrowDownLeft,
-      iconBg: 'bg-brand-emerald-light dark:bg-[rgba(52,211,153,0.12)]',
-      iconColor: 'text-brand-emerald',
       value: formatINR(income),
-      subValue: 'This month',
-      subColor: 'text-text-tertiary dark:text-text-dark-tertiary',
+      subValue: `+${formatINR(income)} this month`,
+      subPill: PILL_IN,
     },
     {
-      label: 'Expenses',
+      label: 'Outflow',
       icon: ArrowUpRight,
-      iconBg: 'bg-brand-red-light dark:bg-[rgba(251,113,133,0.12)]',
-      iconColor: 'text-brand-red',
       value: formatINR(expenses),
-      subValue: 'This month',
-      subColor: 'text-text-tertiary dark:text-text-dark-tertiary',
+      subValue: `−${formatINR(expenses)} this month`,
+      subPill: PILL_OUT,
     },
     {
       label: 'Savings',
       icon: PiggyBank,
-      iconBg: 'bg-blue-50 dark:bg-[rgba(59,130,246,0.12)]',
-      iconColor: 'text-blue-500',
       value: formatINR(savings),
       subValue: `${formatPercent(savingsRate)} rate`,
-      subColor:
-        savingsRate >= 20 ? 'text-brand-emerald' : savingsRate >= 0 ? 'text-brand-amber' : 'text-brand-red',
+      subPill:
+        savingsRate >= 20 ? PILL_IN : savingsRate >= 0 ? 'text-[#8E9192]' : PILL_OUT,
     },
     {
       label: 'Investments',
       icon: TrendingUp,
-      iconBg: 'bg-purple-50 dark:bg-[rgba(139,92,246,0.12)]',
-      iconColor: 'text-purple-500',
       value: formatCompact(investmentValue),
-      subValue: `${formatPercent(investmentReturn)} return`,
-      subColor: investmentReturn >= 0 ? 'text-brand-emerald' : 'text-brand-red',
+      subValue: `${investmentReturn >= 0 ? '+' : ''}${formatPercent(investmentReturn)} return`,
+      subPill: investmentReturn >= 0 ? PILL_IN : PILL_OUT,
     },
   ];
 
@@ -117,7 +99,7 @@ export default function FinancialMetrics({
       aria-label="Financial metrics"
       style={{ animationDelay: '0.05s' }}
     >
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 divide-y sm:divide-y-0 sm:divide-x divide-ivory-border dark:divide-surface-dark-border">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 divide-y sm:divide-y-0 sm:divide-x divide-[#E5E5E5] dark:divide-[#262626]">
         {metrics.map((m) => (
           <div key={m.label} className="px-3 sm:px-4 lg:px-5">
             <MetricBlock {...m} />

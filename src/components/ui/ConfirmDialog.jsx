@@ -4,17 +4,7 @@ import Modal from './Modal';
 import Button from './Button';
 
 /**
- * ConfirmDialog — "Are you sure?" modal for destructive actions.
- *
- * @param {boolean} isOpen
- * @param {() => void} onClose
- * @param {() => void} onConfirm
- * @param {string} title
- * @param {string} message — description text
- * @param {string} confirmLabel — button text (default "Delete")
- * @param {string} cancelLabel — button text (default "Cancel")
- * @param {'destructive'|'primary'} variant — confirm button variant
- * @param {boolean} loading
+ * ConfirmDialog — Terminal confirm. Monochrome chrome, red signal only for destructive icon.
  */
 export default function ConfirmDialog({
   isOpen,
@@ -38,25 +28,23 @@ export default function ConfirmDialog({
         {/* Warning Icon */}
         <div
           className={`
-            w-12 h-12 rounded-full flex items-center justify-center mb-4
+            w-12 h-12 rounded flex items-center justify-center mb-4 border
             ${
               variant === 'destructive'
-                ? 'bg-brand-red-light dark:bg-[rgba(251,113,133,0.15)]'
-                : 'bg-brand-amber-light dark:bg-[rgba(245,158,11,0.15)]'
+                ? 'bg-[rgba(255,107,107,0.12)] border-[#ff6b6b]/30 dark:bg-[rgba(255,107,107,0.12)]'
+                : 'bg-[#F5F5F5] border-[#E5E5E5] dark:bg-[#1E1E1E] dark:border-[#262626]'
             }
           `}
         >
           <AlertTriangle
             className={`w-6 h-6 ${
-              variant === 'destructive'
-                ? 'text-brand-red dark:text-rose-400'
-                : 'text-brand-amber dark:text-amber-400'
+              variant === 'destructive' ? 'text-[#ff6b6b]' : 'text-[#0A0A0A] dark:text-white'
             }`}
           />
         </div>
 
         {/* Title */}
-        <h3 className="heading-sm text-zinc-900 dark:text-text-dark-primary mb-2">{title}</h3>
+        <h3 className="heading-sm text-[#0A0A0A] dark:text-white mb-2">{title}</h3>
 
         {/* Message */}
         <p className="body-sm max-w-xs mb-6">{message}</p>

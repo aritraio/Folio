@@ -4,21 +4,14 @@ import { formatINR, formatCompact } from '@/utils/formatCurrency';
 import { getLastNMonths } from '@/utils/dateUtils';
 
 /**
- * Custom tooltip for the portfolio value chart.
+ * Terminal tooltip: #141414 bg, #262626 border, mono figures.
  */
 function PortfolioTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null;
   return (
-    <div
-      className="
-      bg-white dark:bg-surface-dark-card
-      border border-ivory-border dark:border-surface-dark-border
-      rounded-lg shadow-elevated dark:shadow-dark-elevated
-      px-4 py-3
-    "
-    >
-      <p className="text-xs font-semibold text-text-secondary dark:text-text-dark-secondary mb-1">{label}</p>
-      <p className="text-base font-bold mono text-zinc-900 dark:text-text-dark-primary">
+    <div className="bg-[#141414] border border-[#262626] rounded px-4 py-3">
+      <p className="text-xs font-semibold text-[#8E9192] mb-1 font-mono">{label}</p>
+      <p className="text-base font-bold font-mono tabular-nums text-white">
         {formatINR(payload[0].value)}
       </p>
     </div>
@@ -26,12 +19,9 @@ function PortfolioTooltip({ active, payload, label }) {
 }
 
 /**
- * PortfolioValueChart — Area chart showing estimated portfolio value trend.
+ * PortfolioValueChart — Monochrome area: white stroke, white gradient.
  * NOTE: historical prices are not stored in v1, so this is an illustrative
  * projection from current value (clearly labelled as estimated).
- * Replace with real snapshots once price history is persisted.
- *
- * @param {{ totalCurrent: number }} props
  */
 export default function PortfolioValueChart({ totalCurrent = 0 }) {
   const chartData = useMemo(() => {
@@ -57,8 +47,8 @@ export default function PortfolioValueChart({ totalCurrent = 0 }) {
       style={{ animationDelay: '0.15s' }}
     >
       <div className="mb-5">
-        <h2 className="heading-sm text-zinc-900 dark:text-text-dark-primary">Portfolio Value</h2>
-        <p className="text-xs text-text-secondary dark:text-text-dark-secondary mt-0.5">
+        <h2 className="heading-sm text-[#0A0A0A] dark:text-white">Portfolio Value</h2>
+        <p className="text-xs text-[#8E9192] mt-0.5 font-mono uppercase tracking-widest">
           Estimated trend — illustrative projection from current value, not market history
         </p>
       </div>
@@ -72,22 +62,22 @@ export default function PortfolioValueChart({ totalCurrent = 0 }) {
           <AreaChart data={chartData} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
             <defs>
               <linearGradient id="portfolioGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#7C3AED" stopOpacity={0.2} />
-                <stop offset="95%" stopColor="#7C3AED" stopOpacity={0.02} />
+                <stop offset="0%" stopColor="#FFFFFF" stopOpacity={0.05} />
+                <stop offset="100%" stopColor="#FFFFFF" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-border-subtle)" />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#262626" />
             <XAxis
               dataKey="name"
               axisLine={false}
               tickLine={false}
-              tick={{ fontSize: 11, fill: 'var(--color-text-secondary)' }}
+              tick={{ fontSize: 11, fill: '#8E9192', fontFamily: 'JetBrains Mono, monospace' }}
               dy={8}
             />
             <YAxis
               axisLine={false}
               tickLine={false}
-              tick={{ fontSize: 11, fill: 'var(--color-text-secondary)' }}
+              tick={{ fontSize: 11, fill: '#8E9192', fontFamily: 'JetBrains Mono, monospace' }}
               tickFormatter={(v) => formatCompact(v)}
               dx={-4}
             />
@@ -95,16 +85,11 @@ export default function PortfolioValueChart({ totalCurrent = 0 }) {
             <Area
               type="monotone"
               dataKey="value"
-              stroke="#7C3AED"
-              strokeWidth={2.5}
+              stroke="#FFFFFF"
+              strokeWidth={2}
               fill="url(#portfolioGradient)"
               dot={false}
-              activeDot={{
-                r: 5,
-                strokeWidth: 2,
-                stroke: '#7C3AED',
-                fill: 'var(--color-bg-secondary)',
-              }}
+              activeDot={{ r: 4, strokeWidth: 2, stroke: '#FFFFFF', fill: '#0A0A0A' }}
             />
           </AreaChart>
         </ResponsiveContainer>

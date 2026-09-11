@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import {
-  Wallet,
+  Terminal,
   LayoutDashboard,
   ArrowLeftRight,
   Landmark,
@@ -32,17 +32,9 @@ const NAV_ITEMS = [
 ];
 
 /**
- * Navbar — Desktop top navigation bar.
- *
- * Features:
- * - Logo / product name ("Ledger") left-aligned
- * - 7 navigation links with uppercase labels & icons
- * - Active link indicator (bottom border highlight)
- * - Right side: search icon, notification icon, user avatar/menu
- * - Sticky header with backdrop blur
- * - Dark mode support
- *
- * @param {() => void} onSearchClick — callback when search icon is clicked
+ * Navbar — Terminal top navigation.
+ * Bg #0A0A0A/#111111 with crisp 1px #262626 border. Active route:
+ * solid white indicator + high-contrast neutral badge. Monochrome brand.
  */
 export default function Navbar({ onSearchClick }) {
   const location = useLocation();
@@ -96,9 +88,8 @@ export default function Navbar({ onSearchClick }) {
     <nav
       className="
         sticky top-0 z-30
-        bg-white/80 dark:bg-surface-dark/80
-        backdrop-blur-xl
-        border-b border-ivory-border dark:border-surface-dark-border
+        bg-white dark:bg-[#111111]
+        border-b border-[#E5E5E5] dark:border-[#262626]
         transition-colors duration-200
       "
       role="navigation"
@@ -112,21 +103,24 @@ export default function Navbar({ onSearchClick }) {
             <NavLink
               to="/"
               className="flex items-center gap-2.5 shrink-0 group"
-              aria-label="Ledger — Go to dashboard"
+              aria-label="Folio — Go to dashboard"
             >
               <div
                 className="
-              p-2 rounded-lg
-              bg-amber-50 dark:bg-[rgba(245,158,11,0.12)]
-              text-brand-amber
-              group-hover:bg-amber-100 dark:group-hover:bg-[rgba(245,158,11,0.2)]
-              transition-colors duration-150
+              p-2 rounded
+              bg-[#0A0A0A] text-white
+              dark:bg-white dark:text-[#0A0A0A]
+              group-hover:opacity-80
+              transition-opacity duration-150
             "
               >
-                <Wallet className="w-5 h-5" />
+                <Terminal className="w-5 h-5" />
               </div>
-              <span className="font-serif-display text-xl font-bold tracking-tight text-zinc-900 dark:text-text-dark-primary">
-                Ledger
+              <span className="font-sans text-lg font-semibold tracking-tight text-[#0A0A0A] dark:text-white">
+                FOLIO
+                <span className="ml-2 font-mono text-[10px] font-medium text-[#8E9192] tracking-widest">
+                  v1.0
+                </span>
               </span>
             </NavLink>
           </div>
@@ -139,20 +133,20 @@ export default function Navbar({ onSearchClick }) {
                 to={to}
                 end={to === '/'}
                 className={({ isActive }) => `
-                  relative px-3 py-2 rounded-lg
+                  relative px-3 py-2 rounded
                   flex items-center gap-1.5
                   text-[11px] font-semibold uppercase tracking-widest
-                  transition-all duration-150
+                  transition-colors duration-150
                   ${
                     isActive
-                      ? 'text-brand-amber dark:text-amber-400'
-                      : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-text-dark-primary hover:bg-ivory-muted dark:hover:bg-surface-dark-elevated group'
+                      ? 'text-[#0A0A0A] bg-[#F5F5F5] border border-[#E5E5E5] dark:text-white dark:bg-[#1E1E1E] dark:border-[#404040]'
+                      : 'text-[#8E9192] border border-transparent hover:text-[#0A0A0A] hover:bg-[#F5F5F5] dark:hover:text-white dark:hover:bg-[#1E1E1E] group'
                   }
                 `}
               >
                 <Icon className="w-3.5 h-3.5" />
                 <span>{label}</span>
-                {/* Hover/Active indicator — bottom bar */}
+                {/* Active indicator — solid white line */}
                 {({ isActive }) => (
                   <span
                     className={`
@@ -171,10 +165,10 @@ export default function Navbar({ onSearchClick }) {
             <button
               onClick={cycleTheme}
               className="
-                relative p-2.5 rounded-lg
-                text-zinc-500 dark:text-zinc-400
-                hover:text-zinc-900 dark:hover:text-text-dark-primary
-                hover:bg-ivory-muted dark:hover:bg-surface-dark-elevated
+                relative p-2.5 rounded
+                text-[#8E9192]
+                hover:text-[#0A0A0A] dark:hover:text-white
+                hover:bg-[#F5F5F5] dark:hover:bg-[#1E1E1E]
                 transition-colors duration-150
                 group
               "
@@ -192,10 +186,10 @@ export default function Navbar({ onSearchClick }) {
             <button
               onClick={onSearchClick}
               className="
-                p-2.5 rounded-lg
-                text-zinc-500 dark:text-zinc-400
-                hover:text-zinc-900 dark:hover:text-text-dark-primary
-                hover:bg-ivory-muted dark:hover:bg-surface-dark-elevated
+                p-2.5 rounded
+                text-[#8E9192]
+                hover:text-[#0A0A0A] dark:hover:text-white
+                hover:bg-[#F5F5F5] dark:hover:bg-[#1E1E1E]
                 transition-colors duration-150
               "
               aria-label="Search (Ctrl+K)"
@@ -209,10 +203,10 @@ export default function Navbar({ onSearchClick }) {
               <button
                 onClick={() => setNotifOpen((v) => !v)}
                 className="
-                  relative p-2.5 rounded-lg
-                  text-zinc-500 dark:text-zinc-400
-                  hover:text-zinc-900 dark:hover:text-text-dark-primary
-                  hover:bg-ivory-muted dark:hover:bg-surface-dark-elevated
+                  relative p-2.5 rounded
+                  text-[#8E9192]
+                  hover:text-[#0A0A0A] dark:hover:text-white
+                  hover:bg-[#F5F5F5] dark:hover:bg-[#1E1E1E]
                   transition-colors duration-150
                 "
                 aria-label="Notifications"
@@ -221,20 +215,20 @@ export default function Navbar({ onSearchClick }) {
               >
                 <Bell className="w-[18px] h-[18px]" />
                 <span
-                  className="absolute top-2 right-2 w-1.5 h-1.5 bg-brand-red rounded-full"
+                  className="absolute top-2 right-2 w-1.5 h-1.5 bg-[#ff6b6b] rounded-full"
                   aria-hidden="true"
                 />
               </button>
               {notifOpen && (
                 <div
-                  className="absolute right-0 top-full mt-2 w-72 p-4 bg-white dark:bg-surface-dark-card border border-ivory-border dark:border-surface-dark-border rounded-xl shadow-elevated dark:shadow-dark-elevated z-50"
+                  className="absolute right-0 top-full mt-2 w-72 p-4 bg-white dark:bg-[#141414] border border-[#E5E5E5] dark:border-[#262626] rounded-md z-50"
                   role="menu"
                   aria-label="Notifications"
                 >
-                  <p className="text-sm font-semibold text-zinc-900 dark:text-text-dark-primary mb-1">
+                  <p className="text-sm font-semibold text-[#0A0A0A] dark:text-white mb-1">
                     You&apos;re all caught up
                   </p>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
+                  <p className="text-xs text-[#8E9192] leading-relaxed">
                     Local-first demo: budgets, insights and reminders update from your transactions on the
                     Dashboard. No server notifications in v1.
                   </p>
@@ -243,7 +237,7 @@ export default function Navbar({ onSearchClick }) {
                       setNotifOpen(false);
                       navigate('/');
                     }}
-                    className="mt-3 text-xs font-medium text-brand-amber hover:underline"
+                    className="mt-3 text-xs font-medium text-[#0A0A0A] dark:text-white hover:opacity-70 underline underline-offset-2"
                   >
                     View insights →
                   </button>
@@ -252,15 +246,15 @@ export default function Navbar({ onSearchClick }) {
             </div>
 
             {/* Divider */}
-            <div className="w-px h-6 bg-ivory-border dark:bg-surface-dark-border mx-1.5" aria-hidden="true" />
+            <div className="w-px h-6 bg-[#E5E5E5] dark:bg-[#262626] mx-1.5" aria-hidden="true" />
 
             {/* User Menu */}
             <div className="relative" ref={userMenuRef}>
               <button
                 onClick={() => setUserMenuOpen(!userMenuOpen)}
                 className="
-                  flex items-center gap-2 p-1.5 pr-3 rounded-lg
-                  hover:bg-ivory-muted dark:hover:bg-surface-dark-elevated
+                  flex items-center gap-2 p-1.5 pr-3 rounded
+                  hover:bg-[#F5F5F5] dark:hover:bg-[#1E1E1E]
                   transition-colors duration-150
                 "
                 aria-label="User menu"
@@ -269,17 +263,17 @@ export default function Navbar({ onSearchClick }) {
               >
                 <div
                   className="
-                  w-7 h-7 rounded-full
-                  bg-gradient-to-br from-amber-400 to-orange-500
+                  w-7 h-7 rounded
+                  bg-[#0A0A0A] text-white
+                  dark:bg-white dark:text-[#0A0A0A]
                   flex items-center justify-center
-                  text-white text-xs font-bold
-                  shadow-sm
+                  text-xs font-bold font-mono
                 "
                   aria-hidden="true"
                 >
                   {initials}
                 </div>
-                <span className="hidden sm:block text-sm font-medium text-zinc-700 dark:text-text-dark-secondary">
+                <span className="hidden sm:block text-sm font-medium text-[#404040] dark:text-[#C4C7C8]">
                   {userName}
                 </span>
               </button>
@@ -290,26 +284,26 @@ export default function Navbar({ onSearchClick }) {
                   className="
                     absolute right-0 top-full mt-2
                     w-56 py-1.5
-                    bg-white dark:bg-surface-dark-card
-                    border border-ivory-border dark:border-surface-dark-border
-                    rounded-xl shadow-elevated dark:shadow-dark-elevated
+                    bg-white dark:bg-[#141414]
+                    border border-[#E5E5E5] dark:border-[#262626]
+                    rounded-md
                     animate-fade-in-up
                     z-50
                   "
                   role="menu"
                 >
                   {/* User info */}
-                  <div className="px-4 py-3 border-b border-ivory-border dark:border-surface-dark-border">
-                    <p className="text-sm font-semibold text-zinc-900 dark:text-text-dark-primary">
+                  <div className="px-4 py-3 border-b border-[#E5E5E5] dark:border-[#262626]">
+                    <p className="text-sm font-semibold text-[#0A0A0A] dark:text-white">
                       {userName}
                     </p>
-                    {userEmail && <p className="text-xs text-zinc-500 dark:text-zinc-500">{userEmail}</p>}
+                    {userEmail && <p className="text-xs text-[#8E9192]">{userEmail}</p>}
                   </div>
 
                   <div className="py-1">
                     <NavLink
                       to="/settings"
-                      className="flex items-center gap-2.5 px-4 py-2 text-sm text-zinc-700 dark:text-text-dark-secondary hover:bg-ivory-muted dark:hover:bg-surface-dark-elevated transition-colors"
+                      className="flex items-center gap-2.5 px-4 py-2 text-sm text-[#404040] dark:text-[#C4C7C8] hover:bg-[#F5F5F5] dark:hover:bg-[#1E1E1E] transition-colors"
                       role="menuitem"
                       onClick={() => setUserMenuOpen(false)}
                     >
@@ -317,7 +311,7 @@ export default function Navbar({ onSearchClick }) {
                       Settings
                     </NavLink>
                     <button
-                      className="flex items-center gap-2.5 w-full px-4 py-2 text-sm text-zinc-700 dark:text-text-dark-secondary hover:bg-ivory-muted dark:hover:bg-surface-dark-elevated transition-colors"
+                      className="flex items-center gap-2.5 w-full px-4 py-2 text-sm text-[#404040] dark:text-[#C4C7C8] hover:bg-[#F5F5F5] dark:hover:bg-[#1E1E1E] transition-colors"
                       role="menuitem"
                       onClick={() => {
                         setUserMenuOpen(false);
@@ -333,9 +327,9 @@ export default function Navbar({ onSearchClick }) {
                     </button>
                   </div>
 
-                  <div className="border-t border-ivory-border dark:border-surface-dark-border pt-1">
+                  <div className="border-t border-[#E5E5E5] dark:border-[#262626] pt-1">
                     <button
-                      className="flex items-center gap-2.5 w-full px-4 py-2 text-sm text-zinc-500 dark:text-zinc-400 hover:bg-ivory-muted dark:hover:bg-surface-dark-elevated transition-colors"
+                      className="flex items-center gap-2.5 w-full px-4 py-2 text-sm text-[#8E9192] hover:bg-[#F5F5F5] dark:hover:bg-[#1E1E1E] transition-colors"
                       role="menuitem"
                       onClick={() => {
                         setUserMenuOpen(false);
@@ -352,8 +346,6 @@ export default function Navbar({ onSearchClick }) {
           </div>
         </div>
       </div>
-
-      {/* Removed the global style for nav links since we now use a component-level span */}
     </nav>
   );
 }
