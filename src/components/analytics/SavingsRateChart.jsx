@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { formatPercent } from '@/utils/formatCurrency';
 import { calcMonthlyIncome, calcMonthlyExpenses, calcSavingsRate } from '@/utils/calculations';
+import useChartTheme from '@/utils/useChartTheme';
 
 /**
  * Terminal tooltip: #141414 bg, #262626 border. Value keeps inflow/outflow signal.
@@ -22,9 +23,10 @@ function SavingsRateTooltip({ active, payload, label }) {
 }
 
 /**
- * SavingsRateChart — Monochrome white trend line for savings rate.
+ * SavingsRateChart — Monochrome theme-aware trend line for savings rate.
  */
 export default function SavingsRateChart({ transactions = [], months = [] }) {
+  const chart = useChartTheme();
   const chartData = useMemo(() => {
     return months.map((m) => {
       const income = calcMonthlyIncome(transactions, m.monthKey);
@@ -53,18 +55,18 @@ export default function SavingsRateChart({ transactions = [], months = [] }) {
       <div className="h-[260px]">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#262626" />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={chart.grid} />
             <XAxis
               dataKey="name"
               axisLine={false}
               tickLine={false}
-              tick={{ fontSize: 11, fill: '#8E9192', fontFamily: 'JetBrains Mono, monospace' }}
+              tick={{ fontSize: 11, fill: chart.tick, fontFamily: 'JetBrains Mono, monospace' }}
               dy={8}
             />
             <YAxis
               axisLine={false}
               tickLine={false}
-              tick={{ fontSize: 11, fill: '#8E9192', fontFamily: 'JetBrains Mono, monospace' }}
+              tick={{ fontSize: 11, fill: chart.tick, fontFamily: 'JetBrains Mono, monospace' }}
               tickFormatter={(v) => `${v}%`}
               dx={-4}
               domain={['auto', 'auto']}
@@ -73,10 +75,10 @@ export default function SavingsRateChart({ transactions = [], months = [] }) {
             <Line
               type="monotone"
               dataKey="rate"
-              stroke="#FFFFFF"
+              stroke={chart.line}
               strokeWidth={2}
               dot={false}
-              activeDot={{ r: 4, strokeWidth: 2, stroke: '#FFFFFF', fill: '#0A0A0A' }}
+              activeDot={{ r: 4, strokeWidth: 2, stroke: chart.line, fill: chart.activeDotFill }}
             />
           </LineChart>
         </ResponsiveContainer>

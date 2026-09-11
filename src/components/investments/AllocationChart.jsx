@@ -1,18 +1,9 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Sector } from 'recharts';
 import { formatINR } from '@/utils/formatCurrency';
+import useChartTheme from '@/utils/useChartTheme';
 
-/* Monochrome allocation tones by asset class */
-const ALLOCATION_COLORS = {
-  'Mutual Fund': '#FFFFFF',
-  Stocks: '#E4E4E7',
-  Gold: '#A1A1AA',
-  'Provident Fund': '#71717A',
-  'Fixed Deposit': '#52525B',
-  Bonds: '#3F3F46',
-  'Real Estate': '#27272A',
-  Other: '#71717A',
-};
+/* Donut slices use the theme-aware monochrome ramp by rank (see below). */
 
 /**
  * Terminal tooltip: #141414 bg, #262626 border, mono figures.
@@ -60,6 +51,7 @@ function renderActiveShape(props) {
  */
 export default function AllocationChart({ holdings = [] }) {
   const [activeIndex, setActiveIndex] = useState(-1);
+  const chart = useChartTheme();
 
   const onPieEnter = useCallback((_, index) => {
     setActiveIndex(index);
@@ -69,8 +61,8 @@ export default function AllocationChart({ holdings = [] }) {
     setActiveIndex(-1);
   }, []);
 
-  // Group by category
-  const allocationData = (() => {
+  // Group by category, then re-tone per theme so slices stay visible.
+  const allocationData = useMemo(() => {
     const grouped = {};
     let total = 0;
 
@@ -86,10 +78,10 @@ export default function AllocationChart({ holdings = [] }) {
         name,
         value,
         percentage: total > 0 ? (value / total) * 100 : 0,
-        color: ALLOCATION_COLORS[name] || '#71717A',
       }))
-      .sort((a, b) => b.value - a.value);
-  })();
+      .sort((a, b) => b.value - a.value)
+      .map((d, i) => ({ ...d, color: chart.mono(i) }));
+  }, [holdings, chart]);
 
   if (allocationData.length === 0) return null;
 
@@ -129,7 +121,7 @@ export default function AllocationChart({ holdings = [] }) {
                 onMouseLeave={onPieLeave}
               >
                 {allocationData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} stroke="#0A0A0A" strokeWidth={1} />
+                  <Cell key={`cell-${index}`} fill={entry.color} stroke={chart.activeDotFill} strokeWidth={1} />
                 ))}
               </Pie>
               <Tooltip content={<AllocationTooltip />} />

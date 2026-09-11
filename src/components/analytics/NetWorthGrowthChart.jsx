@@ -1,6 +1,7 @@
 import React from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { formatINR, formatCompact } from '@/utils/formatCurrency';
+import useChartTheme from '@/utils/useChartTheme';
 
 /**
  * Terminal tooltip: #141414 bg, #262626 border, mono figures.
@@ -18,9 +19,10 @@ function NetWorthTooltip({ active, payload, label }) {
 }
 
 /**
- * NetWorthGrowthChart — Monochrome area: white stroke, white gradient.
+ * NetWorthGrowthChart — Monochrome theme-aware area chart.
  */
 export default function NetWorthGrowthChart({ data = [] }) {
+  const chart = useChartTheme();
   const chartData = data.map((d) => ({
     name: d.label || d.shortLabel,
     value: d.netWorth,
@@ -44,22 +46,22 @@ export default function NetWorthGrowthChart({ data = [] }) {
           <AreaChart data={chartData} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
             <defs>
               <linearGradient id="analyticsNWGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#FFFFFF" stopOpacity={0.05} />
-                <stop offset="100%" stopColor="#FFFFFF" stopOpacity={0} />
+                <stop offset="0%" stopColor={chart.line} stopOpacity={0.05} />
+                <stop offset="100%" stopColor={chart.line} stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#262626" />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={chart.grid} />
             <XAxis
               dataKey="name"
               axisLine={false}
               tickLine={false}
-              tick={{ fontSize: 11, fill: '#8E9192', fontFamily: 'JetBrains Mono, monospace' }}
+              tick={{ fontSize: 11, fill: chart.tick, fontFamily: 'JetBrains Mono, monospace' }}
               dy={8}
             />
             <YAxis
               axisLine={false}
               tickLine={false}
-              tick={{ fontSize: 11, fill: '#8E9192', fontFamily: 'JetBrains Mono, monospace' }}
+              tick={{ fontSize: 11, fill: chart.tick, fontFamily: 'JetBrains Mono, monospace' }}
               tickFormatter={(v) => formatCompact(v)}
               dx={-4}
             />
@@ -67,11 +69,11 @@ export default function NetWorthGrowthChart({ data = [] }) {
             <Area
               type="monotone"
               dataKey="value"
-              stroke="#FFFFFF"
+              stroke={chart.line}
               strokeWidth={2}
               fill="url(#analyticsNWGradient)"
               dot={false}
-              activeDot={{ r: 4, strokeWidth: 2, stroke: '#FFFFFF', fill: '#0A0A0A' }}
+              activeDot={{ r: 4, strokeWidth: 2, stroke: chart.line, fill: chart.activeDotFill }}
             />
           </AreaChart>
         </ResponsiveContainer>

@@ -59,7 +59,8 @@ export default function FinancialMetrics({
       label: 'Net Worth',
       icon: Wallet,
       value: formatCompact(netWorth),
-      subValue: `${netWorthChange >= 0 ? '+' : '−'}${formatPercent(Math.abs(netWorthChangePercent))} this month`,
+      // formatPercent already carries its own sign — do not prefix another.
+      subValue: `${formatPercent(netWorthChangePercent)} this month`,
       subPill: netWorthChange >= 0 ? PILL_IN : PILL_OUT,
     },
     {
@@ -88,7 +89,7 @@ export default function FinancialMetrics({
       label: 'Investments',
       icon: TrendingUp,
       value: formatCompact(investmentValue),
-      subValue: `${investmentReturn >= 0 ? '+' : ''}${formatPercent(investmentReturn)} return`,
+      subValue: `${formatPercent(investmentReturn)} return`,
       subPill: investmentReturn >= 0 ? PILL_IN : PILL_OUT,
     },
   ];

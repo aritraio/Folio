@@ -6,6 +6,7 @@ import ConfirmDialog from '../ui/ConfirmDialog';
 import { formatINR } from '../../utils/formatCurrency';
 import { formatDate } from '../../utils/dateUtils';
 import { CATEGORY_COLORS, FALLBACK_CATEGORY_COLOR } from '../../constants/finance';
+import useChartTheme from '../../utils/useChartTheme';
 
 /**
  * TransactionRow — Terminal row: JetBrains Mono amounts,
@@ -13,6 +14,7 @@ import { CATEGORY_COLORS, FALLBACK_CATEGORY_COLOR } from '../../constants/financ
  */
 export default function TransactionRow({ transaction, onEdit, onDelete, accountName }) {
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
+  const chart = useChartTheme();
 
   const isIncome = transaction.type === 'income';
   const isTransfer = transaction.type === 'transfer';
@@ -23,7 +25,7 @@ export default function TransactionRow({ transaction, onEdit, onDelete, accountN
       : 'text-[#e84118] dark:text-[#ff6b6b]';
   const amountPrefix = isIncome ? '+' : isTransfer ? '' : '−';
 
-  const dotColor = CATEGORY_COLORS[transaction.category] || FALLBACK_CATEGORY_COLOR;
+  const dotColor = chart.monoColor(CATEGORY_COLORS[transaction.category] || FALLBACK_CATEGORY_COLOR);
 
   return (
     <>

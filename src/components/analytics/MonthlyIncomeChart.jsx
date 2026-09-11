@@ -1,6 +1,7 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { formatINR, formatCompact } from '@/utils/formatCurrency';
+import useChartTheme from '@/utils/useChartTheme';
 
 /**
  * Terminal tooltip: #141414 bg, #262626 border, mono figures.
@@ -27,6 +28,7 @@ function IncomeTooltip({ active, payload, label }) {
  * MonthlyIncomeChart — Inflow bars in #00b894.
  */
 export default function MonthlyIncomeChart({ data = [] }) {
+  const chart = useChartTheme();
   const chartData = data.map((d) => ({
     name: d.shortLabel || d.label,
     Income: d.income,
@@ -48,23 +50,23 @@ export default function MonthlyIncomeChart({ data = [] }) {
       <div className="h-[260px]">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={chartData} margin={{ top: 4, right: 4, left: -16, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#262626" />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={chart.grid} />
             <XAxis
               dataKey="name"
               axisLine={false}
               tickLine={false}
-              tick={{ fontSize: 11, fill: '#8E9192', fontFamily: 'JetBrains Mono, monospace' }}
+              tick={{ fontSize: 11, fill: chart.tick, fontFamily: 'JetBrains Mono, monospace' }}
               dy={8}
             />
             <YAxis
               axisLine={false}
               tickLine={false}
-              tick={{ fontSize: 11, fill: '#8E9192', fontFamily: 'JetBrains Mono, monospace' }}
+              tick={{ fontSize: 11, fill: chart.tick, fontFamily: 'JetBrains Mono, monospace' }}
               tickFormatter={(v) => formatCompact(v)}
               dx={-4}
             />
-            <Tooltip content={<IncomeTooltip />} cursor={{ fill: 'rgba(255,255,255,0.04)' }} />
-            <Bar dataKey="Income" fill="#00b894" radius={[2, 2, 0, 0]} maxBarSize={36} />
+            <Tooltip content={<IncomeTooltip />} cursor={{ fill: chart.cursor }} />
+            <Bar dataKey="Income" fill={chart.income} radius={[2, 2, 0, 0]} maxBarSize={36} />
           </BarChart>
         </ResponsiveContainer>
       </div>

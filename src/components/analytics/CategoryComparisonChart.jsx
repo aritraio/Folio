@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { formatINR, formatCompact } from '@/utils/formatCurrency';
 import { calcCategoryBreakdown } from '@/utils/calculations';
+import useChartTheme from '@/utils/useChartTheme';
 
 /**
  * Terminal tooltip: #141414 bg, #262626 border, mono figures.
@@ -24,13 +25,14 @@ function CategoryComparisonTooltip({ active, payload, label }) {
   );
 }
 
-/* High-contrast monochromatic tonal gradient — no rainbow */
-const MONO_STACK = ['#FFFFFF', '#E4E4E7', '#A1A1AA', '#71717A', '#52525B', '#3F3F46'];
-
 /**
- * CategoryComparisonChart — Stacked bars in monochrome tones.
+ * CategoryComparisonChart — Stacked bars in the theme-aware monochrome ramp
+ * (darkest-first in light mode). No rainbow.
  */
 export default function CategoryComparisonChart({ transactions = [], months = [] }) {
+  const chart = useChartTheme();
+  // Theme-aware ramp: darkest-first in light mode so segments stay visible.
+  const palette = chart.monoPalette;
   const { chartData, categories } = useMemo(() => {
     // Get all category breakdowns per month
     const allCategories = new Set();
@@ -83,28 +85,28 @@ export default function CategoryComparisonChart({ transactions = [], months = []
       <div className="h-[300px]">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={chartData} margin={{ top: 4, right: 4, left: -16, bottom: 0 }} barGap={2}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#262626" />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={chart.grid} />
             <XAxis
               dataKey="name"
               axisLine={false}
               tickLine={false}
-              tick={{ fontSize: 11, fill: '#8E9192', fontFamily: 'JetBrains Mono, monospace' }}
+              tick={{ fontSize: 11, fill: chart.tick, fontFamily: 'JetBrains Mono, monospace' }}
               dy={8}
             />
             <YAxis
               axisLine={false}
               tickLine={false}
-              tick={{ fontSize: 11, fill: '#8E9192', fontFamily: 'JetBrains Mono, monospace' }}
+              tick={{ fontSize: 11, fill: chart.tick, fontFamily: 'JetBrains Mono, monospace' }}
               tickFormatter={(v) => formatCompact(v)}
               dx={-4}
             />
-            <Tooltip content={<CategoryComparisonTooltip />} cursor={{ fill: 'rgba(255,255,255,0.04)' }} />
+            <Tooltip content={<CategoryComparisonTooltip />} cursor={{ fill: chart.cursor }} />
             {categories.map((cat, idx) => (
               <Bar
                 key={cat}
                 dataKey={cat}
                 stackId="categories"
-                fill={MONO_STACK[idx % MONO_STACK.length]}
+                fill={palette[idx % palette.length]}
                 radius={idx === categories.length - 1 ? [2, 2, 0, 0] : [0, 0, 0, 0]}
                 maxBarSize={40}
               />
@@ -119,7 +121,7 @@ export default function CategoryComparisonChart({ transactions = [], months = []
           <div key={cat} className="flex items-center gap-1.5">
             <span
               className="w-2.5 h-2.5 rounded-sm shrink-0"
-              style={{ background: MONO_STACK[idx % MONO_STACK.length] }}
+              style={{ background: palette[idx % palette.length] }}
             />
             <span className="text-xs text-[#8E9192]">{cat}</span>
           </div>

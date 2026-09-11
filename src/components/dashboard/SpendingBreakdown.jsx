@@ -1,6 +1,7 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Sector } from 'recharts';
 import { formatINR } from '@/utils/formatCurrency';
+import useChartTheme from '@/utils/useChartTheme';
 
 /**
  * Terminal tooltip: #141414 bg, #262626 border, mono figures.
@@ -45,11 +46,11 @@ function renderActiveShape(props) {
 }
 
 /**
- * SpendingBreakdown — Monochrome donut + category legend.
- * Colors arrive pre-mapped to the terminal tonal gradient via CATEGORY_COLORS.
+ * SpendingBreakdown — Monochrome donut + category legend, theme-aware tones.
  */
 export default function SpendingBreakdown({ data = [], totalExpenses = 0 }) {
   const [activeIndex, setActiveIndex] = useState(-1);
+  const chart = useChartTheme();
 
   const onPieEnter = useCallback((_, index) => {
     setActiveIndex(index);
@@ -59,7 +60,10 @@ export default function SpendingBreakdown({ data = [], totalExpenses = 0 }) {
     setActiveIndex(-1);
   }, []);
 
-  if (data.length === 0) {
+  // Re-tone slices per theme so every rank stays visible on the card surface.
+  const themedData = useMemo(() => data.map((d, i) => ({ ...d, color: chart.mono(i) })), [data, chart]);
+
+  if (themedData.length === 0) {
     return (
       <section className="card p-6 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
         <h2 className="heading-sm text-[#0A0A0A] dark:text-white mb-2">Spending Breakdown</h2>
@@ -90,7 +94,7 @@ export default function SpendingBreakdown({ data = [], totalExpenses = 0 }) {
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
-                data={data}
+                data={themedData}
                 dataKey="amount"
                 nameKey="category"
                 cx="50%"
@@ -104,8 +108,8 @@ export default function SpendingBreakdown({ data = [], totalExpenses = 0 }) {
                 onMouseEnter={onPieEnter}
                 onMouseLeave={onPieLeave}
               >
-                {data.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} stroke="#0A0A0A" strokeWidth={1} />
+                {themedData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} stroke={chart.activeDotFill} strokeWidth={1} />
                 ))}
               </Pie>
               <Tooltip content={<DonutTooltip />} />
@@ -124,7 +128,7 @@ export default function SpendingBreakdown({ data = [], totalExpenses = 0 }) {
 
         {/* Category Legend */}
         <div className="flex-1 w-full space-y-2.5">
-          {data.map((item, idx) => (
+          {themedData.map((item, idx) => (
             <div
               key={item.category}
               className={`
