@@ -128,7 +128,18 @@ export function initStorage() {
       setItem(KEYS.TRANSACTIONS, INITIAL_TRANSACTIONS);
       localStorage.setItem(KEYS.INITIALIZED, 'true');
       localStorage.setItem(KEYS.SCHEMA_VERSION, String(SCHEMA_VERSION));
-    } else {
+      // Migrate previous demo seeds to current average Indian demo profile
+      const accounts = getItem(KEYS.ACCOUNTS, []);
+      const isOldDemo = accounts.some((a) => a.id === 'acc-3' && a.type === 'credit');
+      if (isOldDemo) {
+        setItem(KEYS.ACCOUNTS, INITIAL_ACCOUNTS);
+        setItem(KEYS.BUDGETS, INITIAL_BUDGETS);
+        setItem(KEYS.INVESTMENTS, INITIAL_INVESTMENTS);
+        setItem(KEYS.NETWORTH_HISTORY, INITIAL_NETWORTH_HISTORY);
+        setItem(KEYS.TRANSACTIONS, INITIAL_TRANSACTIONS);
+        setItem(KEYS.SETTINGS, { ...INITIAL_SETTINGS, ...(getItem(KEYS.SETTINGS, {}) || {}) });
+      }
+
       // Backfill schema version + any missing keys (forward-compat).
       if (!localStorage.getItem(KEYS.SCHEMA_VERSION)) {
         localStorage.setItem(KEYS.SCHEMA_VERSION, String(SCHEMA_VERSION));

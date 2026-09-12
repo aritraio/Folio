@@ -130,8 +130,9 @@ Folio/
 
 Folio is designed for zero-config static hosting:
 
+- **Cloudflare Pages**: Includes [wrangler.toml](wrangler.toml), [public/\_headers](public/_headers), and [public/\_redirects](public/_redirects) for instant SPA routing, asset caching, and security headers. Deploy via Cloudflare Dashboard Git integration or with `npm run deploy:cf`.
 - **Vercel**: Includes `vercel.json` with SPA routing rewrites (`/*` → `/index.html`), immutable asset caching, and security headers.
-- **Static Hosting**: Run `npm run build` to generate the standalone `/dist` folder. Can be served via Netlify, Cloudflare Pages, GitHub Pages, or any static HTTP server.
+- **Static Hosting**: Run `npm run build` to generate the standalone `/dist` folder. Can be served via Cloudflare Pages, Vercel, Netlify, GitHub Pages, or any static HTTP server.
 
 ---
 

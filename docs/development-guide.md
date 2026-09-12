@@ -84,7 +84,13 @@ npm test -- calculations.test.js
 
 ## 6. Production Deployment
 
-The project is pre-configured for static hosting platforms (Vercel, Netlify, Cloudflare Pages):
+The project is pre-configured for static hosting platforms (Cloudflare Pages, Vercel, Netlify):
 
+- **Cloudflare Pages**:
+  - Configuration: `wrangler.toml` (`pages_build_output_dir = "dist"`).
+  - SPA Routing: `public/_redirects` rewrites `/* /index.html 200`.
+  - Security & Cache: `public/_headers` handles immutable asset caching (`/assets/*`) and security headers (`X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`).
+  - Deploy with CLI: `npm run deploy:cf` (requires `npx wrangler login`).
+  - Deploy with Git: Connect repository in Cloudflare Dashboard (Preset: Vite, Build command: `npm run build`, Output directory: `dist`).
 - **Vercel**: `vercel.json` provides SPA fallback rewrites (`/*` → `/index.html`), cache-control headers for `/assets/*` (`max-age=31536000, immutable`), and security response headers (`X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`).
 - **Static Artifacts**: Running `npm run build` outputs everything into `dist/`. No server runtime is required.
