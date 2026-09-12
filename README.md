@@ -38,7 +38,7 @@
 
 ### Prerequisites
 
-- **Node.js**: `v18.0.0` or higher (`v20.x` recommended, see `.nvmrc`)
+- **Node.js**: `v20.0.0` or higher (`v22.x` recommended, see `.nvmrc`)
 - **npm**: `v9.0.0` or higher
 
 ### Quickstart
