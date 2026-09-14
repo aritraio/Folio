@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 import AppLayout from '@/components/layout/AppLayout';
 import ScrollToTop from '@/components/layout/ScrollToTop';
 import DashboardPage from '@/pages/DashboardPage';
+import { useCapacitor } from '@/utils/useCapacitor';
 
 // Code-split heavy / less-visited routes to keep the initial bundle small.
 // Dashboard stays eager (landing page); the rest lazy-load on navigation.
@@ -30,6 +31,8 @@ function PageFallback() {
 }
 
 export default function App() {
+  useCapacitor();
+
   return (
     <>
       <ScrollToTop />
