@@ -67,7 +67,7 @@ export const CURRENCIES = Object.freeze({
 
 export const SUPPORTED_CURRENCIES = Object.freeze(Object.keys(CURRENCIES));
 
-export const SCHEMA_VERSION = 2;
+export const SCHEMA_VERSION = 3;
 
 export const STORAGE_KEYS = Object.freeze({
   INITIALIZED: 'ledger_initialized',

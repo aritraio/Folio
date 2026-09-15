@@ -119,7 +119,11 @@ export function getSchemaVersion() {
 export function initStorage() {
   try {
     const isInitialized = localStorage.getItem(KEYS.INITIALIZED);
-    if (!isInitialized) {
+    const schemaVersion = getSchemaVersion();
+    const settings = getItem(KEYS.SETTINGS, null);
+
+    // Re-seed if uninitialized, outdated schema, or if demo user is not yet Dishari
+    if (!isInitialized || schemaVersion < SCHEMA_VERSION || !settings || settings.userName !== 'Dishari') {
       setItem(KEYS.ACCOUNTS, INITIAL_ACCOUNTS);
       setItem(KEYS.BUDGETS, INITIAL_BUDGETS);
       setItem(KEYS.INVESTMENTS, INITIAL_INVESTMENTS);
@@ -128,29 +132,18 @@ export function initStorage() {
       setItem(KEYS.TRANSACTIONS, INITIAL_TRANSACTIONS);
       localStorage.setItem(KEYS.INITIALIZED, 'true');
       localStorage.setItem(KEYS.SCHEMA_VERSION, String(SCHEMA_VERSION));
-      // Migrate previous demo seeds to current average Indian demo profile
-      const accounts = getItem(KEYS.ACCOUNTS, []);
-      const isOldDemo = accounts.some((a) => a.id === 'acc-3' && a.type === 'credit');
-      if (isOldDemo) {
-        setItem(KEYS.ACCOUNTS, INITIAL_ACCOUNTS);
-        setItem(KEYS.BUDGETS, INITIAL_BUDGETS);
-        setItem(KEYS.INVESTMENTS, INITIAL_INVESTMENTS);
-        setItem(KEYS.NETWORTH_HISTORY, INITIAL_NETWORTH_HISTORY);
-        setItem(KEYS.TRANSACTIONS, INITIAL_TRANSACTIONS);
-        setItem(KEYS.SETTINGS, { ...INITIAL_SETTINGS, ...(getItem(KEYS.SETTINGS, {}) || {}) });
-      }
-
-      // Backfill schema version + any missing keys (forward-compat).
-      if (!localStorage.getItem(KEYS.SCHEMA_VERSION)) {
-        localStorage.setItem(KEYS.SCHEMA_VERSION, String(SCHEMA_VERSION));
-      }
-      if (localStorage.getItem(KEYS.TRANSACTIONS) == null) setItem(KEYS.TRANSACTIONS, []);
-      if (localStorage.getItem(KEYS.ACCOUNTS) == null) setItem(KEYS.ACCOUNTS, []);
-      if (localStorage.getItem(KEYS.BUDGETS) == null) setItem(KEYS.BUDGETS, []);
-      if (localStorage.getItem(KEYS.INVESTMENTS) == null) setItem(KEYS.INVESTMENTS, []);
-      if (localStorage.getItem(KEYS.NETWORTH_HISTORY) == null) setItem(KEYS.NETWORTH_HISTORY, []);
-      if (localStorage.getItem(KEYS.SETTINGS) == null) setItem(KEYS.SETTINGS, INITIAL_SETTINGS);
     }
+
+    // Backfill schema version + any missing keys (forward-compat).
+    if (!localStorage.getItem(KEYS.SCHEMA_VERSION)) {
+      localStorage.setItem(KEYS.SCHEMA_VERSION, String(SCHEMA_VERSION));
+    }
+    if (localStorage.getItem(KEYS.TRANSACTIONS) == null) setItem(KEYS.TRANSACTIONS, []);
+    if (localStorage.getItem(KEYS.ACCOUNTS) == null) setItem(KEYS.ACCOUNTS, []);
+    if (localStorage.getItem(KEYS.BUDGETS) == null) setItem(KEYS.BUDGETS, []);
+    if (localStorage.getItem(KEYS.INVESTMENTS) == null) setItem(KEYS.INVESTMENTS, []);
+    if (localStorage.getItem(KEYS.NETWORTH_HISTORY) == null) setItem(KEYS.NETWORTH_HISTORY, []);
+    if (localStorage.getItem(KEYS.SETTINGS) == null) setItem(KEYS.SETTINGS, INITIAL_SETTINGS);
   } catch (err) {
     console.error('Storage initialization failed:', err);
   }
