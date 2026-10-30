@@ -6,6 +6,10 @@ import {
   getInvestments,
   getSettings,
   getNetWorthHistory,
+  getActiveProfileId,
+  getActiveProfileMetadata,
+  getDemoProfilesList,
+  switchDemoProfile,
   subscribeToData,
 } from '../services/storage.js';
 
@@ -19,6 +23,9 @@ function readAll() {
     investments: getInvestments(),
     settings: getSettings(),
     netWorthHistory: getNetWorthHistory(),
+    activeProfileId: getActiveProfileId(),
+    activeProfile: getActiveProfileMetadata(),
+    demoProfiles: getDemoProfilesList(),
   };
 }
 
@@ -34,6 +41,14 @@ export function DataProvider({ children }) {
     setData(readAll());
   }, []);
 
+  const switchProfile = useCallback((profileId) => {
+    const success = switchDemoProfile(profileId);
+    if (success) {
+      setData(readAll());
+    }
+    return success;
+  }, []);
+
   useEffect(() => {
     const unsubscribe = subscribeToData(refresh);
     return unsubscribe;
@@ -42,9 +57,10 @@ export function DataProvider({ children }) {
   const value = useMemo(
     () => ({
       ...data,
+      switchProfile,
       refresh,
     }),
-    [data, refresh]
+    [data, switchProfile, refresh]
   );
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;

@@ -37,7 +37,7 @@ export default function SidebarDrawer({ isOpen, onClose }) {
   const drawerRef = useRef(null);
   const previousActiveRef = useRef(null);
   const navigate = useNavigate();
-  const { settings } = useData();
+  const { settings, activeProfileId, demoProfiles, switchProfile } = useData();
   const userName = settings?.userName || 'User';
   const userEmail = settings?.email || '';
   const initials = (userName || 'U')
@@ -163,11 +163,7 @@ export default function SidebarDrawer({ isOpen, onClose }) {
           </p>
           <ul className="space-y-1">
             {NAV_ITEMS.map(({ to, label, icon: Icon }, i) => (
-              <li
-                key={to}
-                className="drawer-item"
-                style={{ '--stagger-delay': `${50 + i * 25}ms` }}
-              >
+              <li key={to} className="drawer-item" style={{ '--stagger-delay': `${50 + i * 25}ms` }}>
                 <NavLink
                   to={to}
                   end={to === '/'}
@@ -208,6 +204,35 @@ export default function SidebarDrawer({ isOpen, onClose }) {
           className="drawer-item px-5 py-4 border-t border-[#E5E5E5] dark:border-[#262626] shrink-0"
           style={{ '--stagger-delay': '225ms' }}
         >
+          {/* Quick Demo Switcher */}
+          <div className="mb-3">
+            <p className="text-[10px] font-mono uppercase tracking-wider text-[#8E9192] mb-1.5 px-0.5">
+              Demo Student Profile
+            </p>
+            <div className="grid grid-cols-3 gap-1.5">
+              {demoProfiles?.map((p) => {
+                const isActive = p.id === activeProfileId;
+                return (
+                  <button
+                    key={p.id}
+                    onClick={() => switchProfile(p.id)}
+                    className={`
+                      py-1.5 px-2 rounded text-xs font-mono font-medium transition-all text-center
+                      ${
+                        isActive
+                          ? 'bg-[#0A0A0A] text-white dark:bg-white dark:text-[#0A0A0A] shadow-sm font-bold'
+                          : 'bg-[#F5F5F5] dark:bg-[#1E1E1E] text-[#71717A] dark:text-[#A1A1AA] hover:text-[#0A0A0A] dark:hover:text-white'
+                      }
+                    `}
+                    title={`${p.name} (${p.tagline})`}
+                  >
+                    {p.name}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           <button
             onClick={() => {
               close();
@@ -226,9 +251,7 @@ export default function SidebarDrawer({ isOpen, onClose }) {
               {initials}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-[#0A0A0A] dark:text-white truncate">
-                {userName}
-              </p>
+              <p className="text-sm font-medium text-[#0A0A0A] dark:text-white truncate">{userName}</p>
               {userEmail && <p className="text-xs text-[#8E9192] truncate font-mono">{userEmail}</p>}
             </div>
           </button>

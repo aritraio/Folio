@@ -67,11 +67,12 @@ export const CURRENCIES = Object.freeze({
 
 export const SUPPORTED_CURRENCIES = Object.freeze(Object.keys(CURRENCIES));
 
-export const SCHEMA_VERSION = 3;
+export const SCHEMA_VERSION = 4;
 
 export const STORAGE_KEYS = Object.freeze({
   INITIALIZED: 'ledger_initialized',
   SCHEMA_VERSION: 'ledger_schema_version',
+  ACTIVE_PROFILE: 'ledger_active_profile',
   TRANSACTIONS: 'ledger_transactions',
   ACCOUNTS: 'ledger_accounts',
   BUDGETS: 'ledger_budgets',

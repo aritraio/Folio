@@ -1,11 +1,4 @@
-import {
-  INITIAL_ACCOUNTS,
-  INITIAL_BUDGETS,
-  INITIAL_INVESTMENTS,
-  INITIAL_NETWORTH_HISTORY,
-  INITIAL_SETTINGS,
-  INITIAL_TRANSACTIONS,
-} from '../data/mockData.js';
+import { DEMO_PROFILES, INITIAL_SETTINGS } from '../data/mockData.js';
 import {
   STORAGE_KEYS as KEYS,
   SCHEMA_VERSION,
@@ -113,6 +106,34 @@ export function getSchemaVersion() {
 }
 
 /**
+ * Get active demo profile ID ('sagnik' | 'sourav' | 'ankita').
+ */
+export function getActiveProfileId() {
+  try {
+    const active = localStorage.getItem(KEYS.ACTIVE_PROFILE);
+    if (active && DEMO_PROFILES[active]) return active;
+  } catch {
+    /* fall through */
+  }
+  return 'sagnik';
+}
+
+/**
+ * Get list of available demo student profiles with metadata.
+ */
+export function getDemoProfilesList() {
+  return Object.values(DEMO_PROFILES).map((p) => p.metadata);
+}
+
+/**
+ * Get active demo student profile metadata.
+ */
+export function getActiveProfileMetadata() {
+  const id = getActiveProfileId();
+  return DEMO_PROFILES[id]?.metadata || DEMO_PROFILES.sagnik.metadata;
+}
+
+/**
  * Initialize storage with default mock data if not initialized yet.
  * Versioned so future migrations can run exactly once.
  */
@@ -121,15 +142,23 @@ export function initStorage() {
     const isInitialized = localStorage.getItem(KEYS.INITIALIZED);
     const schemaVersion = getSchemaVersion();
     const settings = getItem(KEYS.SETTINGS, null);
+    const validStudentProfiles = ['sagnik', 'sourav', 'ankita'];
+    const activeProfileId = getActiveProfileId();
 
-    // Re-seed if uninitialized, outdated schema, or if demo user is not yet Dishari
-    if (!isInitialized || schemaVersion < SCHEMA_VERSION || !settings || settings.userName !== 'Dishari') {
-      setItem(KEYS.ACCOUNTS, INITIAL_ACCOUNTS);
-      setItem(KEYS.BUDGETS, INITIAL_BUDGETS);
-      setItem(KEYS.INVESTMENTS, INITIAL_INVESTMENTS);
-      setItem(KEYS.NETWORTH_HISTORY, INITIAL_NETWORTH_HISTORY);
-      setItem(KEYS.SETTINGS, INITIAL_SETTINGS);
-      setItem(KEYS.TRANSACTIONS, INITIAL_TRANSACTIONS);
+    // Re-seed if uninitialized, outdated schema, or if demo user is not one of our student profiles
+    const isStudentProfile =
+      settings &&
+      validStudentProfiles.some((p) => DEMO_PROFILES[p]?.settings?.userName === settings.userName);
+
+    if (!isInitialized || schemaVersion < SCHEMA_VERSION || !settings || !isStudentProfile) {
+      const profileData = DEMO_PROFILES[activeProfileId] || DEMO_PROFILES.sagnik;
+      setItem(KEYS.ACCOUNTS, profileData.accounts);
+      setItem(KEYS.BUDGETS, profileData.budgets);
+      setItem(KEYS.INVESTMENTS, profileData.investments);
+      setItem(KEYS.NETWORTH_HISTORY, profileData.netWorthHistory);
+      setItem(KEYS.SETTINGS, profileData.settings);
+      setItem(KEYS.TRANSACTIONS, profileData.transactions);
+      localStorage.setItem(KEYS.ACTIVE_PROFILE, profileData.metadata.id);
       localStorage.setItem(KEYS.INITIALIZED, 'true');
       localStorage.setItem(KEYS.SCHEMA_VERSION, String(SCHEMA_VERSION));
     }
@@ -137,6 +166,9 @@ export function initStorage() {
     // Backfill schema version + any missing keys (forward-compat).
     if (!localStorage.getItem(KEYS.SCHEMA_VERSION)) {
       localStorage.setItem(KEYS.SCHEMA_VERSION, String(SCHEMA_VERSION));
+    }
+    if (!localStorage.getItem(KEYS.ACTIVE_PROFILE)) {
+      localStorage.setItem(KEYS.ACTIVE_PROFILE, 'sagnik');
     }
     if (localStorage.getItem(KEYS.TRANSACTIONS) == null) setItem(KEYS.TRANSACTIONS, []);
     if (localStorage.getItem(KEYS.ACCOUNTS) == null) setItem(KEYS.ACCOUNTS, []);
@@ -146,6 +178,86 @@ export function initStorage() {
     if (localStorage.getItem(KEYS.SETTINGS) == null) setItem(KEYS.SETTINGS, INITIAL_SETTINGS);
   } catch (err) {
     console.error('Storage initialization failed:', err);
+  }
+}
+
+/**
+ * Switch active demo profile to target profile ID ('sagnik' | 'sourav' | 'ankita').
+ * Automatically snapshots current working dataset under its profile key and
+ * restores the target profile dataset.
+ */
+export function switchDemoProfile(targetId) {
+  if (!DEMO_PROFILES[targetId]) {
+    console.error(`Invalid profile ID: ${targetId}`);
+    return false;
+  }
+  try {
+    const currentId = getActiveProfileId();
+
+    // 1. Snapshot current working state into current profile slot
+    const currentSnapshot = {
+      accounts: getItem(KEYS.ACCOUNTS, []),
+      budgets: getItem(KEYS.BUDGETS, []),
+      investments: getItem(KEYS.INVESTMENTS, []),
+      netWorthHistory: getItem(KEYS.NETWORTH_HISTORY, []),
+      settings: getItem(KEYS.SETTINGS, null),
+      transactions: getItem(KEYS.TRANSACTIONS, []),
+    };
+    localStorage.setItem(`ledger_profile_${currentId}`, JSON.stringify(currentSnapshot));
+
+    // 2. Load target profile data: either previously modified snapshot or fresh seed
+    let targetData = null;
+    try {
+      const saved = localStorage.getItem(`ledger_profile_${targetId}`);
+      if (saved) targetData = JSON.parse(saved);
+    } catch {
+      targetData = null;
+    }
+
+    const profileSeed = DEMO_PROFILES[targetId];
+    setItem(KEYS.ACCOUNTS, targetData?.accounts || profileSeed.accounts);
+    setItem(KEYS.BUDGETS, targetData?.budgets || profileSeed.budgets);
+    setItem(KEYS.INVESTMENTS, targetData?.investments || profileSeed.investments);
+    setItem(KEYS.NETWORTH_HISTORY, targetData?.netWorthHistory || profileSeed.netWorthHistory);
+    setItem(KEYS.SETTINGS, targetData?.settings || profileSeed.settings);
+    setItem(KEYS.TRANSACTIONS, targetData?.transactions || profileSeed.transactions);
+
+    localStorage.setItem(KEYS.ACTIVE_PROFILE, targetId);
+    localStorage.setItem(KEYS.INITIALIZED, 'true');
+    localStorage.setItem(KEYS.SCHEMA_VERSION, String(SCHEMA_VERSION));
+
+    notifyDataUpdated();
+    notifySettingsUpdated();
+    return true;
+  } catch (err) {
+    console.error('Failed to switch demo profile:', err);
+    return false;
+  }
+}
+
+/**
+ * Reset a demo profile back to its clean student seed dataset.
+ */
+export function resetDemoProfile(profileId) {
+  const id = profileId || getActiveProfileId();
+  if (!DEMO_PROFILES[id]) return false;
+  try {
+    localStorage.removeItem(`ledger_profile_${id}`);
+    const target = DEMO_PROFILES[id];
+    if (id === getActiveProfileId()) {
+      setItem(KEYS.ACCOUNTS, target.accounts);
+      setItem(KEYS.BUDGETS, target.budgets);
+      setItem(KEYS.INVESTMENTS, target.investments);
+      setItem(KEYS.NETWORTH_HISTORY, target.netWorthHistory);
+      setItem(KEYS.SETTINGS, target.settings);
+      setItem(KEYS.TRANSACTIONS, target.transactions);
+      notifyDataUpdated();
+      notifySettingsUpdated();
+    }
+    return true;
+  } catch (err) {
+    console.error('Failed to reset profile:', err);
+    return false;
   }
 }
 
@@ -789,6 +901,8 @@ export function clearAllData() {
 /** Wipe keys then re-seed demo data. */
 export function resetToDemo() {
   try {
+    const activeId = getActiveProfileId();
+    localStorage.removeItem(`ledger_profile_${activeId}`);
     localStorage.removeItem(KEYS.TRANSACTIONS);
     localStorage.removeItem(KEYS.ACCOUNTS);
     localStorage.removeItem(KEYS.BUDGETS);
@@ -818,13 +932,15 @@ export function eraseAllData() {
     localStorage.removeItem(KEYS.SETTINGS);
     localStorage.removeItem(KEYS.NETWORTH_HISTORY);
     localStorage.removeItem(KEYS.INITIALIZED);
+    localStorage.removeItem(KEYS.ACTIVE_PROFILE);
+    Object.keys(DEMO_PROFILES).forEach((k) => localStorage.removeItem(`ledger_profile_${k}`));
     localStorage.setItem(KEYS.SCHEMA_VERSION, String(SCHEMA_VERSION));
     setItem(KEYS.TRANSACTIONS, []);
     setItem(KEYS.ACCOUNTS, []);
     setItem(KEYS.BUDGETS, []);
     setItem(KEYS.INVESTMENTS, []);
     setItem(KEYS.NETWORTH_HISTORY, []);
-    setItem(KEYS.SETTINGS, { ...INITIAL_SETTINGS });
+    setItem(KEYS.SETTINGS, { ...INITIAL_SETTINGS, userName: 'User', email: '' });
     notifyDataUpdated();
     notifySettingsUpdated();
     return true;
