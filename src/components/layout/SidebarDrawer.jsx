@@ -37,7 +37,7 @@ export default function SidebarDrawer({ isOpen, onClose }) {
   const drawerRef = useRef(null);
   const previousActiveRef = useRef(null);
   const navigate = useNavigate();
-  const { settings, activeProfileId, demoProfiles, switchProfile } = useData();
+  const { settings } = useData();
   const userName = settings?.userName || 'User';
   const userEmail = settings?.email || '';
   const initials = (userName || 'U')
@@ -204,35 +204,6 @@ export default function SidebarDrawer({ isOpen, onClose }) {
           className="drawer-item px-5 py-4 border-t border-[#E5E5E5] dark:border-[#262626] shrink-0"
           style={{ '--stagger-delay': '225ms' }}
         >
-          {/* Quick Demo Switcher */}
-          <div className="mb-3">
-            <p className="text-[10px] font-mono uppercase tracking-wider text-[#8E9192] mb-1.5 px-0.5">
-              Demo Student Profile
-            </p>
-            <div className="grid grid-cols-3 gap-1.5">
-              {demoProfiles?.map((p) => {
-                const isActive = p.id === activeProfileId;
-                return (
-                  <button
-                    key={p.id}
-                    onClick={() => switchProfile(p.id)}
-                    className={`
-                      py-1.5 px-2 rounded text-xs font-mono font-medium transition-all text-center
-                      ${
-                        isActive
-                          ? 'bg-[#0A0A0A] text-white dark:bg-white dark:text-[#0A0A0A] shadow-sm font-bold'
-                          : 'bg-[#F5F5F5] dark:bg-[#1E1E1E] text-[#71717A] dark:text-[#A1A1AA] hover:text-[#0A0A0A] dark:hover:text-white'
-                      }
-                    `}
-                    title={`${p.name} (${p.tagline})`}
-                  >
-                    {p.name}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
           <button
             onClick={() => {
               close();

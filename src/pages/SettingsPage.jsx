@@ -1,17 +1,5 @@
 import React, { useState, useRef } from 'react';
-import {
-  User,
-  Palette,
-  Database,
-  Download,
-  Upload,
-  Trash2,
-  Info,
-  Eraser,
-  GraduationCap,
-  Check,
-  RefreshCw,
-} from 'lucide-react';
+import { User, Palette, Database, Download, Upload, Trash2, Info, Eraser } from 'lucide-react';
 import { useData } from '../contexts/DataContext';
 import {
   saveSettings,
@@ -19,14 +7,13 @@ import {
   createPreImportBackup,
   importData,
   resetToDemo,
-  resetDemoProfile,
   eraseAllData,
 } from '../services/storage';
 import { CURRENCIES } from '../constants/finance';
 import { Input, Select, Button, ConfirmDialog } from '../components/ui';
 
 export default function SettingsPage() {
-  const { settings, accounts, activeProfileId, demoProfiles, switchProfile, refresh } = useData();
+  const { settings, accounts, refresh } = useData();
   const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
   const [isEraseDialogOpen, setIsEraseDialogOpen] = useState(false);
   const [alertMsg, setAlertMsg] = useState(null);
@@ -140,111 +127,21 @@ export default function SettingsPage() {
         </div>
       )}
 
-      {/* ── Demo Student Profiles ── */}
-      <section className="card p-6 md:p-8" aria-labelledby="settings-demo-profiles">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded border border-[#E5E5E5] dark:border-[#262626] bg-[#F5F5F5] dark:bg-[#1E1E1E] flex items-center justify-center">
-            <GraduationCap className="w-5 h-5 text-[#0A0A0A] dark:text-white" />
-          </div>
-          <div>
-            <h2 id="settings-demo-profiles" className="heading-sm text-[#0A0A0A] dark:text-white">
-              Demo Student Profiles
-            </h2>
-            <p className="text-xs text-[#8E9192]">
-              Switch between authentic Indian college student datasets (₹10,000–₹15,000 budget range)
-            </p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {demoProfiles?.map((p) => {
-            const isActive = p.id === activeProfileId;
-            return (
-              <div
-                key={p.id}
-                className={`
-                  p-5 rounded-lg border transition-all flex flex-col justify-between
-                  ${
-                    isActive
-                      ? 'border-[#0A0A0A] dark:border-white bg-[#FAFAFA] dark:bg-[#181818] shadow-sm ring-1 ring-[#0A0A0A] dark:ring-white'
-                      : 'border-[#E5E5E5] dark:border-[#262626] bg-white dark:bg-[#141414] hover:border-[#A1A1AA]'
-                  }
-                `}
-              >
-                <div>
-                  <div className="flex items-center justify-between mb-3">
-                    <div
-                      className={`
-                        w-10 h-10 rounded flex items-center justify-center font-mono text-sm font-bold
-                        ${
-                          isActive
-                            ? 'bg-[#0A0A0A] text-white dark:bg-white dark:text-[#0A0A0A]'
-                            : 'bg-[#F0F0F0] text-[#52525B] dark:bg-[#262626] dark:text-[#A1A1AA]'
-                        }
-                      `}
-                    >
-                      {p.avatar}
-                    </div>
-                    {isActive ? (
-                      <span className="inline-flex items-center gap-1 text-[11px] font-mono font-semibold px-2 py-0.5 rounded bg-[rgba(0,184,148,0.15)] text-[#00a383] dark:text-[#00b894]">
-                        <Check className="w-3 h-3" /> Active Profile
-                      </span>
-                    ) : (
-                      <span className="text-[11px] font-mono text-[#8E9192]">
-                        ₹{(p.monthlyAllowance / 1000).toFixed(1)}k / mo
-                      </span>
-                    )}
-                  </div>
-
-                  <h3 className="text-base font-semibold text-[#0A0A0A] dark:text-white">{p.name}</h3>
-                  <p className="text-xs font-mono text-[#8E9192] mb-1">{p.tagline}</p>
-                  <p className="text-[11px] text-[#8E9192] font-mono mb-2">{p.college}</p>
-                  <p className="text-xs text-[#71717A] dark:text-[#A1A1AA] line-clamp-3 leading-relaxed mb-4">
-                    {p.description}
-                  </p>
-                </div>
-
-                <div className="pt-3 border-t border-[#E5E5E5] dark:border-[#262626] flex items-center gap-2">
-                  <Button
-                    variant={isActive ? 'secondary' : 'primary'}
-                    size="sm"
-                    className="flex-1 justify-center text-xs"
-                    onClick={() => {
-                      if (!isActive) {
-                        switchProfile(p.id);
-                        showAlert('success', `Switched to ${p.name}'s profile.`);
-                      }
-                    }}
-                    disabled={isActive}
-                  >
-                    {isActive ? 'Current Profile' : `Switch to ${p.name}`}
-                  </Button>
-                  <button
-                    onClick={() => {
-                      resetDemoProfile(p.id);
-                      if (isActive) refresh();
-                      showAlert('success', `Reset ${p.name}'s data to initial demo state.`);
-                    }}
-                    title={`Reset ${p.name}'s data to default`}
-                    className="p-2 rounded border border-[#E5E5E5] dark:border-[#262626] text-[#8E9192] hover:text-[#0A0A0A] dark:hover:text-white transition-colors"
-                  >
-                    <RefreshCw className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
+      {/* ── Profile Section ── */}
       <section className="card p-6 md:p-8" aria-labelledby="settings-profile">
         <div className="flex items-center gap-3 mb-6">
           <div className="w-10 h-10 rounded border border-[#E5E5E5] dark:border-[#262626] bg-[#F5F5F5] dark:bg-[#1E1E1E] flex items-center justify-center">
             <User className="w-5 h-5 text-[#0A0A0A] dark:text-white" />
           </div>
-          <h2 id="settings-profile" className="heading-sm text-[#0A0A0A] dark:text-white">
-            Profile
-          </h2>
+          <div>
+            <h2 id="settings-profile" className="heading-sm text-[#0A0A0A] dark:text-white">
+              Profile
+            </h2>
+            <p className="text-xs text-[#8E9192]">
+              Active user profile details. Switch student accounts anytime via the Profile menu in the
+              top-right header.
+            </p>
+          </div>
         </div>
         <div className="flex flex-col md:flex-row gap-8 items-start">
           <div

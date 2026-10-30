@@ -1,19 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
-import {
-  Terminal,
-  Menu,
-  X,
-  Search,
-  User,
-  Download,
-  Moon,
-  Sun,
-  Settings,
-  GraduationCap,
-  Check,
-  ChevronDown,
-} from 'lucide-react';
+import { Terminal, Menu, X, Search, Download, Moon, Sun, Settings, Check } from 'lucide-react';
 import { useTheme } from '../ThemeProvider';
 import { useData } from '../../contexts/DataContext';
 import { downloadBackup } from '../../services/storage';
@@ -44,9 +31,7 @@ export default function Navbar({ onSearchClick, isDrawerOpen = false, onMenuClic
   const location = useLocation();
   const navigate = useNavigate();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const userMenuRef = useRef(null);
-  const profileMenuRef = useRef(null);
   const { theme, preference, setPreference } = useTheme();
   const { settings, activeProfileId, activeProfile, demoProfiles, switchProfile } = useData();
   const userName = settings?.userName || 'User';
@@ -67,25 +52,21 @@ export default function Navbar({ onSearchClick, isDrawerOpen = false, onMenuClic
   const themeLabel = preference === 'system' ? `System (${theme})` : preference === 'dark' ? 'Dark' : 'Light';
   const activePage = PAGE_LABELS[location.pathname] || 'Not Found';
 
-  // Close user & profile menus on outside click / route change
+  // Close user profile menu on outside click / route change
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
         setUserMenuOpen(false);
       }
-      if (profileMenuRef.current && !profileMenuRef.current.contains(e.target)) {
-        setProfileMenuOpen(false);
-      }
     };
-    if (userMenuOpen || profileMenuOpen) {
+    if (userMenuOpen) {
       document.addEventListener('mousedown', handleClickOutside);
     }
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [userMenuOpen, profileMenuOpen]);
+  }, [userMenuOpen]);
 
   useEffect(() => {
     setUserMenuOpen(false);
-    setProfileMenuOpen(false);
   }, [location.pathname]);
 
   return (
@@ -222,117 +203,8 @@ export default function Navbar({ onSearchClick, isDrawerOpen = false, onMenuClic
               <Search className="w-[18px] h-[18px]" />
             </button>
 
-            {/* ── Demo Profile Switcher Dropdown ── */}
-            <div className="relative" ref={profileMenuRef}>
-              <button
-                onClick={() => setProfileMenuOpen((v) => !v)}
-                className="
-                  flex items-center gap-1.5 px-2.5 py-1.5 rounded
-                  text-xs font-mono font-medium
-                  bg-[#F5F5F5] dark:bg-[#1E1E1E]
-                  text-[#0A0A0A] dark:text-white
-                  border border-[#E5E5E5] dark:border-[#262626]
-                  hover:border-[#0A0A0A]/40 dark:hover:border-white/40
-                  transition-all duration-150 ease-out
-                  active:scale-[0.97]
-                "
-                aria-label="Switch student profile"
-                aria-expanded={profileMenuOpen}
-                aria-haspopup="true"
-                title="Switch demo student profile (Sagnik / Sourav / Ankita)"
-              >
-                <GraduationCap className="w-3.5 h-3.5 text-[#8E9192]" />
-                <span className="font-semibold tracking-wide">{activeProfile?.name || userName}</span>
-                <ChevronDown
-                  className={`w-3 h-3 text-[#8E9192] transition-transform duration-150 ${
-                    profileMenuOpen ? 'rotate-180' : ''
-                  }`}
-                />
-              </button>
-
-              {profileMenuOpen && (
-                <div
-                  className="
-                    absolute right-0 top-full mt-2
-                    w-64 py-1.5
-                    bg-white dark:bg-[#141414]
-                    border border-[#E5E5E5] dark:border-[#262626]
-                    rounded-lg shadow-xl
-                    animate-fade-in-up motion-reduce:animate-none
-                    z-50
-                  "
-                  role="menu"
-                >
-                  <div className="px-3 py-2 border-b border-[#E5E5E5] dark:border-[#262626]">
-                    <p className="text-[10px] font-mono uppercase tracking-wider text-[#8E9192]">
-                      Demo Student Profiles
-                    </p>
-                    <p className="text-[11px] text-[#71717A] dark:text-[#A1A1AA] mt-0.5">
-                      Switch data to test Indian student patterns
-                    </p>
-                  </div>
-
-                  <div className="py-1">
-                    {demoProfiles?.map((p) => {
-                      const isActive = p.id === activeProfileId;
-                      return (
-                        <button
-                          key={p.id}
-                          onClick={() => {
-                            switchProfile(p.id);
-                            setProfileMenuOpen(false);
-                          }}
-                          className={`
-                            w-full flex items-center justify-between px-3 py-2 text-left
-                            transition-colors text-xs
-                            ${
-                              isActive
-                                ? 'bg-[#F5F5F5] dark:bg-[#1E1E1E] text-[#0A0A0A] dark:text-white font-medium'
-                                : 'text-[#404040] dark:text-[#C4C7C8] hover:bg-[#FAFAFA] dark:hover:bg-[#1A1A1A]'
-                            }
-                          `}
-                          role="menuitem"
-                        >
-                          <div className="flex items-center gap-2.5 min-w-0">
-                            <div
-                              className={`
-                                w-7 h-7 rounded flex items-center justify-center font-mono text-[10px] font-bold shrink-0
-                                ${
-                                  isActive
-                                    ? 'bg-[#0A0A0A] text-white dark:bg-white dark:text-[#0A0A0A]'
-                                    : 'bg-[#E5E5E5] text-[#52525B] dark:bg-[#262626] dark:text-[#A1A1AA]'
-                                }
-                              `}
-                            >
-                              {p.avatar}
-                            </div>
-                            <div className="min-w-0">
-                              <div className="flex items-center gap-1.5">
-                                <span className="font-semibold text-xs text-[#0A0A0A] dark:text-white">
-                                  {p.name}
-                                </span>
-                                <span className="text-[10px] text-[#8E9192] font-mono">
-                                  (₹{(p.monthlyAllowance / 1000).toFixed(1)}k/mo)
-                                </span>
-                              </div>
-                              <p className="text-[11px] text-[#8E9192] truncate">{p.tagline}</p>
-                            </div>
-                          </div>
-                          {isActive && (
-                            <Check className="w-3.5 h-3.5 text-[#00a383] dark:text-[#00b894] shrink-0 ml-2" />
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <div className="w-px h-6 bg-[#E5E5E5] dark:bg-[#262626] mx-1" aria-hidden="true" />
-
-            {/* User pill */}
-            <div className="relative" ref={userMenuRef}>
+            {/* Profile section pill */}
+            <div className="relative ml-1" ref={userMenuRef}>
               <button
                 onClick={() => setUserMenuOpen((v) => !v)}
                 className="
@@ -343,18 +215,19 @@ export default function Navbar({ onSearchClick, isDrawerOpen = false, onMenuClic
                   transition-all duration-150 ease-out
                   active:scale-[0.97]
                 "
-                aria-label="User menu"
+                aria-label="Profile and account menu"
                 aria-expanded={userMenuOpen}
                 aria-haspopup="true"
+                title={`Profile: ${userName} — Switch student account`}
               >
                 <div
                   className="
-                  w-7 h-7 rounded
-                  bg-[#0A0A0A] text-white
-                  dark:bg-white dark:text-[#0A0A0A]
-                  flex items-center justify-center
-                  text-xs font-bold font-mono
-                "
+                    w-7 h-7 rounded
+                    bg-[#0A0A0A] text-white
+                    dark:bg-white dark:text-[#0A0A0A]
+                    flex items-center justify-center
+                    text-xs font-bold font-mono
+                  "
                   aria-hidden="true"
                 >
                   {initials}
@@ -368,53 +241,52 @@ export default function Navbar({ onSearchClick, isDrawerOpen = false, onMenuClic
                 <div
                   className="
                     absolute right-0 top-full mt-2
-                    w-56 py-1.5
+                    w-72 py-2
                     bg-white dark:bg-[#141414]
                     border border-[#E5E5E5] dark:border-[#262626]
-                    rounded-md
+                    rounded-lg shadow-xl
                     animate-fade-in-up motion-reduce:animate-none
                     z-50
                   "
                   role="menu"
+                  aria-label="User profile and account switcher"
                 >
+                  {/* Active Profile Info */}
                   <div className="px-4 py-3 border-b border-[#E5E5E5] dark:border-[#262626]">
-                    <p className="text-sm font-semibold text-[#0A0A0A] dark:text-white">{userName}</p>
-                    {userEmail && <p className="text-xs text-[#8E9192] font-mono">{userEmail}</p>}
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded bg-[#0A0A0A] text-white dark:bg-white dark:text-[#0A0A0A] flex items-center justify-center text-sm font-bold font-mono shrink-0">
+                        {initials}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1.5">
+                          <p className="text-sm font-semibold text-[#0A0A0A] dark:text-white truncate">
+                            {userName}
+                          </p>
+                          <span className="text-[10px] font-mono font-medium px-1.5 py-0.5 rounded bg-[rgba(0,184,148,0.12)] text-[#00a383] dark:text-[#00b894]">
+                            Active
+                          </span>
+                        </div>
+                        {userEmail && (
+                          <p className="text-xs text-[#8E9192] font-mono truncate">{userEmail}</p>
+                        )}
+                        {activeProfile?.college && (
+                          <p className="text-[11px] text-[#71717A] dark:text-[#A1A1AA] truncate mt-0.5 font-mono">
+                            {activeProfile.college}
+                          </p>
+                        )}
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="py-1">
-                    <NavLink
-                      to="/settings"
-                      className="flex items-center gap-2.5 px-4 py-2 text-sm text-[#404040] dark:text-[#C4C7C8] hover:bg-[#F5F5F5] dark:hover:bg-[#1E1E1E] transition-colors"
-                      role="menuitem"
-                      onClick={() => setUserMenuOpen(false)}
-                    >
-                      <Settings className="w-4 h-4" />
-                      Settings
-                    </NavLink>
-                    <button
-                      className="flex items-center gap-2.5 w-full px-4 py-2 text-sm text-[#404040] dark:text-[#C4C7C8] hover:bg-[#F5F5F5] dark:hover:bg-[#1E1E1E] transition-colors"
-                      role="menuitem"
-                      onClick={() => {
-                        setUserMenuOpen(false);
-                        try {
-                          downloadBackup();
-                        } catch {
-                          navigate('/settings');
-                        }
-                      }}
-                    >
-                      <Download className="w-4 h-4" />
-                      Export backup
-                    </button>
-                  </div>
-
-                  {/* Quick Profile Switch */}
-                  <div className="border-t border-[#E5E5E5] dark:border-[#262626] px-4 py-2 bg-[#FAFAFA] dark:bg-[#181818]">
-                    <p className="text-[10px] font-mono uppercase tracking-wider text-[#8E9192] mb-1.5">
-                      Switch Demo Profile
-                    </p>
-                    <div className="flex items-center gap-1">
+                  {/* Switch Student Account */}
+                  <div className="py-2 border-b border-[#E5E5E5] dark:border-[#262626]">
+                    <div className="px-4 pb-1.5 flex items-center justify-between">
+                      <p className="text-[10px] font-mono uppercase tracking-wider text-[#8E9192]">
+                        Switch Student Account
+                      </p>
+                      <span className="text-[10px] font-mono text-[#8E9192]">Demo Data</span>
+                    </div>
+                    <div className="px-1.5 space-y-0.5">
                       {demoProfiles?.map((p) => {
                         const isActive = p.id === activeProfileId;
                         return (
@@ -425,32 +297,75 @@ export default function Navbar({ onSearchClick, isDrawerOpen = false, onMenuClic
                               setUserMenuOpen(false);
                             }}
                             className={`
-                              flex-1 py-1 px-1.5 rounded text-[11px] font-mono transition-all text-center
+                              w-full flex items-center justify-between px-2.5 py-2 rounded text-left
+                              transition-colors text-xs
                               ${
                                 isActive
-                                  ? 'bg-[#0A0A0A] text-white dark:bg-white dark:text-[#0A0A0A] font-bold shadow-sm'
-                                  : 'bg-white dark:bg-[#202020] text-[#71717A] dark:text-[#A1A1AA] border border-[#E5E5E5] dark:border-[#333] hover:text-[#0A0A0A] dark:hover:text-white'
+                                  ? 'bg-[#F5F5F5] dark:bg-[#1E1E1E] text-[#0A0A0A] dark:text-white font-medium'
+                                  : 'text-[#404040] dark:text-[#C4C7C8] hover:bg-[#FAFAFA] dark:hover:bg-[#1A1A1A]'
                               }
                             `}
+                            role="menuitem"
                           >
-                            {p.name}
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              <div
+                                className={`
+                                  w-7 h-7 rounded flex items-center justify-center font-mono text-[10px] font-bold shrink-0
+                                  ${
+                                    isActive
+                                      ? 'bg-[#0A0A0A] text-white dark:bg-white dark:text-[#0A0A0A]'
+                                      : 'bg-[#E5E5E5] text-[#52525B] dark:bg-[#262626] dark:text-[#A1A1AA]'
+                                  }
+                                `}
+                              >
+                                {p.avatar}
+                              </div>
+                              <div className="min-w-0">
+                                <div className="flex items-center gap-1.5">
+                                  <span className="font-semibold text-xs text-[#0A0A0A] dark:text-white">
+                                    {p.name}
+                                  </span>
+                                  <span className="text-[10px] text-[#8E9192] font-mono">
+                                    (₹{(p.monthlyAllowance / 1000).toFixed(1)}k/mo)
+                                  </span>
+                                </div>
+                                <p className="text-[11px] text-[#8E9192] truncate">{p.tagline}</p>
+                              </div>
+                            </div>
+                            {isActive && (
+                              <Check className="w-4 h-4 text-[#00a383] dark:text-[#00b894] shrink-0 ml-2" />
+                            )}
                           </button>
                         );
                       })}
                     </div>
                   </div>
 
-                  <div className="border-t border-[#E5E5E5] dark:border-[#262626] pt-1">
+                  {/* Actions */}
+                  <div className="pt-1">
+                    <NavLink
+                      to="/settings"
+                      className="flex items-center gap-2.5 px-4 py-2 text-xs text-[#404040] dark:text-[#C4C7C8] hover:bg-[#F5F5F5] dark:hover:bg-[#1E1E1E] transition-colors"
+                      role="menuitem"
+                      onClick={() => setUserMenuOpen(false)}
+                    >
+                      <Settings className="w-3.5 h-3.5 text-[#8E9192]" />
+                      Settings
+                    </NavLink>
                     <button
-                      className="flex items-center gap-2.5 w-full px-4 py-2 text-sm text-[#8E9192] hover:bg-[#F5F5F5] dark:hover:bg-[#1E1E1E] transition-colors"
+                      className="flex items-center gap-2.5 w-full px-4 py-2 text-xs text-[#404040] dark:text-[#C4C7C8] hover:bg-[#F5F5F5] dark:hover:bg-[#1E1E1E] transition-colors"
                       role="menuitem"
                       onClick={() => {
                         setUserMenuOpen(false);
-                        navigate('/settings');
+                        try {
+                          downloadBackup();
+                        } catch {
+                          navigate('/settings');
+                        }
                       }}
                     >
-                      <User className="w-4 h-4" />
-                      Manage data
+                      <Download className="w-3.5 h-3.5 text-[#8E9192]" />
+                      Export backup
                     </button>
                   </div>
                 </div>
