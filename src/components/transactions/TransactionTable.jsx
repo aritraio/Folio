@@ -60,7 +60,7 @@ export default function TransactionTable({ transactions, onEdit, onDelete, accou
       <div className="w-full overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="hidden md:table-row bg-[#F5F5F5] dark:bg-[#0A0A0A] border-b border-[#E5E5E5] dark:border-[#262626] text-xs font-semibold text-[#8E9192] uppercase tracking-wider font-mono">
+            <tr className="bg-[#F5F5F5] dark:bg-[#0A0A0A] border-b border-[#E5E5E5] dark:border-[#262626] text-xs font-semibold text-[#8E9192] uppercase tracking-wider font-mono">
               <th
                 className="py-3 pl-4 pr-3 cursor-pointer hover:text-[#0A0A0A] dark:hover:text-white transition-colors"
                 onClick={() => handleSort('date')}

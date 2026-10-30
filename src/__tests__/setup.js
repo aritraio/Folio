@@ -19,3 +19,11 @@ if (typeof globalThis.crypto === 'undefined') {
   // Minimal fallback for generateId in tests.
   globalThis.crypto = { randomUUID: () => `test-${Math.random().toString(36).slice(2)}` };
 }
+
+if (typeof globalThis.ResizeObserver === 'undefined') {
+  globalThis.ResizeObserver = class ResizeObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  };
+}
