@@ -227,7 +227,7 @@ export default function SidebarDrawer({ isOpen, onClose }) {
             </div>
           </button>
           <p className="mt-3 text-center font-mono text-[10px] tracking-wider text-[#8E9192]">
-            Made by Aritra &amp; Dishari with ❤️
+            Made by Aritra with ❤️
           </p>
         </div>
       </aside>
