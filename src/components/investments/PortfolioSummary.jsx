@@ -8,14 +8,16 @@ import { formatINR, formatPercent, formatChange } from '@/utils/formatCurrency';
 function StatCard({ icon: Icon, label, value, valueClass }) {
   return (
     <div className="flex items-center gap-4">
-      <div className="w-10 h-10 rounded border border-[#E5E5E5] dark:border-[#262626] bg-[#F5F5F5] dark:bg-[#1E1E1E] flex items-center justify-center shrink-0">
-        <Icon className="w-5 h-5 text-[#0A0A0A] dark:text-white" />
+      <div className="w-10 h-10 rounded border border-[var(--color-border)] dark:border-[var(--color-border)] bg-[var(--color-bg-tertiary)] dark:bg-[var(--color-bg-tertiary)] flex items-center justify-center shrink-0">
+        <Icon className="w-5 h-5 text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]" />
       </div>
       <div>
-        <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[#8E9192] font-mono">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[var(--color-text-tertiary)] font-mono">
           {label}
         </p>
-        <p className={`text-lg font-bold font-mono tabular-nums ${valueClass || 'text-[#0A0A0A] dark:text-white'}`}>
+        <p
+          className={`text-lg font-bold font-mono tabular-nums ${valueClass || 'text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]'}`}
+        >
           {value}
         </p>
       </div>
@@ -39,16 +41,16 @@ export default function PortfolioSummary({
   return (
     <section className="card p-6 animate-fade-in-up" aria-label="Portfolio summary">
       {/* Big headline number */}
-      <div className="mb-6 pb-6 border-b border-[#E5E5E5] dark:border-[#262626]">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[#8E9192] mb-1 font-mono">
+      <div className="mb-6 pb-6 border-b border-[var(--color-border)] dark:border-[var(--color-border)]">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[var(--color-text-tertiary)] mb-1 font-mono">
           Total Investments
         </p>
         <div className="flex items-baseline gap-3 flex-wrap">
-          <span className="display-xl text-[#0A0A0A] dark:text-white tabular-nums">
+          <span className="display-xl text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] tabular-nums">
             {formatINR(totalCurrent)}
           </span>
           <span
-            className={`text-sm font-semibold font-mono tabular-nums ${isPositiveReturn ? 'text-[#00a383] dark:text-[#00b894]' : 'text-[#e84118] dark:text-[#ff6b6b]'}`}
+            className={`text-sm font-semibold font-mono tabular-nums ${isPositiveReturn ? 'text-[var(--color-positive)] dark:text-[var(--color-positive)]' : 'text-[var(--color-negative)] dark:text-[var(--color-negative)]'}`}
           >
             {formatChange(totalReturn)} ({formatPercent(returnPercentage)})
           </span>
@@ -57,24 +59,16 @@ export default function PortfolioSummary({
 
       {/* Stat cards row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard
-          icon={Wallet}
-          label="Invested"
-          value={formatINR(totalInvested)}
-        />
-        <StatCard
-          icon={BarChart3}
-          label="Current Value"
-          value={formatINR(totalCurrent)}
-        />
+        <StatCard icon={Wallet} label="Invested" value={formatINR(totalInvested)} />
+        <StatCard icon={BarChart3} label="Current Value" value={formatINR(totalCurrent)} />
         <StatCard
           icon={isPositiveReturn ? TrendingUp : TrendingDown}
           label="Total Return"
           value={formatChange(totalReturn)}
           valueClass={
             isPositiveReturn
-              ? 'text-[#00a383] dark:text-[#00b894]'
-              : 'text-[#e84118] dark:text-[#ff6b6b]'
+              ? 'text-[var(--color-positive)] dark:text-[var(--color-positive)]'
+              : 'text-[var(--color-negative)] dark:text-[var(--color-negative)]'
           }
         />
         <StatCard
@@ -82,7 +76,9 @@ export default function PortfolioSummary({
           label="Today"
           value={formatChange(todayChange)}
           valueClass={
-            isPositiveToday ? 'text-[#00a383] dark:text-[#00b894]' : 'text-[#e84118] dark:text-[#ff6b6b]'
+            isPositiveToday
+              ? 'text-[var(--color-positive)] dark:text-[var(--color-positive)]'
+              : 'text-[var(--color-negative)] dark:text-[var(--color-negative)]'
           }
         />
       </div>

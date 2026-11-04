@@ -16,22 +16,22 @@ function HoldingCard({ holding, onEdit, onDelete }) {
     <div className="card p-4 space-y-3">
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
-          <p className="text-sm font-semibold text-[#0A0A0A] dark:text-white truncate">
+          <p className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] truncate">
             {holding.name}
           </p>
-          <p className="text-xs text-[#8E9192] font-mono">{holding.category}</p>
+          <p className="text-xs text-[var(--color-text-tertiary)] font-mono">{holding.category}</p>
         </div>
         <div className="flex items-center gap-1 shrink-0">
           <button
             onClick={() => onEdit(holding)}
-            className="p-1.5 rounded text-[#8E9192] hover:text-[#0A0A0A] hover:bg-[#F5F5F5] dark:hover:text-white dark:hover:bg-[#1E1E1E] transition-colors"
+            className="p-1.5 rounded text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-tertiary)] dark:hover:text-[var(--color-text-primary)] dark:hover:bg-[var(--color-bg-tertiary)] transition-colors"
             aria-label={`Edit ${holding.name}`}
           >
             <Pencil className="w-3.5 h-3.5" />
           </button>
           <button
             onClick={() => onDelete(holding.id)}
-            className="p-1.5 rounded text-[#8E9192] hover:text-[#ff6b6b] hover:bg-[rgba(255,107,107,0.12)] transition-colors"
+            className="p-1.5 rounded text-[var(--color-text-tertiary)] hover:text-[var(--color-negative)] hover:bg-[rgba(255,107,107,0.12)] transition-colors"
             aria-label={`Delete ${holding.name}`}
           >
             <Trash2 className="w-3.5 h-3.5" />
@@ -41,37 +41,49 @@ function HoldingCard({ holding, onEdit, onDelete }) {
 
       <div className="grid grid-cols-2 gap-3 text-xs">
         <div>
-          <span className="text-[#8E9192] font-mono uppercase tracking-widest">Units</span>
-          <p className="font-semibold font-mono tabular-nums text-[#0A0A0A] dark:text-white">{holding.units}</p>
+          <span className="text-[var(--color-text-tertiary)] font-mono uppercase tracking-widest">Units</span>
+          <p className="font-semibold font-mono tabular-nums text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+            {holding.units}
+          </p>
         </div>
         <div>
-          <span className="text-[#8E9192] font-mono uppercase tracking-widest">Avg Price</span>
-          <p className="font-semibold font-mono tabular-nums text-[#0A0A0A] dark:text-white">
+          <span className="text-[var(--color-text-tertiary)] font-mono uppercase tracking-widest">
+            Avg Price
+          </span>
+          <p className="font-semibold font-mono tabular-nums text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
             {formatINR(holding.avgPrice)}
           </p>
         </div>
         <div>
-          <span className="text-[#8E9192] font-mono uppercase tracking-widest">Invested</span>
-          <p className="font-semibold font-mono tabular-nums text-[#0A0A0A] dark:text-white">
+          <span className="text-[var(--color-text-tertiary)] font-mono uppercase tracking-widest">
+            Invested
+          </span>
+          <p className="font-semibold font-mono tabular-nums text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
             {formatINR(invested)}
           </p>
         </div>
         <div>
-          <span className="text-[#8E9192] font-mono uppercase tracking-widest">Current</span>
-          <p className="font-semibold font-mono tabular-nums text-[#0A0A0A] dark:text-white">{formatINR(current)}</p>
+          <span className="text-[var(--color-text-tertiary)] font-mono uppercase tracking-widest">
+            Current
+          </span>
+          <p className="font-semibold font-mono tabular-nums text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+            {formatINR(current)}
+          </p>
         </div>
       </div>
 
-      <div className="flex items-center justify-between pt-2 border-t border-[#E5E5E5] dark:border-[#262626]">
-        <span className="text-xs text-[#8E9192] font-mono uppercase tracking-widest">Return</span>
+      <div className="flex items-center justify-between pt-2 border-t border-[var(--color-border)] dark:border-[var(--color-border)]">
+        <span className="text-xs text-[var(--color-text-tertiary)] font-mono uppercase tracking-widest">
+          Return
+        </span>
         <div className="flex items-center gap-1.5">
           {isPositive ? (
-            <TrendingUp className="w-3.5 h-3.5 text-[#00b894]" />
+            <TrendingUp className="w-3.5 h-3.5 text-[var(--color-positive)]" />
           ) : (
-            <TrendingDown className="w-3.5 h-3.5 text-[#ff6b6b]" />
+            <TrendingDown className="w-3.5 h-3.5 text-[var(--color-negative)]" />
           )}
           <span
-            className={`text-sm font-bold font-mono tabular-nums ${isPositive ? 'text-[#00a383] dark:text-[#00b894]' : 'text-[#e84118] dark:text-[#ff6b6b]'}`}
+            className={`text-sm font-bold font-mono tabular-nums ${isPositive ? 'text-[var(--color-positive)] dark:text-[var(--color-positive)]' : 'text-[var(--color-negative)] dark:text-[var(--color-negative)]'}`}
           >
             {isPositive ? '+' : '−'}
             {formatINR(Math.abs(returnAmt))} ({formatPercent(returnPct)})
@@ -91,8 +103,10 @@ export default function HoldingsTable({ holdings = [], onEdit, onDelete }) {
   return (
     <section className="animate-fade-in-up" aria-label="Holdings table" style={{ animationDelay: '0.2s' }}>
       <div className="mb-4">
-        <h2 className="heading-sm text-[#0A0A0A] dark:text-white">Holdings</h2>
-        <p className="text-xs text-[#8E9192] mt-0.5 font-mono uppercase tracking-widest">
+        <h2 className="heading-sm text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+          Holdings
+        </h2>
+        <p className="text-xs text-[var(--color-text-tertiary)] mt-0.5 font-mono uppercase tracking-widest">
           {holdings.length} {holdings.length === 1 ? 'asset' : 'assets'} in your portfolio
         </p>
       </div>
@@ -102,29 +116,29 @@ export default function HoldingsTable({ holdings = [], onEdit, onDelete }) {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-[#E5E5E5] dark:border-[#262626] bg-[#F5F5F5] dark:bg-[#0A0A0A]">
-                <th className="text-left px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-[#8E9192] font-mono">
+              <tr className="border-b border-[var(--color-border)] dark:border-[var(--color-border)] bg-[var(--color-bg-tertiary)] dark:bg-[var(--color-bg-tertiary)]">
+                <th className="text-left px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-[var(--color-text-tertiary)] font-mono">
                   Asset
                 </th>
-                <th className="text-right px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-[#8E9192] font-mono">
+                <th className="text-right px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-[var(--color-text-tertiary)] font-mono">
                   Units
                 </th>
-                <th className="text-right px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-[#8E9192] font-mono">
+                <th className="text-right px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-[var(--color-text-tertiary)] font-mono">
                   Avg Price
                 </th>
-                <th className="text-right px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-[#8E9192] font-mono">
+                <th className="text-right px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-[var(--color-text-tertiary)] font-mono">
                   Current Price
                 </th>
-                <th className="text-right px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-[#8E9192] font-mono">
+                <th className="text-right px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-[var(--color-text-tertiary)] font-mono">
                   Invested
                 </th>
-                <th className="text-right px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-[#8E9192] font-mono">
+                <th className="text-right px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-[var(--color-text-tertiary)] font-mono">
                   Current Value
                 </th>
-                <th className="text-right px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-[#8E9192] font-mono">
+                <th className="text-right px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-[var(--color-text-tertiary)] font-mono">
                   Return
                 </th>
-                <th className="text-right px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-[#8E9192] font-mono">
+                <th className="text-right px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-[var(--color-text-tertiary)] font-mono">
                   Return %
                 </th>
                 <th className="px-4 py-3 w-20"></th>
@@ -141,41 +155,41 @@ export default function HoldingsTable({ holdings = [], onEdit, onDelete }) {
                 return (
                   <tr
                     key={h.id}
-                    className="border-b border-[#E5E5E5]/60 dark:border-[#262626]/60 last:border-0 hover:bg-[#F5F5F5]/50 dark:hover:bg-[#1E1E1E]/50 transition-colors"
+                    className="border-b border-[var(--color-border)]/60 dark:border-[var(--color-border)]/60 last:border-0 hover:bg-[var(--color-bg-tertiary)]/50 dark:hover:bg-[var(--color-bg-tertiary)]/50 transition-colors"
                   >
                     <td className="px-4 py-3.5">
                       <div>
-                        <p className="font-medium text-[#0A0A0A] dark:text-white truncate max-w-[200px]">
+                        <p className="font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] truncate max-w-[200px]">
                           {h.name}
                         </p>
-                        <p className="text-xs text-[#8E9192] mt-0.5 font-mono">
+                        <p className="text-xs text-[var(--color-text-tertiary)] mt-0.5 font-mono">
                           {h.category}
                         </p>
                       </div>
                     </td>
-                    <td className="px-4 py-3.5 text-right font-mono tabular-nums text-[#0A0A0A] dark:text-white">
+                    <td className="px-4 py-3.5 text-right font-mono tabular-nums text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                       {h.units}
                     </td>
-                    <td className="px-4 py-3.5 text-right font-mono tabular-nums text-[#0A0A0A] dark:text-white">
+                    <td className="px-4 py-3.5 text-right font-mono tabular-nums text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                       {formatINR(h.avgPrice)}
                     </td>
-                    <td className="px-4 py-3.5 text-right font-mono tabular-nums text-[#0A0A0A] dark:text-white">
+                    <td className="px-4 py-3.5 text-right font-mono tabular-nums text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                       {formatINR(h.currentPrice)}
                     </td>
-                    <td className="px-4 py-3.5 text-right font-mono tabular-nums text-[#0A0A0A] dark:text-white">
+                    <td className="px-4 py-3.5 text-right font-mono tabular-nums text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                       {formatINR(invested)}
                     </td>
-                    <td className="px-4 py-3.5 text-right font-mono tabular-nums font-semibold text-[#0A0A0A] dark:text-white">
+                    <td className="px-4 py-3.5 text-right font-mono tabular-nums font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                       {formatINR(current)}
                     </td>
                     <td
-                      className={`px-4 py-3.5 text-right font-mono tabular-nums font-semibold ${isPositive ? 'text-[#00a383] dark:text-[#00b894]' : 'text-[#e84118] dark:text-[#ff6b6b]'}`}
+                      className={`px-4 py-3.5 text-right font-mono tabular-nums font-semibold ${isPositive ? 'text-[var(--color-positive)] dark:text-[var(--color-positive)]' : 'text-[var(--color-negative)] dark:text-[var(--color-negative)]'}`}
                     >
                       {isPositive ? '+' : '−'}
                       {formatINR(Math.abs(returnAmt))}
                     </td>
                     <td
-                      className={`px-4 py-3.5 text-right font-mono tabular-nums font-semibold ${isPositive ? 'text-[#00a383] dark:text-[#00b894]' : 'text-[#e84118] dark:text-[#ff6b6b]'}`}
+                      className={`px-4 py-3.5 text-right font-mono tabular-nums font-semibold ${isPositive ? 'text-[var(--color-positive)] dark:text-[var(--color-positive)]' : 'text-[var(--color-negative)] dark:text-[var(--color-negative)]'}`}
                     >
                       {formatPercent(returnPct)}
                     </td>
@@ -183,14 +197,14 @@ export default function HoldingsTable({ holdings = [], onEdit, onDelete }) {
                       <div className="flex items-center justify-end gap-1">
                         <button
                           onClick={() => onEdit(h)}
-                          className="p-1.5 rounded text-[#8E9192] hover:text-[#0A0A0A] hover:bg-[#F5F5F5] dark:hover:text-white dark:hover:bg-[#1E1E1E] transition-colors"
+                          className="p-1.5 rounded text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-tertiary)] dark:hover:text-[var(--color-text-primary)] dark:hover:bg-[var(--color-bg-tertiary)] transition-colors"
                           aria-label={`Edit ${h.name}`}
                         >
                           <Pencil className="w-3.5 h-3.5" />
                         </button>
                         <button
                           onClick={() => onDelete(h.id)}
-                          className="p-1.5 rounded text-[#8E9192] hover:text-[#ff6b6b] hover:bg-[rgba(255,107,107,0.12)] transition-colors"
+                          className="p-1.5 rounded text-[var(--color-text-tertiary)] hover:text-[var(--color-negative)] hover:bg-[rgba(255,107,107,0.12)] transition-colors"
                           aria-label={`Delete ${h.name}`}
                         >
                           <Trash2 className="w-3.5 h-3.5" />

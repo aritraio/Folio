@@ -3,6 +3,7 @@ import Modal from '../ui/Modal';
 import Input from '../ui/Input';
 import Select from '../ui/Select';
 import Button from '../ui/Button';
+import { getCurrencySymbol } from '../../utils/formatCurrency';
 
 const INITIAL_STATE = {
   name: '',
@@ -68,6 +69,14 @@ export default function AccountModal({ isOpen, onClose, account, onSave }) {
 
       onSave({
         ...formData,
+        updatedAt: new Date().toISOString(),
+        ...(formData.type === 'credit'
+          ? Object.fromEntries(
+              ['creditLimit', 'statementBalance', 'minimumDue']
+                .filter((k) => formData[k] !== '' && formData[k] != null)
+                .map((k) => [k, Number(formData[k])])
+            )
+          : {}),
         balance: Number(formData.balance),
         accountNumber: formData.accountNumber || 'N/A',
         icon,
@@ -115,16 +124,50 @@ export default function AccountModal({ isOpen, onClose, account, onSave }) {
           <Input
             label={formData.type === 'credit' ? 'Current Outstanding' : 'Opening Balance'}
             type="number"
-            min="0"
             step="0.01"
-            icon={<span className="text-sm font-mono">₹</span>}
+            icon={<span className="text-sm font-mono">{getCurrencySymbol()}</span>}
             value={formData.balance}
             onChange={(e) => setFormData({ ...formData, balance: e.target.value })}
             error={errors.balance}
           />
         </div>
 
-        <div className="pt-4 flex justify-end gap-3 border-t border-[#E5E5E5] dark:border-[#262626] mt-6">
+        {formData.type === 'credit' && (
+          <div className="v-form-grid">
+            {[
+              ['creditLimit', 'Credit limit'],
+              ['statementBalance', 'Statement amount due'],
+              ['minimumDue', 'Minimum due'],
+            ].map(([key, label]) => (
+              <Input
+                key={key}
+                label={label}
+                type="number"
+                min="0"
+                step="0.01"
+                value={formData[key] ?? ''}
+                onChange={(e) => setFormData({ ...formData, [key]: e.target.value })}
+              />
+            ))}
+            <Input
+              label="Payment due date"
+              type="date"
+              value={formData.dueDate || ''}
+              onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
+            />
+            <Input
+              label="Statement date"
+              type="date"
+              value={formData.statementDate || ''}
+              onChange={(e) => setFormData({ ...formData, statementDate: e.target.value })}
+            />
+          </div>
+        )}
+        <p className="v-caption">
+          Enter a current tracked balance. When importing old statements later, choose history only to avoid
+          counting them again. Credit card payments are transfers from your bank account.
+        </p>
+        <div className="pt-4 flex justify-end gap-3 border-t border-[var(--color-border)] dark:border-[var(--color-border)] mt-6">
           <Button type="button" variant="ghost" onClick={onClose}>
             Cancel
           </Button>

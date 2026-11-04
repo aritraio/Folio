@@ -73,7 +73,9 @@ export default function InvestmentsPage() {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
           <p className="label mb-1 font-mono">Portfolio</p>
-          <h1 className="heading-lg text-[#0A0A0A] dark:text-white">Investments</h1>
+          <h1 className="heading-lg text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+            Investments
+          </h1>
         </div>
 
         <Button variant="primary" icon={<Plus className="w-4 h-4" />} onClick={handleAddClick}>
@@ -84,7 +86,9 @@ export default function InvestmentsPage() {
       {!hasHoldings ? (
         <div className="card p-8 md:p-12">
           <EmptyState
-            icon={<TrendingUp className="w-7 h-7 text-[#0A0A0A] dark:text-white" />}
+            icon={
+              <TrendingUp className="w-7 h-7 text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]" />
+            }
             title="No investments tracked"
             description="Start tracking your portfolio by adding your first investment holding."
             actionLabel="Add Holding"

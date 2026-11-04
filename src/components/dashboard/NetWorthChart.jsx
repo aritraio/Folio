@@ -34,15 +34,15 @@ function ChartTooltip({ active, payload }) {
   if (!row) return null;
   const delta = row.delta;
   return (
-    <div className="bg-[#141414] border border-[#262626] rounded px-4 py-3 space-y-1.5 min-w-[180px]">
-      <p className="text-xs font-semibold text-[#8E9192] font-mono">{row.full}</p>
-      <p className="text-base font-bold font-mono tabular-nums text-white">
+    <div className="bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded px-4 py-3 space-y-1.5 min-w-[180px]">
+      <p className="text-xs font-semibold text-[var(--color-text-tertiary)] font-mono">{row.full}</p>
+      <p className="text-base font-bold font-mono tabular-nums text-[var(--color-text-primary)]">
         {formatINR(row.value)}
       </p>
       {delta !== null && delta !== undefined && (
         <p
           className={`text-xs font-semibold font-mono tabular-nums ${
-            delta >= 0 ? 'text-[#00b894]' : 'text-[#ff6b6b]'
+            delta >= 0 ? 'text-[var(--color-positive)]' : 'text-[var(--color-negative)]'
           }`}
         >
           {formatChange(delta)} <span className="opacity-80">vs {row.prevName || 'prior'}</span>
@@ -169,8 +169,10 @@ export default function NetWorthChart({ data = [], currentNetWorth = null }) {
   if (rows.length === 0) {
     return (
       <section className="card p-6 animate-fade-in-up" aria-label="Net worth chart">
-        <h2 className="heading-sm text-[#0A0A0A] dark:text-white mb-2">Net Worth</h2>
-        <p className="text-sm text-[#8E9192]">No net worth data yet.</p>
+        <h2 className="heading-sm text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] mb-2">
+          Net Worth
+        </h2>
+        <p className="text-sm text-[var(--color-text-tertiary)]">No net worth data yet.</p>
       </section>
     );
   }
@@ -186,8 +188,10 @@ export default function NetWorthChart({ data = [], currentNetWorth = null }) {
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
         <div>
-          <h2 className="heading-sm text-[#0A0A0A] dark:text-white">Net Worth</h2>
-          <p className="text-xs text-[#8E9192] mt-0.5 font-mono uppercase tracking-widest">
+          <h2 className="heading-sm text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+            Net Worth
+          </h2>
+          <p className="text-xs text-[var(--color-text-tertiary)] mt-0.5 font-mono uppercase tracking-widest">
             {activeRange === 'ALL' ? 'All time' : `Last ${activeRange.toLowerCase()}`} ·{' '}
             {isZoomed ? 'Focused' : 'Full baseline'}
           </p>
@@ -199,9 +203,9 @@ export default function NetWorthChart({ data = [], currentNetWorth = null }) {
             onClick={() => setIsZoomed((v) => !v)}
             className="
               p-2 rounded
-              border border-[#E5E5E5] dark:border-[#262626]
-              text-[#8E9192] hover:text-[#0A0A0A] dark:hover:text-white
-              hover:bg-[#F5F5F5] dark:hover:bg-[#1E1E1E]
+              border border-[var(--color-border)] dark:border-[var(--color-border)]
+              text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] dark:hover:text-[var(--color-text-primary)]
+              hover:bg-[var(--color-bg-tertiary)] dark:hover:bg-[var(--color-bg-tertiary)]
               transition-all duration-150 ease-out
               active:scale-[0.97]
             "
@@ -215,7 +219,7 @@ export default function NetWorthChart({ data = [], currentNetWorth = null }) {
           </button>
 
           {/* Time range toggles */}
-          <div className="flex items-center gap-1 bg-[#F5F5F5] dark:bg-[#0A0A0A] border border-[#E5E5E5] dark:border-[#262626] rounded p-1">
+          <div className="flex items-center gap-1 bg-[var(--color-bg-tertiary)] dark:bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] dark:border-[var(--color-border)] rounded p-1">
             {TIME_RANGES.map(({ label }) => (
               <button
                 key={label}
@@ -226,8 +230,8 @@ export default function NetWorthChart({ data = [], currentNetWorth = null }) {
                   active:scale-[0.97]
                   ${
                     activeRange === label
-                      ? 'bg-[#0A0A0A] text-white dark:bg-white dark:text-[#0A0A0A]'
-                      : 'text-[#8E9192] hover:text-[#0A0A0A] dark:hover:text-white'
+                      ? 'bg-[var(--color-bg-tertiary)] text-[var(--color-text-primary)] dark:bg-[var(--color-bg-secondary)] dark:text-[var(--color-text-primary)]'
+                      : 'text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] dark:hover:text-[var(--color-text-primary)]'
                   }
                 `}
               >
@@ -241,17 +245,19 @@ export default function NetWorthChart({ data = [], currentNetWorth = null }) {
       {/* Period stat chips */}
       {stats && (
         <div className="flex flex-wrap items-center gap-2 mb-5" aria-label="Period statistics">
-          <span className="inline-flex items-center gap-1.5 font-mono text-[11px] tabular-nums px-2.5 py-1 rounded border border-[#E5E5E5] dark:border-[#262626] text-[#404040] dark:text-[#C4C7C8]">
-            <span className="text-[#8E9192]">HIGH</span> {formatCompact(stats.hi.value)} · {stats.hi.name}
+          <span className="inline-flex items-center gap-1.5 font-mono text-[11px] tabular-nums px-2.5 py-1 rounded border border-[var(--color-border)] dark:border-[var(--color-border)] text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary)]">
+            <span className="text-[var(--color-text-tertiary)]">HIGH</span> {formatCompact(stats.hi.value)} ·{' '}
+            {stats.hi.name}
           </span>
-          <span className="inline-flex items-center gap-1.5 font-mono text-[11px] tabular-nums px-2.5 py-1 rounded border border-[#E5E5E5] dark:border-[#262626] text-[#404040] dark:text-[#C4C7C8]">
-            <span className="text-[#8E9192]">LOW</span> {formatCompact(stats.lo.value)} · {stats.lo.name}
+          <span className="inline-flex items-center gap-1.5 font-mono text-[11px] tabular-nums px-2.5 py-1 rounded border border-[var(--color-border)] dark:border-[var(--color-border)] text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary)]">
+            <span className="text-[var(--color-text-tertiary)]">LOW</span> {formatCompact(stats.lo.value)} ·{' '}
+            {stats.lo.name}
           </span>
           <span
             className={`inline-flex items-center gap-1.5 font-mono text-[11px] tabular-nums px-2.5 py-1 rounded ${
               deltaUp
-                ? 'bg-[rgba(0,163,131,0.08)] text-[#00a383] dark:bg-[rgba(0,184,148,0.12)] dark:text-[#00b894]'
-                : 'bg-[rgba(232,65,24,0.08)] text-[#e84118] dark:bg-[rgba(255,107,107,0.12)] dark:text-[#ff6b6b]'
+                ? 'bg-[rgba(0,163,131,0.08)] text-[var(--color-positive)] dark:bg-[rgba(0,184,148,0.12)] dark:text-[var(--color-positive)]'
+                : 'bg-[rgba(232,65,24,0.08)] text-[var(--color-negative)] dark:bg-[rgba(255,107,107,0.12)] dark:text-[var(--color-negative)]'
             }`}
           >
             <span className="opacity-70">Δ</span> {formatChange(stats.delta)} ({formatPercent(stats.pct)})
@@ -333,19 +339,19 @@ export default function NetWorthChart({ data = [], currentNetWorth = null }) {
             className="w-2.5 h-2.5 rounded-sm border border-[#8E9192]"
             style={{ background: chart.line }}
           />
-          <span className="text-xs text-[#8E9192]">Net Worth</span>
+          <span className="text-xs text-[var(--color-text-tertiary)]">Net Worth</span>
         </div>
         <div className="flex items-center gap-2">
           <span className="w-2.5 h-2.5 rounded-sm bg-[#00b894]" />
-          <span className="text-xs text-[#8E9192]">Monthly gain</span>
+          <span className="text-xs text-[var(--color-text-tertiary)]">Monthly gain</span>
         </div>
         <div className="flex items-center gap-2">
           <span className="w-2.5 h-2.5 rounded-sm bg-[#ff6b6b]" />
-          <span className="text-xs text-[#8E9192]">Monthly burn</span>
+          <span className="text-xs text-[var(--color-text-tertiary)]">Monthly burn</span>
         </div>
         <div className="flex items-center gap-2">
           <span className="w-4 border-t-2 border-dashed border-[#8E9192]" />
-          <span className="text-xs text-[#8E9192]">Target</span>
+          <span className="text-xs text-[var(--color-text-tertiary)]">Target</span>
         </div>
       </div>
     </section>

@@ -10,6 +10,13 @@ export default [
       parserOptions: { ecmaFeatures: { jsx: true } },
       globals: {
         window: 'readonly',
+        fetch: 'readonly',
+        Response: 'readonly',
+        Request: 'readonly',
+        TextDecoder: 'readonly',
+        AbortSignal: 'readonly',
+        URLSearchParams: 'readonly',
+        btoa: 'readonly',
         document: 'readonly',
         localStorage: 'readonly',
         navigator: 'readonly',

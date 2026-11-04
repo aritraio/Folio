@@ -27,27 +27,25 @@ function AccountRow({ account }) {
       className="
       flex items-center justify-between gap-3
       py-3 px-2 -mx-2 rounded
-      hover:bg-[#F5F5F5] dark:hover:bg-[#1E1E1E]
+      hover:bg-[var(--color-bg-tertiary)] dark:hover:bg-[var(--color-bg-tertiary)]
       transition-colors duration-150
     "
     >
       <div className="flex items-center gap-3 min-w-0">
-        <div className="w-8 h-8 rounded border border-[#E5E5E5] dark:border-[#262626] bg-[#F5F5F5] dark:bg-[#1E1E1E] flex items-center justify-center shrink-0">
-          <IconComp className="w-4 h-4 text-[#0A0A0A] dark:text-white" />
+        <div className="w-8 h-8 rounded border border-[var(--color-border)] dark:border-[var(--color-border)] bg-[var(--color-bg-tertiary)] dark:bg-[var(--color-bg-tertiary)] flex items-center justify-center shrink-0">
+          <IconComp className="w-4 h-4 text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]" />
         </div>
         <div className="min-w-0">
-          <p className="text-sm font-medium text-[#0A0A0A] dark:text-white truncate">
+          <p className="text-sm font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] truncate">
             {account.name}
           </p>
-          <p className="text-[11px] text-[#8E9192] font-mono">
-            {account.accountNumber}
-          </p>
+          <p className="text-[11px] text-[var(--color-text-tertiary)] font-mono">{account.accountNumber}</p>
         </div>
       </div>
       <span
         className={`
         text-sm font-semibold font-mono tabular-nums shrink-0
-        ${isLiability ? 'text-[#e84118] dark:text-[#ff6b6b]' : 'text-[#0A0A0A] dark:text-white'}
+        ${isLiability ? 'text-[var(--color-negative)] dark:text-[var(--color-negative)]' : 'text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]'}
       `}
       >
         {isLiability ? '−' : ''}
@@ -76,8 +74,10 @@ export default function AccountOverview({ accounts = [] }) {
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <div>
-          <h2 className="heading-sm text-[#0A0A0A] dark:text-white">Accounts</h2>
-          <p className="text-xs text-[#8E9192] mt-0.5 font-mono uppercase tracking-widest">
+          <h2 className="heading-sm text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+            Accounts
+          </h2>
+          <p className="text-xs text-[var(--color-text-tertiary)] mt-0.5 font-mono uppercase tracking-widest">
             Assets & Liabilities
           </p>
         </div>
@@ -87,10 +87,12 @@ export default function AccountOverview({ accounts = [] }) {
       {assets.length > 0 && (
         <div className="mb-5">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[#00a383] dark:text-[#00b894] font-mono">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[var(--color-positive)] dark:text-[var(--color-positive)] font-mono">
               Assets
             </span>
-            <span className="text-xs font-semibold font-mono tabular-nums text-[#00a383] dark:text-[#00b894]">{formatINR(totalAssets)}</span>
+            <span className="text-xs font-semibold font-mono tabular-nums text-[var(--color-positive)] dark:text-[var(--color-positive)]">
+              {formatINR(totalAssets)}
+            </span>
           </div>
           <div className="divide-y divide-[#E5E5E5] dark:divide-[#262626]">
             {assets.map((acc) => (
@@ -104,10 +106,12 @@ export default function AccountOverview({ accounts = [] }) {
       {liabilities.length > 0 && (
         <div className="mb-5">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[#e84118] dark:text-[#ff6b6b] font-mono">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[var(--color-negative)] dark:text-[var(--color-negative)] font-mono">
               Liabilities
             </span>
-            <span className="text-xs font-semibold font-mono tabular-nums text-[#e84118] dark:text-[#ff6b6b]">{formatINR(totalLiabilities)}</span>
+            <span className="text-xs font-semibold font-mono tabular-nums text-[var(--color-negative)] dark:text-[var(--color-negative)]">
+              {formatINR(totalLiabilities)}
+            </span>
           </div>
           <div className="divide-y divide-[#E5E5E5] dark:divide-[#262626]">
             {liabilities.map((acc) => (
@@ -122,23 +126,25 @@ export default function AccountOverview({ accounts = [] }) {
         className="
         flex items-center justify-between
         pt-4 mt-1
-        border-t border-[#E5E5E5] dark:border-[#262626]
+        border-t border-[var(--color-border)] dark:border-[var(--color-border)]
       "
       >
-        <span className="text-sm font-semibold text-[#0A0A0A] dark:text-white">Net Worth</span>
-        <span className="text-base font-bold font-mono tabular-nums text-[#0A0A0A] dark:text-white">
+        <span className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+          Net Worth
+        </span>
+        <span className="text-base font-bold font-mono tabular-nums text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
           {formatINR(netWorth)}
         </span>
       </div>
 
       {/* View All link */}
-      <div className="mt-4 pt-3 border-t border-[#E5E5E5] dark:border-[#262626]">
+      <div className="mt-4 pt-3 border-t border-[var(--color-border)] dark:border-[var(--color-border)]">
         <Link
           to="/accounts"
           className="
             inline-flex items-center gap-2
             text-[11px] font-semibold uppercase tracking-[0.15em] font-mono
-            text-[#0A0A0A] dark:text-white hover:opacity-60
+            text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] hover:opacity-60
             transition-opacity duration-150
             group
           "

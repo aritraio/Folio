@@ -31,10 +31,10 @@ export default function HeroSection({ netWorth = 0, prevNetWorth = 0 }) {
 
   const TrendIcon = isPositive ? TrendingUp : isNegative ? TrendingDown : Minus;
   const trendPill = isPositive
-    ? 'bg-[rgba(0,163,131,0.08)] text-[#00a383] dark:bg-[rgba(0,184,148,0.12)] dark:text-[#00b894]'
+    ? 'bg-[rgba(0,163,131,0.08)] text-[var(--color-positive)] dark:bg-[rgba(0,184,148,0.12)] dark:text-[var(--color-positive)]'
     : isNegative
-      ? 'bg-[rgba(232,65,24,0.08)] text-[#e84118] dark:bg-[rgba(255,107,107,0.12)] dark:text-[#ff6b6b]'
-      : 'bg-[#F5F5F5] text-[#8E9192] dark:bg-[#1E1E1E]';
+      ? 'bg-[rgba(232,65,24,0.08)] text-[var(--color-negative)] dark:bg-[rgba(255,107,107,0.12)] dark:text-[var(--color-negative)]'
+      : 'bg-[var(--color-bg-tertiary)] text-[var(--color-text-tertiary)] dark:bg-[var(--color-bg-tertiary)]';
 
   const animatedNetWorth = useCountUp(netWorth, 1200);
 
@@ -42,27 +42,27 @@ export default function HeroSection({ netWorth = 0, prevNetWorth = 0 }) {
     <section className="animate-fade-in motion-reduce:animate-none" aria-label="Financial overview">
       <div className="flex items-center gap-2 mb-6 font-mono">
         <span className="label">Overview</span>
-        <span className="text-[#8E9192] text-xs">/</span>
+        <span className="text-[var(--color-text-tertiary)] text-xs">/</span>
         <span className="label">{currentMonthYear}</span>
-        <span className="ml-auto hidden sm:inline-flex items-center gap-1.5 font-mono text-[10px] tracking-widest text-[#8E9192]">
+        <span className="ml-auto hidden sm:inline-flex items-center gap-1.5 font-mono text-[10px] tracking-widest text-[var(--color-text-tertiary)]">
           <span className="w-1.5 h-1.5 rounded-full bg-[#00b894] animate-pulse" />
           LIVE · LOCAL-FIRST
         </span>
       </div>
 
       <div className="mb-2">
-        <p className="font-mono text-[11px] font-medium uppercase tracking-[0.2em] text-[#404040] dark:text-[#C4C7C8]">
+        <p className="font-mono text-[11px] font-medium uppercase tracking-[0.2em] text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary)]">
           {getGreeting()}, {userName}
         </p>
       </div>
-      <p className="text-xs font-semibold uppercase tracking-[0.15em] text-[#8E9192] mb-8">
+      <p className="text-xs font-semibold uppercase tracking-[0.15em] text-[var(--color-text-tertiary)] mb-8">
         Your Financial Overview
       </p>
 
       <div className="flex flex-col sm:flex-row sm:items-end gap-4 sm:gap-6">
         <div>
           <p className="label mb-2">Net Worth</p>
-          <h1 className="display-xl text-[#0A0A0A] dark:text-white tabular-nums">
+          <h1 className="display-xl text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] tabular-nums">
             {formatMoney(animatedNetWorth)}
           </h1>
         </div>
@@ -80,7 +80,7 @@ export default function HeroSection({ netWorth = 0, prevNetWorth = 0 }) {
           <span className="text-xs font-medium font-mono tabular-nums opacity-80">
             {formatPercent(monthChangePercent)}
           </span>
-          <span className="text-xs text-[#8E9192]">this month</span>
+          <span className="text-xs text-[var(--color-text-tertiary)]">this month</span>
         </div>
       </div>
     </section>

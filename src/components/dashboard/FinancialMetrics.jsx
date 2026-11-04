@@ -9,20 +9,20 @@ import { formatINR, formatPercent, formatCompact } from '@/utils/formatCurrency'
 function MetricBlock({ label, icon: Icon, value, subValue, subPill }) {
   return (
     <div className="flex items-start gap-3.5 py-4 px-1 min-w-0">
-      <div className="shrink-0 p-2.5 rounded border border-[#E5E5E5] dark:border-[#262626] bg-[#F5F5F5] dark:bg-[#1E1E1E]">
-        <Icon className="w-4 h-4 text-[#0A0A0A] dark:text-white" />
+      <div className="shrink-0 p-2.5 rounded border border-[var(--color-border)] dark:border-[var(--color-border)] bg-[var(--color-bg-tertiary)] dark:bg-[var(--color-bg-tertiary)]">
+        <Icon className="w-4 h-4 text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]" />
       </div>
       <div className="min-w-0">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[#404040] dark:text-[#C4C7C8] mb-1 font-mono">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary)] mb-1 font-mono">
           {label}
         </p>
-        <p className="text-lg font-bold font-mono tabular-nums text-[#0A0A0A] dark:text-white truncate">
+        <p className="text-lg font-bold font-mono tabular-nums text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] truncate">
           {value}
         </p>
         {subValue && (
           <p className="mt-1">
             <span
-              className={`inline-flex items-center text-xs font-medium font-mono tabular-nums px-2 py-0.5 rounded ${subPill || 'text-[#8E9192]'}`}
+              className={`inline-flex items-center text-xs font-medium font-mono tabular-nums px-2 py-0.5 rounded ${subPill || 'text-[var(--color-text-tertiary)]'}`}
             >
               {subValue}
             </span>
@@ -34,9 +34,9 @@ function MetricBlock({ label, icon: Icon, value, subValue, subPill }) {
 }
 
 const PILL_IN =
-  'bg-[rgba(0,163,131,0.08)] text-[#00a383] dark:bg-[rgba(0,184,148,0.12)] dark:text-[#00b894]';
+  'bg-[rgba(0,163,131,0.08)] text-[var(--color-positive)] dark:bg-[rgba(0,184,148,0.12)] dark:text-[var(--color-positive)]';
 const PILL_OUT =
-  'bg-[rgba(232,65,24,0.08)] text-[#e84118] dark:bg-[rgba(255,107,107,0.12)] dark:text-[#ff6b6b]';
+  'bg-[rgba(232,65,24,0.08)] text-[var(--color-negative)] dark:bg-[rgba(255,107,107,0.12)] dark:text-[var(--color-negative)]';
 
 /**
  * FinancialMetrics — Horizontal strip of 5 key financial metrics.
@@ -83,7 +83,7 @@ export default function FinancialMetrics({
       value: formatINR(savings),
       subValue: `${formatPercent(savingsRate)} rate`,
       subPill:
-        savingsRate >= 20 ? PILL_IN : savingsRate >= 0 ? 'text-[#8E9192]' : PILL_OUT,
+        savingsRate >= 20 ? PILL_IN : savingsRate >= 0 ? 'text-[var(--color-text-tertiary)]' : PILL_OUT,
     },
     {
       label: 'Investments',

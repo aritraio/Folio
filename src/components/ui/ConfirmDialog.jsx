@@ -32,19 +32,23 @@ export default function ConfirmDialog({
             ${
               variant === 'destructive'
                 ? 'bg-[rgba(255,107,107,0.12)] border-[#ff6b6b]/30 dark:bg-[rgba(255,107,107,0.12)]'
-                : 'bg-[#F5F5F5] border-[#E5E5E5] dark:bg-[#1E1E1E] dark:border-[#262626]'
+                : 'bg-[var(--color-bg-tertiary)] border-[var(--color-border)] dark:bg-[var(--color-bg-tertiary)] dark:border-[var(--color-border)]'
             }
           `}
         >
           <AlertTriangle
             className={`w-6 h-6 ${
-              variant === 'destructive' ? 'text-[#ff6b6b]' : 'text-[#0A0A0A] dark:text-white'
+              variant === 'destructive'
+                ? 'text-[var(--color-negative)]'
+                : 'text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]'
             }`}
           />
         </div>
 
         {/* Title */}
-        <h3 className="heading-sm text-[#0A0A0A] dark:text-white mb-2">{title}</h3>
+        <h3 className="heading-sm text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] mb-2">
+          {title}
+        </h3>
 
         {/* Message */}
         <p className="body-sm max-w-xs mb-6">{message}</p>

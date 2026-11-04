@@ -53,3 +53,9 @@ dist-ssr/
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Local Worker secrets
+.dev.vars
+.dev.vars.*
+!.dev.vars.example
+.wrangler/

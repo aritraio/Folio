@@ -1,3 +1,5 @@
+> **V2 development branch:** The responsive redesign, statement review, data-focused assistant and Learn section are implemented here. See [V2 setup and delivered scope](docs/v2/README.md), especially the separate cloud configuration. The `main` assignment version is unchanged.
+
 # Folio — Personal Wealth & Finance Tracker
 
 > **Editorial clarity for personal wealth.** A private, local-first finance dashboard built with React 18, Vite, Tailwind CSS, and Recharts.

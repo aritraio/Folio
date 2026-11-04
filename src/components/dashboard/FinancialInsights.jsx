@@ -27,28 +27,28 @@ function InsightCard({ icon: Icon, title, description, signal }) {
       className="
       flex items-start gap-3.5
       p-3.5 rounded
-      bg-[#F5F5F5] dark:bg-[#0A0A0A]
-      border border-[#E5E5E5] dark:border-[#262626]
-      hover:border-[#CCCCCC] dark:hover:border-[#404040]
+      bg-[var(--color-bg-tertiary)] dark:bg-[var(--color-bg-tertiary)]
+      border border-[var(--color-border)] dark:border-[var(--color-border)]
+      hover:border-[var(--color-border)] dark:hover:border-[var(--color-border)]
       transition-colors duration-150
     "
     >
-      <div className="shrink-0 p-2 rounded border border-[#E5E5E5] dark:border-[#262626] bg-white dark:bg-[#1E1E1E]">
+      <div className="shrink-0 p-2 rounded border border-[var(--color-border)] dark:border-[var(--color-border)] bg-[var(--color-bg-secondary)] dark:bg-[var(--color-bg-tertiary)]">
         <Icon
           className={`w-4 h-4 ${
             signal === 'in'
-              ? 'text-[#00a383] dark:text-[#00b894]'
+              ? 'text-[var(--color-positive)] dark:text-[var(--color-positive)]'
               : signal === 'out'
-                ? 'text-[#e84118] dark:text-[#ff6b6b]'
-                : 'text-[#0A0A0A] dark:text-white'
+                ? 'text-[var(--color-negative)] dark:text-[var(--color-negative)]'
+                : 'text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]'
           }`}
         />
       </div>
       <div className="min-w-0">
-        <p className="text-sm font-medium text-[#0A0A0A] dark:text-white mb-0.5">{title}</p>
-        <p className="text-xs text-[#8E9192] leading-relaxed">
-          {description}
+        <p className="text-sm font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] mb-0.5">
+          {title}
         </p>
+        <p className="text-xs text-[var(--color-text-tertiary)] leading-relaxed">{description}</p>
       </div>
     </div>
   );
@@ -138,8 +138,10 @@ export default function FinancialInsights({ transactions = [], netWorth = 0, pre
     >
       {/* Header */}
       <div className="flex items-center gap-2 mb-5">
-        <Terminal className="w-4 h-4 text-[#0A0A0A] dark:text-white" />
-        <h2 className="heading-sm text-[#0A0A0A] dark:text-white">Insights</h2>
+        <Terminal className="w-4 h-4 text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]" />
+        <h2 className="heading-sm text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+          Insights
+        </h2>
       </div>
 
       {/* Insight cards */}

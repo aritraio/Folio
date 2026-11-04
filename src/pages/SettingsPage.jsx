@@ -111,7 +111,9 @@ export default function SettingsPage() {
     <div className="space-y-6 pb-12">
       <div>
         <p className="label mb-1 font-mono">Preferences</p>
-        <h1 className="heading-lg text-[#0A0A0A] dark:text-white">Settings</h1>
+        <h1 className="heading-lg text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+          Settings
+        </h1>
       </div>
 
       {alertMsg && (
@@ -119,8 +121,8 @@ export default function SettingsPage() {
           role={alertMsg.type === 'error' ? 'alert' : 'status'}
           className={`p-4 rounded text-sm font-medium font-mono border ${
             alertMsg.type === 'success'
-              ? 'bg-[rgba(0,184,148,0.12)] text-[#00a383] dark:text-[#00b894] border-[#00b894]/30'
-              : 'bg-[rgba(255,107,107,0.12)] text-[#e84118] dark:text-[#ff6b6b] border-[#ff6b6b]/30'
+              ? 'bg-[rgba(0,184,148,0.12)] text-[var(--color-positive)] dark:text-[var(--color-positive)] border-[#00b894]/30'
+              : 'bg-[rgba(255,107,107,0.12)] text-[var(--color-negative)] dark:text-[var(--color-negative)] border-[#ff6b6b]/30'
           }`}
         >
           {alertMsg.text}
@@ -130,22 +132,25 @@ export default function SettingsPage() {
       {/* ── Profile Section ── */}
       <section className="card p-6 md:p-8" aria-labelledby="settings-profile">
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded border border-[#E5E5E5] dark:border-[#262626] bg-[#F5F5F5] dark:bg-[#1E1E1E] flex items-center justify-center">
-            <User className="w-5 h-5 text-[#0A0A0A] dark:text-white" />
+          <div className="w-10 h-10 rounded border border-[var(--color-border)] dark:border-[var(--color-border)] bg-[var(--color-bg-tertiary)] dark:bg-[var(--color-bg-tertiary)] flex items-center justify-center">
+            <User className="w-5 h-5 text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]" />
           </div>
           <div>
-            <h2 id="settings-profile" className="heading-sm text-[#0A0A0A] dark:text-white">
+            <h2
+              id="settings-profile"
+              className="heading-sm text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]"
+            >
               Profile
             </h2>
-            <p className="text-xs text-[#8E9192]">
-              Active user profile details. Switch student accounts anytime via the Profile menu in the
-              top-right header.
+            <p className="text-xs text-[var(--color-text-tertiary)]">
+              Active user profile details. Switch sample profiles using the header selector. These are local
+              demo profiles, not authenticated accounts.
             </p>
           </div>
         </div>
         <div className="flex flex-col md:flex-row gap-8 items-start">
           <div
-            className="w-20 h-20 rounded bg-[#0A0A0A] text-white dark:bg-white dark:text-[#0A0A0A] flex items-center justify-center text-2xl font-mono font-bold shrink-0"
+            className="w-20 h-20 rounded bg-[var(--color-bg-tertiary)] text-[var(--color-text-primary)] dark:bg-[var(--color-bg-secondary)] dark:text-[var(--color-text-primary)] flex items-center justify-center text-2xl font-mono font-bold shrink-0"
             aria-hidden="true"
           >
             {getInitials(settings.userName)}
@@ -170,10 +175,13 @@ export default function SettingsPage() {
 
       <section className="card p-6 md:p-8" aria-labelledby="settings-prefs">
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded border border-[#E5E5E5] dark:border-[#262626] bg-[#F5F5F5] dark:bg-[#1E1E1E] flex items-center justify-center">
-            <Palette className="w-5 h-5 text-[#0A0A0A] dark:text-white" />
+          <div className="w-10 h-10 rounded border border-[var(--color-border)] dark:border-[var(--color-border)] bg-[var(--color-bg-tertiary)] dark:bg-[var(--color-bg-tertiary)] flex items-center justify-center">
+            <Palette className="w-5 h-5 text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]" />
           </div>
-          <h2 id="settings-prefs" className="heading-sm text-[#0A0A0A] dark:text-white">
+          <h2
+            id="settings-prefs"
+            className="heading-sm text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]"
+          >
             Preferences
           </h2>
         </div>
@@ -183,7 +191,7 @@ export default function SettingsPage() {
             value={settings.currency || 'INR'}
             onChange={(e) => handleChange('currency', e.target.value)}
             options={Object.values(CURRENCIES).map((c) => ({ value: c.code, label: c.label }))}
-            hint="Applies to all amounts instantly"
+            hint="Display symbol only; does not convert balances"
           />
           <Select
             label="Theme"
@@ -207,17 +215,22 @@ export default function SettingsPage() {
 
       <section className="card p-6 md:p-8" aria-labelledby="settings-data">
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded border border-[#E5E5E5] dark:border-[#262626] bg-[#F5F5F5] dark:bg-[#1E1E1E] flex items-center justify-center">
-            <Database className="w-5 h-5 text-[#0A0A0A] dark:text-white" />
+          <div className="w-10 h-10 rounded border border-[var(--color-border)] dark:border-[var(--color-border)] bg-[var(--color-bg-tertiary)] dark:bg-[var(--color-bg-tertiary)] flex items-center justify-center">
+            <Database className="w-5 h-5 text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]" />
           </div>
-          <h2 id="settings-data" className="heading-sm text-[#0A0A0A] dark:text-white">
+          <h2
+            id="settings-data"
+            className="heading-sm text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]"
+          >
             Data Management
           </h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl">
           <div className="flex flex-col gap-3">
-            <h3 className="text-sm font-medium text-[#0A0A0A] dark:text-white">Export Data</h3>
-            <p className="text-xs text-[#8E9192] leading-relaxed">
+            <h3 className="text-sm font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+              Export Data
+            </h3>
+            <p className="text-xs text-[var(--color-text-tertiary)] leading-relaxed">
               Download a versioned JSON backup of everything.
             </p>
             <Button variant="secondary" onClick={handleExport} className="mt-auto justify-center">
@@ -226,8 +239,10 @@ export default function SettingsPage() {
             </Button>
           </div>
           <div className="flex flex-col gap-3">
-            <h3 className="text-sm font-medium text-[#0A0A0A] dark:text-white">Import Data</h3>
-            <p className="text-xs text-[#8E9192] leading-relaxed">
+            <h3 className="text-sm font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+              Import Data
+            </h3>
+            <p className="text-xs text-[var(--color-text-tertiary)] leading-relaxed">
               Restore from a backup. Validated first; a pre-import backup is auto-downloaded.
             </p>
             <Button variant="secondary" onClick={handleImportClick} className="mt-auto justify-center">
@@ -243,8 +258,10 @@ export default function SettingsPage() {
             />
           </div>
           <div className="flex flex-col gap-3">
-            <h3 className="text-sm font-medium text-[#0A0A0A] dark:text-white">Reset to Demo</h3>
-            <p className="text-xs text-[#8E9192] leading-relaxed">
+            <h3 className="text-sm font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+              Reset to Demo
+            </h3>
+            <p className="text-xs text-[var(--color-text-tertiary)] leading-relaxed">
               Wipe current data and restore the demo dataset. A backup is downloaded first.
             </p>
             <Button
@@ -257,8 +274,10 @@ export default function SettingsPage() {
             </Button>
           </div>
           <div className="flex flex-col gap-3">
-            <h3 className="text-sm font-medium text-[#e84118] dark:text-[#ff6b6b]">Erase Everything</h3>
-            <p className="text-xs text-[#8E9192] leading-relaxed">
+            <h3 className="text-sm font-medium text-[var(--color-negative)] dark:text-[var(--color-negative)]">
+              Erase Everything
+            </h3>
+            <p className="text-xs text-[var(--color-text-tertiary)] leading-relaxed">
               Permanently delete all data with no re-seed. App shows empty states.
             </p>
             <Button
@@ -275,18 +294,21 @@ export default function SettingsPage() {
 
       <section className="card p-6 md:p-8" aria-labelledby="settings-about">
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded border border-[#E5E5E5] dark:border-[#262626] bg-[#F5F5F5] dark:bg-[#1E1E1E] flex items-center justify-center">
-            <Info className="w-5 h-5 text-[#0A0A0A] dark:text-white" />
+          <div className="w-10 h-10 rounded border border-[var(--color-border)] dark:border-[var(--color-border)] bg-[var(--color-bg-tertiary)] dark:bg-[var(--color-bg-tertiary)] flex items-center justify-center">
+            <Info className="w-5 h-5 text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]" />
           </div>
-          <h2 id="settings-about" className="heading-sm text-[#0A0A0A] dark:text-white">
+          <h2
+            id="settings-about"
+            className="heading-sm text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]"
+          >
             About
           </h2>
         </div>
-        <div className="flex flex-col gap-1 text-sm text-[#404040] dark:text-[#C4C7C8]">
-          <p className="font-medium text-[#0A0A0A] dark:text-white mb-1 font-mono">
-            FOLIO — Personal Finance Terminal
+        <div className="flex flex-col gap-1 text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary)]">
+          <p className="font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] mb-1 font-mono">
+            FOLIO — Your money, in focus
           </p>
-          <p className="font-mono text-xs">Version 1.0.0 · Schema v2 · Local-first (localStorage)</p>
+          <p className="font-mono text-xs">Version 2.0 · Isolated V2 storage · Local-first</p>
           <p>A personal finance dashboard built with React + Vite.</p>
           <p className="mt-2 text-xs flex items-center gap-1 font-mono">
             <Eraser className="w-3 h-3" /> Backups include a schema version for safe restores.

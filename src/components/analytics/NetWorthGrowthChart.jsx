@@ -9,9 +9,9 @@ import useChartTheme from '@/utils/useChartTheme';
 function NetWorthTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-[#141414] border border-[#262626] rounded px-4 py-3">
-      <p className="text-xs font-semibold text-[#8E9192] mb-1 font-mono">{label}</p>
-      <p className="text-base font-bold font-mono tabular-nums text-white">
+    <div className="bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded px-4 py-3">
+      <p className="text-xs font-semibold text-[var(--color-text-tertiary)] mb-1 font-mono">{label}</p>
+      <p className="text-base font-bold font-mono tabular-nums text-[var(--color-text-primary)]">
         {formatINR(payload[0].value)}
       </p>
     </div>
@@ -35,8 +35,10 @@ export default function NetWorthGrowthChart({ data = [] }) {
       style={{ animationDelay: '0.3s' }}
     >
       <div className="mb-5">
-        <h2 className="heading-sm text-[#0A0A0A] dark:text-white">Net Worth Growth</h2>
-        <p className="text-xs text-[#8E9192] mt-0.5 font-mono uppercase tracking-widest">
+        <h2 className="heading-sm text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+          Net Worth Growth
+        </h2>
+        <p className="text-xs text-[var(--color-text-tertiary)] mt-0.5 font-mono uppercase tracking-widest">
           Portfolio value trajectory
         </p>
       </div>

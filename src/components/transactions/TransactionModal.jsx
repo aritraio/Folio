@@ -16,6 +16,7 @@ const INITIAL_STATE = {
   toAccountId: '',
   date: format(new Date(), 'yyyy-MM-dd'),
   notes: '',
+  person: '',
 };
 
 const MAX_AMOUNT = 100000000;
@@ -32,6 +33,7 @@ export default function TransactionModal({
   const [formData, setFormData] = useState(INITIAL_STATE);
   const [errors, setErrors] = useState({});
   const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
 
   useEffect(() => {
     if (isOpen) {
@@ -97,6 +99,7 @@ export default function TransactionModal({
     if (isSaving) return;
     if (validate()) {
       setIsSaving(true);
+      setSaveError('');
       try {
         const payload =
           formData.type === 'transfer'
@@ -121,8 +124,10 @@ export default function TransactionModal({
                 date: formData.date,
                 notes: formData.notes.trim(),
               };
-        onSave(payload);
+        onSave({ ...payload, person: formData.person?.trim() || '' });
         onClose();
+      } catch (error) {
+        setSaveError(error.message || 'Could not save this transaction.');
       } finally {
         setIsSaving(false);
       }
@@ -139,8 +144,13 @@ export default function TransactionModal({
       size="md"
     >
       <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+        {saveError && (
+          <p role="alert" className="v-error">
+            {saveError}
+          </p>
+        )}
         <div
-          className="flex bg-[#F5F5F5] dark:bg-[#0A0A0A] border border-[#E5E5E5] dark:border-[#262626] p-1 rounded"
+          className="flex bg-[var(--color-bg-tertiary)] dark:bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] dark:border-[var(--color-border)] p-1 rounded"
           role="tablist"
           aria-label="Transaction type"
         >
@@ -152,8 +162,8 @@ export default function TransactionModal({
               aria-selected={formData.type === t}
               className={`flex-1 py-1.5 text-sm font-medium font-mono uppercase tracking-wider rounded transition-colors capitalize ${
                 formData.type === t
-                  ? 'bg-[#0A0A0A] text-white dark:bg-white dark:text-[#0A0A0A]'
-                  : 'text-[#8E9192] hover:text-[#0A0A0A] dark:hover:text-white'
+                  ? 'bg-[var(--color-bg-tertiary)] text-[var(--color-text-primary)] dark:bg-[var(--color-bg-secondary)] dark:text-[var(--color-text-primary)]'
+                  : 'text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] dark:hover:text-[var(--color-text-primary)]'
               }`}
               onClick={() => setFormData({ ...formData, type: t })}
             >
@@ -186,13 +196,20 @@ export default function TransactionModal({
               error={errors.date}
             />
             {isFuture && !errors.date && (
-              <p className="mt-1 text-xs text-[#0A0A0A] dark:text-white">
+              <p className="mt-1 text-xs text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                 Future date — scheduled transactions aren&apos;t tracked separately yet.
               </p>
             )}
           </div>
         </div>
 
+        <Input
+          label="Person (optional)"
+          placeholder="e.g. Riya — makes spending by person searchable"
+          maxLength={80}
+          value={formData.person || ''}
+          onChange={(e) => setFormData({ ...formData, person: e.target.value })}
+        />
         <Input
           label="Merchant / Description"
           placeholder="e.g. Amazon, Salary, Groceries..."
@@ -241,7 +258,7 @@ export default function TransactionModal({
         </div>
 
         {formData.type === 'transfer' && (
-          <p className="text-xs text-[#8E9192] -mt-2">
+          <p className="text-xs text-[var(--color-text-tertiary)] -mt-2">
             Transfers move money between your accounts and are excluded from income/expense totals.
           </p>
         )}
@@ -249,13 +266,13 @@ export default function TransactionModal({
         <div>
           <label
             htmlFor="tx-notes"
-            className="block text-sm font-medium text-[#404040] dark:text-[#C4C7C8] mb-1.5"
+            className="block text-sm font-medium text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary)] mb-1.5"
           >
             Notes (Optional)
           </label>
           <textarea
             id="tx-notes"
-            className="w-full px-3.5 py-2.5 text-sm font-sans text-[#0A0A0A] dark:text-white bg-white dark:bg-[#0A0A0A] border border-[#E5E5E5] dark:border-[#262626] rounded focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-[#0A0A0A] dark:focus:border-white transition-colors duration-150 resize-none"
+            className="w-full px-3.5 py-2.5 text-sm font-sans text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] bg-[var(--color-bg-secondary)] dark:bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] dark:border-[var(--color-border)] rounded focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-[#0A0A0A] dark:focus:border-white transition-colors duration-150 resize-none"
             rows={3}
             maxLength={500}
             placeholder="Add details about this transaction..."
@@ -264,13 +281,13 @@ export default function TransactionModal({
             aria-describedby={errors.notes ? 'tx-notes-error' : undefined}
           />
           {errors.notes && (
-            <p id="tx-notes-error" className="mt-1 text-xs text-[#ff6b6b]" role="alert">
+            <p id="tx-notes-error" className="mt-1 text-xs text-[var(--color-negative)]" role="alert">
               {errors.notes}
             </p>
           )}
         </div>
 
-        <div className="pt-4 flex justify-end gap-3 border-t border-[#E5E5E5] dark:border-[#262626]">
+        <div className="pt-4 flex justify-end gap-3 border-t border-[var(--color-border)] dark:border-[var(--color-border)]">
           <Button type="button" variant="ghost" onClick={onClose} disabled={isSaving}>
             Cancel
           </Button>

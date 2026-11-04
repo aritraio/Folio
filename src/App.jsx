@@ -9,6 +9,12 @@ import AnalyticsPage from '@/pages/AnalyticsPage';
 import BudgetsPage from '@/pages/BudgetsPage';
 import InvestmentsPage from '@/pages/InvestmentsPage';
 import SettingsPage from '@/pages/SettingsPage';
+import PlanPage from '@/pages/PlanPage';
+import MorePage from '@/pages/MorePage';
+import LearnPage from '@/pages/LearnPage';
+import AssistantPage from '@/pages/AssistantPage';
+import ImportPage from '@/pages/ImportPage';
+import LoginPage from '@/pages/LoginPage';
 import NotFoundPage from '@/pages/NotFoundPage';
 import { useCapacitor } from '@/utils/useCapacitor';
 
@@ -24,6 +30,12 @@ export default function App() {
           <Route path="/transactions" element={<TransactionsPage />} />
           <Route path="/accounts" element={<AccountsPage />} />
           <Route path="/analytics" element={<AnalyticsPage />} />
+          <Route path="/plan" element={<PlanPage />} />
+          <Route path="/more" element={<MorePage />} />
+          <Route path="/learn" element={<LearnPage />} />
+          <Route path="/assistant" element={<AssistantPage />} />
+          <Route path="/imports/new" element={<ImportPage />} />
+          <Route path="/login" element={<LoginPage />} />
           <Route path="/budgets" element={<BudgetsPage />} />
           <Route path="/investments" element={<InvestmentsPage />} />
           <Route path="/settings" element={<SettingsPage />} />

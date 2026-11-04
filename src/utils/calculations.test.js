@@ -154,9 +154,9 @@ describe('net worth history', () => {
     ];
     expect(calcNetWorthHistory(stored, [], []).map((h) => h.monthKey)).toEqual(['2026-08', '2026-09']);
   });
-  it('derives without fabricating growth factors and ends at current NW', () => {
+  it('shows only the known current valuation without stored history', () => {
     const out = calcNetWorthHistory([], txs, accounts, 3);
-    expect(out).toHaveLength(3);
+    expect(out).toHaveLength(1);
     expect(out[out.length - 1].netWorth).toBe(calcNetWorth(accounts));
   });
   it('returns [] with no basis', () => {

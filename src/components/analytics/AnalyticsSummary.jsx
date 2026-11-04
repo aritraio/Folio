@@ -9,18 +9,20 @@ function MetricCard({ icon: Icon, label, value, subtext, subtextClass }) {
   return (
     <div className="card p-5 flex flex-col gap-3 animate-fade-in-up">
       <div className="flex items-center justify-between">
-        <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[#8E9192] font-mono">
+        <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[var(--color-text-tertiary)] font-mono">
           {label}
         </span>
-        <div className="w-8 h-8 rounded border border-[#E5E5E5] dark:border-[#262626] bg-[#F5F5F5] dark:bg-[#1E1E1E] flex items-center justify-center">
-          <Icon className="w-4 h-4 text-[#0A0A0A] dark:text-white" />
+        <div className="w-8 h-8 rounded border border-[var(--color-border)] dark:border-[var(--color-border)] bg-[var(--color-bg-tertiary)] dark:bg-[var(--color-bg-tertiary)] flex items-center justify-center">
+          <Icon className="w-4 h-4 text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]" />
         </div>
       </div>
       <div>
-        <p className="text-xl font-bold font-mono tabular-nums text-[#0A0A0A] dark:text-white">{value}</p>
+        <p className="text-xl font-bold font-mono tabular-nums text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+          {value}
+        </p>
         {subtext && (
           <p
-            className={`text-xs mt-1 font-medium font-mono ${subtextClass || 'text-[#8E9192]'}`}
+            className={`text-xs mt-1 font-medium font-mono ${subtextClass || 'text-[var(--color-text-tertiary)]'}`}
           >
             {subtext}
           </p>
@@ -50,19 +52,16 @@ export default function AnalyticsSummary({
         value={formatINR(monthlySpending)}
         subtext={monthLabel}
       />
-      <MetricCard
-        icon={TrendingUp}
-        label="Income"
-        value={formatINR(monthlyIncome)}
-        subtext={monthLabel}
-      />
+      <MetricCard icon={TrendingUp} label="Income" value={formatINR(monthlyIncome)} subtext={monthLabel} />
       <MetricCard
         icon={Percent}
         label="Savings Rate"
         value={formatPercent(savingsRate)}
         subtext={savingsRate >= 20 ? 'Healthy' : savingsRate > 0 ? 'Could improve' : 'No savings'}
         subtextClass={
-          savingsRate >= 20 ? 'text-[#00a383] dark:text-[#00b894]' : 'text-[#e84118] dark:text-[#ff6b6b]'
+          savingsRate >= 20
+            ? 'text-[var(--color-positive)] dark:text-[var(--color-positive)]'
+            : 'text-[var(--color-negative)] dark:text-[var(--color-negative)]'
         }
       />
       <MetricCard
@@ -71,7 +70,9 @@ export default function AnalyticsSummary({
         value={formatChange(netCashFlow)}
         subtext={netCashFlow >= 0 ? 'Positive' : 'Negative'}
         subtextClass={
-          netCashFlow >= 0 ? 'text-[#00a383] dark:text-[#00b894]' : 'text-[#e84118] dark:text-[#ff6b6b]'
+          netCashFlow >= 0
+            ? 'text-[var(--color-positive)] dark:text-[var(--color-positive)]'
+            : 'text-[var(--color-negative)] dark:text-[var(--color-negative)]'
         }
       />
       <MetricCard

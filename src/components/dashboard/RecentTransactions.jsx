@@ -24,7 +24,7 @@ function TransactionRow({ tx, accounts, onEdit, onDelete }) {
       flex items-center justify-between gap-3
       py-3.5 px-2 -mx-2
       rounded
-      hover:bg-[#F5F5F5] dark:hover:bg-[#1E1E1E]
+      hover:bg-[var(--color-bg-tertiary)] dark:hover:bg-[var(--color-bg-tertiary)]
       transition-colors duration-150
       group
     "
@@ -38,19 +38,19 @@ function TransactionRow({ tx, accounts, onEdit, onDelete }) {
           }}
         />
         <div className="min-w-0">
-          <p className="text-sm font-medium text-[#0A0A0A] dark:text-white truncate">
+          <p className="text-sm font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] truncate">
             {tx.merchant}
           </p>
           <div className="flex items-center gap-2 mt-0.5 font-mono">
-            <span className="text-[11px] text-[#8E9192]">{tx.category}</span>
-            <span className="text-[#8E9192] text-[9px]">•</span>
-            <span className="text-[11px] text-[#8E9192]">
+            <span className="text-[11px] text-[var(--color-text-tertiary)]">{tx.category}</span>
+            <span className="text-[var(--color-text-tertiary)] text-[9px]">•</span>
+            <span className="text-[11px] text-[var(--color-text-tertiary)]">
               {formatDate(tx.date, 'MMM d')}
             </span>
             {account && (
               <>
-                <span className="text-[#8E9192] text-[9px]">•</span>
-                <span className="text-[11px] text-[#8E9192] truncate">
+                <span className="text-[var(--color-text-tertiary)] text-[9px]">•</span>
+                <span className="text-[11px] text-[var(--color-text-tertiary)] truncate">
                   {account.name.split(' ').slice(0, 2).join(' ')}
                 </span>
               </>
@@ -66,20 +66,20 @@ function TransactionRow({ tx, accounts, onEdit, onDelete }) {
           text-sm font-semibold font-mono tabular-nums
           ${
             isIncome
-              ? 'text-[#00a383] dark:text-[#00b894]'
+              ? 'text-[var(--color-positive)] dark:text-[var(--color-positive)]'
               : isTransfer
-                ? 'text-[#8E9192]'
-                : 'text-[#e84118] dark:text-[#ff6b6b]'
+                ? 'text-[var(--color-text-tertiary)]'
+                : 'text-[var(--color-negative)] dark:text-[var(--color-negative)]'
           }
         `}
         >
           {isIncome ? '+' : isTransfer ? '' : '−'}
           {formatINR(Math.abs(tx.amount))}
         </span>
-        <div className="flex items-center gap-1 opacity-100 md:opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
+        <div className="flex items-center gap-1 opacity-100 md:opacity-100 focus-within:opacity-100 transition-opacity">
           <button
             onClick={() => onEdit(tx)}
-            className="p-1.5 rounded hover:bg-[#E5E5E5] dark:hover:bg-[#262626] text-[#8E9192] hover:text-[#0A0A0A] dark:hover:text-white transition-colors"
+            className="p-1.5 rounded hover:bg-[#E5E5E5] dark:hover:bg-[#262626] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] dark:hover:text-[var(--color-text-primary)] transition-colors"
             title="Edit transaction"
             aria-label="Edit transaction"
           >
@@ -87,7 +87,7 @@ function TransactionRow({ tx, accounts, onEdit, onDelete }) {
           </button>
           <button
             onClick={() => onDelete(tx.id)}
-            className="p-1.5 rounded hover:bg-[rgba(255,107,107,0.15)] text-[#ff6b6b] transition-colors"
+            className="p-1.5 rounded hover:bg-[rgba(255,107,107,0.15)] text-[var(--color-negative)] transition-colors"
             title="Delete transaction"
             aria-label="Delete transaction"
           >
@@ -155,8 +155,12 @@ export default function RecentTransactions({ transactions = [], accounts = [] })
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h2 className="heading-sm text-[#0A0A0A] dark:text-white">Recent Transactions</h2>
-          <p className="text-xs text-[#8E9192] mt-0.5 font-mono uppercase tracking-widest">Latest activity</p>
+          <h2 className="heading-sm text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+            Recent Transactions
+          </h2>
+          <p className="text-xs text-[var(--color-text-tertiary)] mt-0.5 font-mono uppercase tracking-widest">
+            Latest activity
+          </p>
         </div>
         <Button
           variant="primary"
@@ -183,19 +187,19 @@ export default function RecentTransactions({ transactions = [], accounts = [] })
           ))}
         </div>
       ) : (
-        <p className="text-sm text-[#8E9192] py-8 text-center font-mono">
+        <p className="text-sm text-[var(--color-text-tertiary)] py-8 text-center font-mono">
           No transactions yet.
         </p>
       )}
 
       {/* View All link */}
-      <div className="mt-4 pt-4 border-t border-[#E5E5E5] dark:border-[#262626]">
+      <div className="mt-4 pt-4 border-t border-[var(--color-border)] dark:border-[var(--color-border)]">
         <Link
           to="/transactions"
           className="
             inline-flex items-center gap-2
             text-[11px] font-semibold uppercase tracking-[0.15em] font-mono
-            text-[#0A0A0A] dark:text-white hover:opacity-60
+            text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] hover:opacity-60
             transition-opacity duration-150
             group
           "

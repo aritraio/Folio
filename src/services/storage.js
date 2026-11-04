@@ -1,3 +1,4 @@
+import { workspace, atomic, isStaging } from './workspace';
 import { DEMO_PROFILES, INITIAL_SETTINGS } from '../data/mockData.js';
 import {
   STORAGE_KEYS as KEYS,
@@ -26,12 +27,14 @@ export function generateId(prefix = 'id') {
 /* ── Events ──────────────────────────────────────────── */
 
 export function notifyDataUpdated() {
+  if (isStaging()) return;
   if (typeof window !== 'undefined') {
     window.dispatchEvent(new Event(DATA_UPDATED_EVENT));
   }
 }
 
 function notifySettingsUpdated() {
+  if (isStaging()) return;
   if (typeof window !== 'undefined') {
     window.dispatchEvent(new Event(SETTINGS_UPDATED_EVENT));
     window.dispatchEvent(new Event(DATA_UPDATED_EVENT));
@@ -46,7 +49,7 @@ function notifySettingsUpdated() {
 export function subscribeToData(listener) {
   if (typeof window === 'undefined') return () => {};
   const onStorage = (e) => {
-    if (!e.key || e.key.startsWith('ledger_')) listener();
+    if (!e.key || e.key.startsWith('folio_v2_workspace:')) listener();
   };
   window.addEventListener('storage', onStorage);
   window.addEventListener(DATA_UPDATED_EVENT, listener);
@@ -62,7 +65,7 @@ export function subscribeToData(listener) {
 
 function getItem(key, fallback) {
   try {
-    const data = localStorage.getItem(key);
+    const data = workspace.getItem(key);
     if (data == null) return fallback;
     return JSON.parse(data);
   } catch (err) {
@@ -75,7 +78,7 @@ function getItem(key, fallback) {
 
 function setItem(key, value) {
   try {
-    localStorage.setItem(key, JSON.stringify(value));
+    workspace.setItem(key, JSON.stringify(value));
     return true;
   } catch (err) {
     console.error(`Error writing ${key} to localStorage:`, err);
@@ -98,7 +101,7 @@ function isPlainObject(v) {
 
 export function getSchemaVersion() {
   try {
-    const v = localStorage.getItem(KEYS.SCHEMA_VERSION);
+    const v = workspace.getItem(KEYS.SCHEMA_VERSION);
     return v ? Number(v) : 1;
   } catch {
     return 1;
@@ -110,7 +113,7 @@ export function getSchemaVersion() {
  */
 export function getActiveProfileId() {
   try {
-    const active = localStorage.getItem(KEYS.ACTIVE_PROFILE);
+    const active = workspace.getItem(KEYS.ACTIVE_PROFILE);
     if (active && DEMO_PROFILES[active]) return active;
   } catch {
     /* fall through */
@@ -139,18 +142,9 @@ export function getActiveProfileMetadata() {
  */
 export function initStorage() {
   try {
-    const isInitialized = localStorage.getItem(KEYS.INITIALIZED);
-    const schemaVersion = getSchemaVersion();
-    const settings = getItem(KEYS.SETTINGS, null);
-    const validStudentProfiles = ['sagnik', 'sourav', 'ankita'];
+    const isInitialized = workspace.getItem(KEYS.INITIALIZED);
     const activeProfileId = getActiveProfileId();
-
-    // Re-seed if uninitialized, outdated schema, or if demo user is not one of our student profiles
-    const isStudentProfile =
-      settings &&
-      validStudentProfiles.some((p) => DEMO_PROFILES[p]?.settings?.userName === settings.userName);
-
-    if (!isInitialized || schemaVersion < SCHEMA_VERSION || !settings || !isStudentProfile) {
+    if (!isInitialized) {
       const profileData = DEMO_PROFILES[activeProfileId] || DEMO_PROFILES.sagnik;
       setItem(KEYS.ACCOUNTS, profileData.accounts);
       setItem(KEYS.BUDGETS, profileData.budgets);
@@ -158,24 +152,24 @@ export function initStorage() {
       setItem(KEYS.NETWORTH_HISTORY, profileData.netWorthHistory);
       setItem(KEYS.SETTINGS, profileData.settings);
       setItem(KEYS.TRANSACTIONS, profileData.transactions);
-      localStorage.setItem(KEYS.ACTIVE_PROFILE, profileData.metadata.id);
-      localStorage.setItem(KEYS.INITIALIZED, 'true');
-      localStorage.setItem(KEYS.SCHEMA_VERSION, String(SCHEMA_VERSION));
+      workspace.setItem(KEYS.ACTIVE_PROFILE, profileData.metadata.id);
+      workspace.setItem(KEYS.INITIALIZED, 'true');
+      workspace.setItem(KEYS.SCHEMA_VERSION, String(SCHEMA_VERSION));
     }
 
     // Backfill schema version + any missing keys (forward-compat).
-    if (!localStorage.getItem(KEYS.SCHEMA_VERSION)) {
-      localStorage.setItem(KEYS.SCHEMA_VERSION, String(SCHEMA_VERSION));
+    if (!workspace.getItem(KEYS.SCHEMA_VERSION)) {
+      workspace.setItem(KEYS.SCHEMA_VERSION, String(SCHEMA_VERSION));
     }
-    if (!localStorage.getItem(KEYS.ACTIVE_PROFILE)) {
-      localStorage.setItem(KEYS.ACTIVE_PROFILE, 'sagnik');
+    if (!workspace.getItem(KEYS.ACTIVE_PROFILE)) {
+      workspace.setItem(KEYS.ACTIVE_PROFILE, 'sagnik');
     }
-    if (localStorage.getItem(KEYS.TRANSACTIONS) == null) setItem(KEYS.TRANSACTIONS, []);
-    if (localStorage.getItem(KEYS.ACCOUNTS) == null) setItem(KEYS.ACCOUNTS, []);
-    if (localStorage.getItem(KEYS.BUDGETS) == null) setItem(KEYS.BUDGETS, []);
-    if (localStorage.getItem(KEYS.INVESTMENTS) == null) setItem(KEYS.INVESTMENTS, []);
-    if (localStorage.getItem(KEYS.NETWORTH_HISTORY) == null) setItem(KEYS.NETWORTH_HISTORY, []);
-    if (localStorage.getItem(KEYS.SETTINGS) == null) setItem(KEYS.SETTINGS, INITIAL_SETTINGS);
+    if (workspace.getItem(KEYS.TRANSACTIONS) == null) setItem(KEYS.TRANSACTIONS, []);
+    if (workspace.getItem(KEYS.ACCOUNTS) == null) setItem(KEYS.ACCOUNTS, []);
+    if (workspace.getItem(KEYS.BUDGETS) == null) setItem(KEYS.BUDGETS, []);
+    if (workspace.getItem(KEYS.INVESTMENTS) == null) setItem(KEYS.INVESTMENTS, []);
+    if (workspace.getItem(KEYS.NETWORTH_HISTORY) == null) setItem(KEYS.NETWORTH_HISTORY, []);
+    if (workspace.getItem(KEYS.SETTINGS) == null) setItem(KEYS.SETTINGS, INITIAL_SETTINGS);
   } catch (err) {
     console.error('Storage initialization failed:', err);
   }
@@ -203,12 +197,12 @@ export function switchDemoProfile(targetId) {
       settings: getItem(KEYS.SETTINGS, null),
       transactions: getItem(KEYS.TRANSACTIONS, []),
     };
-    localStorage.setItem(`ledger_profile_${currentId}`, JSON.stringify(currentSnapshot));
+    workspace.setItem(`ledger_profile_${currentId}`, JSON.stringify(currentSnapshot));
 
     // 2. Load target profile data: either previously modified snapshot or fresh seed
     let targetData = null;
     try {
-      const saved = localStorage.getItem(`ledger_profile_${targetId}`);
+      const saved = workspace.getItem(`ledger_profile_${targetId}`);
       if (saved) targetData = JSON.parse(saved);
     } catch {
       targetData = null;
@@ -222,9 +216,9 @@ export function switchDemoProfile(targetId) {
     setItem(KEYS.SETTINGS, targetData?.settings || profileSeed.settings);
     setItem(KEYS.TRANSACTIONS, targetData?.transactions || profileSeed.transactions);
 
-    localStorage.setItem(KEYS.ACTIVE_PROFILE, targetId);
-    localStorage.setItem(KEYS.INITIALIZED, 'true');
-    localStorage.setItem(KEYS.SCHEMA_VERSION, String(SCHEMA_VERSION));
+    workspace.setItem(KEYS.ACTIVE_PROFILE, targetId);
+    workspace.setItem(KEYS.INITIALIZED, 'true');
+    workspace.setItem(KEYS.SCHEMA_VERSION, String(SCHEMA_VERSION));
 
     notifyDataUpdated();
     notifySettingsUpdated();
@@ -242,7 +236,7 @@ export function resetDemoProfile(profileId) {
   const id = profileId || getActiveProfileId();
   if (!DEMO_PROFILES[id]) return false;
   try {
-    localStorage.removeItem(`ledger_profile_${id}`);
+    workspace.removeItem(`ledger_profile_${id}`);
     const target = DEMO_PROFILES[id];
     if (id === getActiveProfileId()) {
       setItem(KEYS.ACCOUNTS, target.accounts);
@@ -355,6 +349,57 @@ export function validateBackup(data) {
   if (data.settings !== undefined && !isPlainObject(data.settings)) {
     errors.push('settings must be an object');
   }
+  if (data.planning !== undefined) {
+    const p = data.planning;
+    if (
+      !isPlainObject(p) ||
+      !Array.isArray(p.goals) ||
+      !Array.isArray(p.recurring) ||
+      !Array.isArray(p.completedLessons)
+    )
+      errors.push('Invalid planning data');
+    else {
+      if (
+        p.goals.some(
+          (g) =>
+            !isPlainObject(g) ||
+            typeof g.id !== 'string' ||
+            typeof g.name !== 'string' ||
+            !Number.isFinite(g.target) ||
+            g.target <= 0 ||
+            !Number.isFinite(g.allocated) ||
+            g.allocated < 0
+        )
+      )
+        errors.push('Invalid goal');
+      if (
+        p.recurring.some(
+          (r) =>
+            !isPlainObject(r) ||
+            typeof r.id !== 'string' ||
+            typeof r.name !== 'string' ||
+            !Number.isFinite(r.amount) ||
+            r.amount <= 0 ||
+            !/^\d{4}-\d{2}-\d{2}$/.test(r.nextDue) ||
+            !['weekly', 'monthly', 'yearly'].includes(r.frequency)
+        )
+      )
+        errors.push('Invalid recurring commitment');
+      if (p.completedLessons.some((l) => typeof l !== 'string')) errors.push('Invalid lesson progress');
+    }
+  }
+  if (
+    data.imports !== undefined &&
+    (!Array.isArray(data.imports) ||
+      data.imports.some(
+        (j) =>
+          !isPlainObject(j) ||
+          typeof j.id !== 'string' ||
+          !Array.isArray(j.items) ||
+          typeof j.createdAt !== 'string'
+      ))
+  )
+    errors.push('Invalid import history');
   return { ok: errors.length === 0, errors };
 }
 
@@ -376,6 +421,11 @@ function normalizeTransaction(input) {
 }
 
 export function saveTransaction(transaction) {
+  const result = atomic(() => saveTransactionInternal(transaction));
+  notifyDataUpdated();
+  return result;
+}
+function saveTransactionInternal(transaction) {
   const newTx = normalizeTransaction(transaction);
   const transactions = getTransactions();
   const updated = [newTx, ...transactions];
@@ -392,6 +442,11 @@ export function saveTransaction(transaction) {
  *   updateTransaction(id, patch)        (documented API)
  */
 export function updateTransaction(idOrTx, patch) {
+  const result = atomic(() => updateTransactionInternal(idOrTx, patch));
+  notifyDataUpdated();
+  return result;
+}
+function updateTransactionInternal(idOrTx, patch) {
   let updatedTx;
   if (typeof idOrTx === 'string') {
     updatedTx = { ...(patch || {}), id: idOrTx };
@@ -424,6 +479,11 @@ export function updateTransaction(idOrTx, patch) {
 }
 
 export function deleteTransaction(id) {
+  const result = atomic(() => deleteTransactionInternal(id));
+  notifyDataUpdated();
+  return result;
+}
+function deleteTransactionInternal(id) {
   const transactions = getTransactions();
   const txToDelete = transactions.find((t) => t.id === id);
 
@@ -443,6 +503,7 @@ export function deleteTransaction(id) {
  * income/expense totals elsewhere.
  */
 function deltaForAccount(tx, accountId) {
+  if (tx.balanceImpact === 'history') return 0;
   const amount = Number(tx.amount) || 0;
   const acc = getAccounts().find((a) => a.id === accountId);
   // Fallback if account missing: assume asset semantics.
@@ -455,7 +516,7 @@ function deltaForAccount(tx, accountId) {
     return accType === 'credit' ? -amount : amount;
   }
   if (tx.type === 'transfer') {
-    if (tx.accountId === accountId) return -amount;
+    if (tx.accountId === accountId) return accType === 'credit' ? amount : -amount;
     if (tx.toAccountId === accountId) return accType === 'credit' ? -amount : amount;
     return 0;
   }
@@ -477,7 +538,7 @@ function applyTransactionToAccounts(tx, mode = 'add') {
     if (idx === -1) return;
     const acc = accounts[idx];
     // NOTE: no Math.max(0, ...) clamp — overdrafts/credit must stay truthful.
-    accounts[idx] = { ...acc, balance: Number(acc.balance || 0) + sign * delta };
+    accounts[idx] = { ...acc, balance: Math.round((Number(acc.balance || 0) + sign * delta) * 100) / 100 };
     touched = true;
   };
 
@@ -604,7 +665,19 @@ export function getAccountUsage(accountId) {
 /** Reassign all transactions from one account to another. Returns moved count. */
 export function reassignTransactions(fromAccountId, toAccountId) {
   if (!fromAccountId || !toAccountId || fromAccountId === toAccountId) return 0;
+  const accounts = getAccounts();
+  if (accounts.find((a) => a.id === fromAccountId)?.type !== accounts.find((a) => a.id === toAccountId)?.type)
+    throw new Error('Reassign only to an account of the same type.');
   const txs = getTransactions();
+  if (
+    txs.some(
+      (t) =>
+        t.type === 'transfer' &&
+        [t.accountId, t.toAccountId].includes(fromAccountId) &&
+        [t.accountId, t.toAccountId].includes(toAccountId)
+    )
+  )
+    throw new Error('Reassignment would merge both sides of a transfer. Choose another account.');
   let moved = 0;
   const updated = txs.map((t) => {
     let changed = false;
@@ -708,7 +781,7 @@ export function saveInvestment(investment) {
   const investments = getInvestments();
   const units = Number(investment.units) || 0;
   const avgPrice = Number(investment.avgPrice) || 0;
-  const currentPrice = Number(investment.currentPrice) || avgPrice;
+  const currentPrice = Number(investment.currentPrice ?? avgPrice);
 
   const newInv = {
     ...investment,
@@ -736,7 +809,7 @@ export function updateInvestment(idOrInv, patch) {
   const merged = { ...investments[index], ...updatedInvestment };
   const units = Number(merged.units) || 0;
   const avgPrice = Number(merged.avgPrice) || 0;
-  const currentPrice = Number(merged.currentPrice) || avgPrice;
+  const currentPrice = Number(merged.currentPrice ?? avgPrice);
 
   investments[index] = {
     ...merged,
@@ -829,6 +902,8 @@ export function exportAllData() {
     investments: getInvestments(),
     settings: getSettings(),
     netWorthHistory: getNetWorthHistory(),
+    planning: getItem(`planning_${getActiveProfileId()}`, { goals: [], recurring: [], completedLessons: [] }),
+    imports: getItem(`imports_${getActiveProfileId()}`, []),
   };
   return JSON.stringify(backup, null, 2);
 }
@@ -859,6 +934,12 @@ export function createPreImportBackup() {
 }
 
 export function importData(jsonString) {
+  const result = atomic(() => importDataInternal(jsonString));
+  notifyDataUpdated();
+  notifySettingsUpdated();
+  return result;
+}
+function importDataInternal(jsonString) {
   let data;
   try {
     data = typeof jsonString === 'string' ? JSON.parse(jsonString) : jsonString;
@@ -885,6 +966,8 @@ export function importData(jsonString) {
   if (data.settings && typeof data.settings === 'object')
     setItem(KEYS.SETTINGS, { ...INITIAL_SETTINGS, ...data.settings });
 
+  if (data.planning) setItem(`planning_${getActiveProfileId()}`, data.planning);
+  if (data.imports) setItem(`imports_${getActiveProfileId()}`, data.imports);
   notifyDataUpdated();
   notifySettingsUpdated();
   return true;
@@ -902,15 +985,17 @@ export function clearAllData() {
 export function resetToDemo() {
   try {
     const activeId = getActiveProfileId();
-    localStorage.removeItem(`ledger_profile_${activeId}`);
-    localStorage.removeItem(KEYS.TRANSACTIONS);
-    localStorage.removeItem(KEYS.ACCOUNTS);
-    localStorage.removeItem(KEYS.BUDGETS);
-    localStorage.removeItem(KEYS.INVESTMENTS);
-    localStorage.removeItem(KEYS.SETTINGS);
-    localStorage.removeItem(KEYS.NETWORTH_HISTORY);
-    localStorage.removeItem(KEYS.INITIALIZED);
-    localStorage.setItem(KEYS.SCHEMA_VERSION, String(SCHEMA_VERSION));
+    workspace.removeItem(`ledger_profile_${activeId}`);
+    workspace.removeItem(`planning_${getActiveProfileId()}`);
+    workspace.removeItem(`imports_${getActiveProfileId()}`);
+    workspace.removeItem(KEYS.TRANSACTIONS);
+    workspace.removeItem(KEYS.ACCOUNTS);
+    workspace.removeItem(KEYS.BUDGETS);
+    workspace.removeItem(KEYS.INVESTMENTS);
+    workspace.removeItem(KEYS.SETTINGS);
+    workspace.removeItem(KEYS.NETWORTH_HISTORY);
+    workspace.removeItem(KEYS.INITIALIZED);
+    workspace.setItem(KEYS.SCHEMA_VERSION, String(SCHEMA_VERSION));
 
     initStorage();
     notifyDataUpdated();
@@ -925,22 +1010,29 @@ export function resetToDemo() {
 /** Truly erase everything — no re-seed. App shows empty states. */
 export function eraseAllData() {
   try {
-    localStorage.removeItem(KEYS.TRANSACTIONS);
-    localStorage.removeItem(KEYS.ACCOUNTS);
-    localStorage.removeItem(KEYS.BUDGETS);
-    localStorage.removeItem(KEYS.INVESTMENTS);
-    localStorage.removeItem(KEYS.SETTINGS);
-    localStorage.removeItem(KEYS.NETWORTH_HISTORY);
-    localStorage.removeItem(KEYS.INITIALIZED);
-    localStorage.removeItem(KEYS.ACTIVE_PROFILE);
-    Object.keys(DEMO_PROFILES).forEach((k) => localStorage.removeItem(`ledger_profile_${k}`));
-    localStorage.setItem(KEYS.SCHEMA_VERSION, String(SCHEMA_VERSION));
+    workspace.removeItem(`planning_${getActiveProfileId()}`);
+    workspace.removeItem(`imports_${getActiveProfileId()}`);
+    workspace.removeItem(KEYS.TRANSACTIONS);
+    workspace.removeItem(KEYS.ACCOUNTS);
+    workspace.removeItem(KEYS.BUDGETS);
+    workspace.removeItem(KEYS.INVESTMENTS);
+    workspace.removeItem(KEYS.SETTINGS);
+    workspace.removeItem(KEYS.NETWORTH_HISTORY);
+    workspace.removeItem(KEYS.INITIALIZED);
+    workspace.removeItem(KEYS.ACTIVE_PROFILE);
+    Object.keys(DEMO_PROFILES).forEach((k) => {
+      workspace.removeItem(`ledger_profile_${k}`);
+      workspace.removeItem(`planning_${k}`);
+      workspace.removeItem(`imports_${k}`);
+    });
+    workspace.setItem(KEYS.SCHEMA_VERSION, String(SCHEMA_VERSION));
     setItem(KEYS.TRANSACTIONS, []);
     setItem(KEYS.ACCOUNTS, []);
     setItem(KEYS.BUDGETS, []);
     setItem(KEYS.INVESTMENTS, []);
     setItem(KEYS.NETWORTH_HISTORY, []);
     setItem(KEYS.SETTINGS, { ...INITIAL_SETTINGS, userName: 'User', email: '' });
+    workspace.setItem(KEYS.INITIALIZED, 'true');
     notifyDataUpdated();
     notifySettingsUpdated();
     return true;

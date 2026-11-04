@@ -19,32 +19,37 @@ export default function TransactionRow({ transaction, onEdit, onDelete, accountN
   const isIncome = transaction.type === 'income';
   const isTransfer = transaction.type === 'transfer';
   const amountClass = isIncome
-    ? 'text-[#00a383] dark:text-[#00b894]'
+    ? 'text-[var(--color-positive)] dark:text-[var(--color-positive)]'
     : isTransfer
-      ? 'text-[#8E9192]'
-      : 'text-[#e84118] dark:text-[#ff6b6b]';
+      ? 'text-[var(--color-text-tertiary)]'
+      : 'text-[var(--color-negative)] dark:text-[var(--color-negative)]';
   const amountPrefix = isIncome ? '+' : isTransfer ? '' : '−';
 
   const dotColor = chart.monoColor(CATEGORY_COLORS[transaction.category] || FALLBACK_CATEGORY_COLOR);
 
   return (
     <>
-      <tr className="group border-b border-[#E5E5E5] dark:border-[#262626] hover:bg-[#F5F5F5]/60 dark:hover:bg-[#1E1E1E]/60 transition-colors">
-        <td className="py-3.5 pl-4 pr-3 text-xs md:text-sm text-[#8E9192] whitespace-nowrap font-mono tabular-nums">
+      <tr className="group border-b border-[var(--color-border)] dark:border-[var(--color-border)] hover:bg-[var(--color-bg-tertiary)]/60 dark:hover:bg-[var(--color-bg-tertiary)]/60 transition-colors">
+        <td className="py-3.5 pl-4 pr-3 text-xs md:text-sm text-[var(--color-text-tertiary)] whitespace-nowrap font-mono tabular-nums">
           <div className="flex items-center gap-1.5">
-            <Calendar className="w-3.5 h-3.5 text-[#8E9192] shrink-0" />
+            <Calendar className="w-3.5 h-3.5 text-[var(--color-text-tertiary)] shrink-0" />
             <span>{formatDate(transaction.date, 'MMM d, yyyy')}</span>
           </div>
         </td>
 
         <td className="py-3.5 px-3">
           <div className="flex flex-col">
-            <span className="text-sm font-medium text-[#0A0A0A] dark:text-white flex items-center gap-1.5">
-              {isTransfer && <ArrowLeftRight className="w-3.5 h-3.5 text-[#8E9192]" aria-label="Transfer" />}
+            <span className="text-sm font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] flex items-center gap-1.5">
+              {isTransfer && (
+                <ArrowLeftRight
+                  className="w-3.5 h-3.5 text-[var(--color-text-tertiary)]"
+                  aria-label="Transfer"
+                />
+              )}
               {transaction.merchant || transaction.description || 'Unknown'}
             </span>
             {transaction.notes && (
-              <span className="text-xs text-[#8E9192] truncate max-w-[280px] mt-0.5 font-mono">
+              <span className="text-xs text-[var(--color-text-tertiary)] truncate max-w-[280px] mt-0.5 font-mono">
                 {transaction.notes}
               </span>
             )}
@@ -57,16 +62,14 @@ export default function TransactionRow({ transaction, onEdit, onDelete, accountN
           </Badge>
         </td>
 
-        <td className="py-3.5 px-3 text-xs md:text-sm text-[#404040] dark:text-[#C4C7C8]">
+        <td className="py-3.5 px-3 text-xs md:text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary)]">
           <div className="flex items-center gap-1.5 font-mono text-xs truncate max-w-[150px]">
-            <CreditCard className="w-3.5 h-3.5 text-[#8E9192] shrink-0" />
+            <CreditCard className="w-3.5 h-3.5 text-[var(--color-text-tertiary)] shrink-0" />
             <span className="truncate">{accountName || transaction.accountId}</span>
           </div>
         </td>
 
-        <td
-          className={`py-3.5 px-3 text-sm font-mono tabular-nums text-right font-semibold ${amountClass}`}
-        >
+        <td className={`py-3.5 px-3 text-sm font-mono tabular-nums text-right font-semibold ${amountClass}`}>
           {amountPrefix}
           {formatINR(transaction.amount, { showSymbol: true })}
         </td>
@@ -76,7 +79,9 @@ export default function TransactionRow({ transaction, onEdit, onDelete, accountN
             <Button
               variant="ghost"
               size="sm"
-              icon={<Pencil className="w-4 h-4 text-[#71717A] hover:text-[#0A0A0A] dark:hover:text-white" />}
+              icon={
+                <Pencil className="w-4 h-4 text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] dark:hover:text-[var(--color-text-primary)]" />
+              }
               onClick={() => onEdit(transaction)}
               className="!p-1.5 hover:bg-[#E5E5E5] dark:hover:bg-[#262626] rounded transition-colors"
               aria-label="Edit transaction"
@@ -85,7 +90,7 @@ export default function TransactionRow({ transaction, onEdit, onDelete, accountN
             <Button
               variant="ghost"
               size="sm"
-              icon={<Trash2 className="w-4 h-4 text-[#ff6b6b]" />}
+              icon={<Trash2 className="w-4 h-4 text-[var(--color-negative)]" />}
               onClick={() => setShowConfirmDelete(true)}
               className="!p-1.5 hover:bg-[rgba(255,107,107,0.15)] rounded transition-colors"
               aria-label="Delete transaction"

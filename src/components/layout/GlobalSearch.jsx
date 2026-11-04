@@ -135,11 +135,11 @@ export default function GlobalSearch({ isOpen, onClose }) {
       aria-label="Global search"
     >
       <div
-        className="w-full max-w-2xl bg-white dark:bg-[#141414] rounded-md overflow-hidden animate-fade-in-scale motion-reduce:animate-none border border-[#E5E5E5] dark:border-[#262626]"
+        className="w-full max-w-2xl bg-[var(--color-bg-secondary)] dark:bg-[var(--color-bg-secondary)] rounded-md overflow-hidden animate-fade-in-scale motion-reduce:animate-none border border-[var(--color-border)] dark:border-[var(--color-border)]"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center px-4 border-b border-[#E5E5E5] dark:border-[#262626]">
-          <Search className="w-5 h-5 text-[#8E9192] shrink-0" aria-hidden="true" />
+        <div className="flex items-center px-4 border-b border-[var(--color-border)] dark:border-[var(--color-border)]">
+          <Search className="w-5 h-5 text-[var(--color-text-tertiary)] shrink-0" aria-hidden="true" />
           <input
             ref={inputRef}
             type="text"
@@ -147,7 +147,7 @@ export default function GlobalSearch({ isOpen, onClose }) {
             aria-expanded={hasResults}
             aria-controls="global-search-results"
             aria-label="Search transactions, accounts, budgets, investments"
-            className="w-full bg-transparent border-0 py-4 px-3 text-lg text-[#0A0A0A] dark:text-white placeholder-[#8E9192] focus:outline-none focus:ring-0"
+            className="w-full bg-transparent border-0 py-4 px-3 text-lg text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] placeholder-[#8E9192] focus:outline-none focus:ring-0"
             placeholder="Search transactions, accounts, budgets…"
             value={query}
             onChange={(e) => {
@@ -163,7 +163,7 @@ export default function GlobalSearch({ isOpen, onClose }) {
                 setTimeout(() => inputRef.current?.focus(), 10);
               }}
               aria-label="Clear search"
-              className="p-1.5 rounded text-[#8E9192] hover:text-[#0A0A0A] hover:bg-[#F5F5F5] dark:hover:text-white dark:hover:bg-[#1E1E1E] transition-colors"
+              className="p-1.5 rounded text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-tertiary)] dark:hover:text-[var(--color-text-primary)] dark:hover:bg-[var(--color-bg-tertiary)] transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -172,7 +172,7 @@ export default function GlobalSearch({ isOpen, onClose }) {
 
         <div className="max-h-[60vh] overflow-y-auto" id="global-search-results" role="listbox">
           {hasQuery && !hasResults ? (
-            <div className="px-6 py-12 text-center text-[#8E9192]">
+            <div className="px-6 py-12 text-center text-[var(--color-text-tertiary)]">
               <p>No results found for &ldquo;{query}&rdquo;</p>
             </div>
           ) : (
@@ -183,8 +183,8 @@ export default function GlobalSearch({ isOpen, onClose }) {
                     <button
                       className={`w-full text-left px-4 py-3 flex items-center justify-between group transition-colors ${
                         idx === selectedIndex
-                          ? 'bg-[#F5F5F5] dark:bg-[#1E1E1E]'
-                          : 'hover:bg-[#F5F5F5]/50 dark:hover:bg-[#1E1E1E]/50'
+                          ? 'bg-[var(--color-bg-tertiary)] dark:bg-[var(--color-bg-tertiary)]'
+                          : 'hover:bg-[var(--color-bg-tertiary)]/50 dark:hover:bg-[var(--color-bg-tertiary)]/50'
                       }`}
                       onMouseEnter={() => setSelectedIndex(idx)}
                       onClick={() => handleSelect(item)}
@@ -202,10 +202,10 @@ export default function GlobalSearch({ isOpen, onClose }) {
                           }}
                         />
                         <div className="truncate">
-                          <div className="text-sm font-semibold text-[#0A0A0A] dark:text-white truncate">
+                          <div className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] truncate">
                             {item.data.merchant || item.data.description}
                           </div>
-                          <div className="text-xs text-[#8E9192] truncate flex items-center gap-2">
+                          <div className="text-xs text-[var(--color-text-tertiary)] truncate flex items-center gap-2">
                             <span>{item.data.category}</span>
                             <span>•</span>
                             <span>{formatDate(item.data.date)}</span>
@@ -216,10 +216,10 @@ export default function GlobalSearch({ isOpen, onClose }) {
                         <span
                           className={`font-mono font-medium tabular-nums ${
                             item.data.type === 'expense'
-                              ? 'text-[#ff6b6b]'
+                              ? 'text-[var(--color-negative)]'
                               : item.data.type === 'income'
-                                ? 'text-[#00b894]'
-                                : 'text-[#8E9192]'
+                                ? 'text-[var(--color-positive)]'
+                                : 'text-[var(--color-text-tertiary)]'
                           }`}
                         >
                           {item.data.type === 'expense' ? '−' : item.data.type === 'income' ? '+' : ''}
@@ -228,8 +228,8 @@ export default function GlobalSearch({ isOpen, onClose }) {
                         <ArrowRight
                           className={`w-4 h-4 transition-colors ${
                             idx === selectedIndex
-                              ? 'text-[#8E9192]'
-                              : 'text-transparent group-hover:text-[#8E9192]'
+                              ? 'text-[var(--color-text-tertiary)]'
+                              : 'text-transparent group-hover:text-[var(--color-text-tertiary)]'
                           }`}
                         />
                       </div>
@@ -238,17 +238,17 @@ export default function GlobalSearch({ isOpen, onClose }) {
                     <button
                       className={`w-full text-left px-4 py-3 flex items-center justify-between group transition-colors ${
                         idx === selectedIndex
-                          ? 'bg-[#F5F5F5] dark:bg-[#1E1E1E]'
-                          : 'hover:bg-[#F5F5F5]/50 dark:hover:bg-[#1E1E1E]/50'
+                          ? 'bg-[var(--color-bg-tertiary)] dark:bg-[var(--color-bg-tertiary)]'
+                          : 'hover:bg-[var(--color-bg-tertiary)]/50 dark:hover:bg-[var(--color-bg-tertiary)]/50'
                       }`}
                       onMouseEnter={() => setSelectedIndex(idx)}
                       onClick={() => handleSelect(item)}
                     >
                       <div className="truncate">
-                        <div className="text-xs uppercase tracking-wider text-[#8E9192] mb-0.5 font-mono">
+                        <div className="text-xs uppercase tracking-wider text-[var(--color-text-tertiary)] mb-0.5 font-mono">
                           {item.kind}
                         </div>
-                        <div className="text-sm font-semibold text-[#0A0A0A] dark:text-white truncate">
+                        <div className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] truncate">
                           {item.kind === 'account'
                             ? item.data.name
                             : item.kind === 'budget'
@@ -256,19 +256,19 @@ export default function GlobalSearch({ isOpen, onClose }) {
                               : item.data.name}
                         </div>
                       </div>
-                      <ArrowRight className="w-4 h-4 text-[#8E9192]" />
+                      <ArrowRight className="w-4 h-4 text-[var(--color-text-tertiary)]" />
                     </button>
                   )}
                 </li>
               ))}
               {hasQuery && hasResults && (
-                <li className="px-4 py-2 border-t border-[#E5E5E5] dark:border-[#262626] mt-2">
+                <li className="px-4 py-2 border-t border-[var(--color-border)] dark:border-[var(--color-border)] mt-2">
                   <button
                     onClick={() => {
                       navigate(`/transactions?search=${encodeURIComponent(query.trim())}`);
                       onClose();
                     }}
-                    className="w-full py-2 text-sm text-center font-medium text-[#0A0A0A] dark:text-white hover:opacity-70 underline underline-offset-2 transition-opacity"
+                    className="w-full py-2 text-sm text-center font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] hover:opacity-70 underline underline-offset-2 transition-opacity"
                   >
                     View all results for &ldquo;{query.trim()}&rdquo;
                   </button>
@@ -278,25 +278,25 @@ export default function GlobalSearch({ isOpen, onClose }) {
           )}
         </div>
 
-        <div className="px-4 py-3 bg-[#F5F5F5] dark:bg-[#0A0A0A] text-xs text-[#8E9192] border-t border-[#E5E5E5] dark:border-[#262626] flex items-center justify-between">
+        <div className="px-4 py-3 bg-[var(--color-bg-tertiary)] dark:bg-[var(--color-bg-tertiary)] text-xs text-[var(--color-text-tertiary)] border-t border-[var(--color-border)] dark:border-[var(--color-border)] flex items-center justify-between">
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1">
-              <kbd className="px-1.5 py-0.5 bg-white dark:bg-[#1E1E1E] border border-[#E5E5E5] dark:border-[#262626] rounded text-[#404040] dark:text-[#C4C7C8] font-mono">
+              <kbd className="px-1.5 py-0.5 bg-[var(--color-bg-secondary)] dark:bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] dark:border-[var(--color-border)] rounded text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary)] font-mono">
                 ↑
               </kbd>{' '}
-              <kbd className="px-1.5 py-0.5 bg-white dark:bg-[#1E1E1E] border border-[#E5E5E5] dark:border-[#262626] rounded text-[#404040] dark:text-[#C4C7C8] font-mono">
+              <kbd className="px-1.5 py-0.5 bg-[var(--color-bg-secondary)] dark:bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] dark:border-[var(--color-border)] rounded text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary)] font-mono">
                 ↓
               </kbd>{' '}
               to navigate
             </span>
             <span className="flex items-center gap-1">
-              <kbd className="px-1.5 py-0.5 bg-white dark:bg-[#1E1E1E] border border-[#E5E5E5] dark:border-[#262626] rounded text-[#404040] dark:text-[#C4C7C8] font-mono">
+              <kbd className="px-1.5 py-0.5 bg-[var(--color-bg-secondary)] dark:bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] dark:border-[var(--color-border)] rounded text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary)] font-mono">
                 Enter
               </kbd>{' '}
               to select
             </span>
             <span className="flex items-center gap-1">
-              <kbd className="px-1.5 py-0.5 bg-white dark:bg-[#1E1E1E] border border-[#E5E5E5] dark:border-[#262626] rounded text-[#404040] dark:text-[#C4C7C8] font-mono">
+              <kbd className="px-1.5 py-0.5 bg-[var(--color-bg-secondary)] dark:bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] dark:border-[var(--color-border)] rounded text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary)] font-mono">
                 Esc
               </kbd>{' '}
               to close

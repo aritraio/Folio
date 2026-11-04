@@ -10,13 +10,13 @@ import useChartTheme from '@/utils/useChartTheme';
 function CategoryComparisonTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-[#141414] border border-[#262626] rounded px-4 py-3 space-y-1.5">
-      <p className="text-xs font-semibold text-[#8E9192] font-mono">{label}</p>
+    <div className="bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded px-4 py-3 space-y-1.5">
+      <p className="text-xs font-semibold text-[var(--color-text-tertiary)] font-mono">{label}</p>
       {payload.map((entry) => (
         <div key={entry.name} className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full" style={{ background: entry.fill || entry.color }} />
-          <span className="text-xs text-[#8E9192]">{entry.name}:</span>
-          <span className="text-sm font-semibold font-mono tabular-nums text-white">
+          <span className="text-xs text-[var(--color-text-tertiary)]">{entry.name}:</span>
+          <span className="text-sm font-semibold font-mono tabular-nums text-[var(--color-text-primary)]">
             {formatINR(entry.value)}
           </span>
         </div>
@@ -76,8 +76,10 @@ export default function CategoryComparisonChart({ transactions = [], months = []
       style={{ animationDelay: '0.2s' }}
     >
       <div className="mb-5">
-        <h2 className="heading-sm text-[#0A0A0A] dark:text-white">Category Comparison</h2>
-        <p className="text-xs text-[#8E9192] mt-0.5 font-mono uppercase tracking-widest">
+        <h2 className="heading-sm text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+          Category Comparison
+        </h2>
+        <p className="text-xs text-[var(--color-text-tertiary)] mt-0.5 font-mono uppercase tracking-widest">
           Spending by category across months
         </p>
       </div>
@@ -116,14 +118,14 @@ export default function CategoryComparisonChart({ transactions = [], months = []
       </div>
 
       {/* Legend */}
-      <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 mt-4 pt-3 border-t border-[#E5E5E5] dark:border-[#262626]">
+      <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 mt-4 pt-3 border-t border-[var(--color-border)] dark:border-[var(--color-border)]">
         {categories.map((cat, idx) => (
           <div key={cat} className="flex items-center gap-1.5">
             <span
               className="w-2.5 h-2.5 rounded-sm shrink-0"
               style={{ background: palette[idx % palette.length] }}
             />
-            <span className="text-xs text-[#8E9192]">{cat}</span>
+            <span className="text-xs text-[var(--color-text-tertiary)]">{cat}</span>
           </div>
         ))}
       </div>

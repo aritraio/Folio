@@ -3,6 +3,7 @@ import Modal from '../ui/Modal';
 import Input from '../ui/Input';
 import Select from '../ui/Select';
 import Button from '../ui/Button';
+import { getCurrencySymbol } from '../../utils/formatCurrency';
 
 const TYPE_OPTIONS = [
   { value: 'Mutual Fund', label: 'Mutual Fund' },
@@ -39,7 +40,7 @@ export default function HoldingModal({ isOpen, onClose, holding, onSave }) {
           ...holding,
           units: String(holding.units || ''),
           avgPrice: String(holding.avgPrice || ''),
-          currentPrice: String(holding.currentPrice || ''),
+          currentPrice: String(holding.currentPrice ?? ''),
         });
       } else {
         setFormData(INITIAL_STATE);
@@ -66,7 +67,7 @@ export default function HoldingModal({ isOpen, onClose, holding, onSave }) {
     if (
       formData.currentPrice === '' ||
       isNaN(Number(formData.currentPrice)) ||
-      Number(formData.currentPrice) <= 0
+      Number(formData.currentPrice) < 0
     ) {
       newErrors.currentPrice = 'Valid current price is required';
     }
@@ -84,6 +85,7 @@ export default function HoldingModal({ isOpen, onClose, holding, onSave }) {
 
       onSave({
         ...formData,
+        valuedAt: new Date().toISOString(),
         units,
         avgPrice,
         currentPrice,
@@ -95,7 +97,11 @@ export default function HoldingModal({ isOpen, onClose, holding, onSave }) {
   };
 
   const handleChange = (field) => (e) => {
-    setFormData({ ...formData, [field]: e.target.value });
+    setFormData({
+      ...formData,
+      [field]: e.target.value,
+      ...(field === 'category' && e.target.value === 'Fixed Deposit' ? { units: '1' } : {}),
+    });
   };
 
   return (
@@ -119,7 +125,7 @@ export default function HoldingModal({ isOpen, onClose, holding, onSave }) {
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <Input
-            label="Units"
+            label={formData.category === 'Fixed Deposit' ? 'Number of deposits' : 'Units'}
             type="number"
             min="0"
             step="any"
@@ -129,23 +135,23 @@ export default function HoldingModal({ isOpen, onClose, holding, onSave }) {
             error={errors.units}
           />
           <Input
-            label="Average Price"
+            label={formData.category === 'Fixed Deposit' ? 'Principal amount' : 'Average price'}
             type="number"
             min="0"
             step="0.01"
             placeholder="0.00"
-            icon={<span className="text-sm">₹</span>}
+            icon={<span className="text-sm">{getCurrencySymbol()}</span>}
             value={formData.avgPrice}
             onChange={handleChange('avgPrice')}
             error={errors.avgPrice}
           />
           <Input
-            label="Current Price"
+            label={formData.category === 'Fixed Deposit' ? 'Current deposit value' : 'Current price'}
             type="number"
             min="0"
             step="0.01"
             placeholder="0.00"
-            icon={<span className="text-sm">₹</span>}
+            icon={<span className="text-sm">{getCurrencySymbol()}</span>}
             value={formData.currentPrice}
             onChange={handleChange('currentPrice')}
             error={errors.currentPrice}
@@ -154,20 +160,22 @@ export default function HoldingModal({ isOpen, onClose, holding, onSave }) {
 
         {/* Preview computed values */}
         {formData.units && formData.avgPrice && formData.currentPrice && (
-          <div className="bg-[#F5F5F5] dark:bg-[#0A0A0A] border border-[#E5E5E5] dark:border-[#262626] rounded p-4 space-y-2">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[#8E9192] font-mono">
+          <div className="bg-[var(--color-bg-tertiary)] dark:bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] dark:border-[var(--color-border)] rounded p-4 space-y-2">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[var(--color-text-tertiary)] font-mono">
               Preview
             </p>
             <div className="flex justify-between text-sm">
-              <span className="text-[#8E9192]">Invested Value</span>
-              <span className="mono font-semibold font-mono tabular-nums text-[#0A0A0A] dark:text-white">
-                ₹{(Number(formData.units) * Number(formData.avgPrice)).toLocaleString('en-IN')}
+              <span className="text-[var(--color-text-tertiary)]">Invested Value</span>
+              <span className="mono font-semibold font-mono tabular-nums text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+                {getCurrencySymbol()}
+                {(Number(formData.units) * Number(formData.avgPrice)).toLocaleString('en-IN')}
               </span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-[#8E9192]">Current Value</span>
-              <span className="mono font-semibold font-mono tabular-nums text-[#0A0A0A] dark:text-white">
-                ₹{(Number(formData.units) * Number(formData.currentPrice)).toLocaleString('en-IN')}
+              <span className="text-[var(--color-text-tertiary)]">Current Value</span>
+              <span className="mono font-semibold font-mono tabular-nums text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+                {getCurrencySymbol()}
+                {(Number(formData.units) * Number(formData.currentPrice)).toLocaleString('en-IN')}
               </span>
             </div>
             {(() => {
@@ -176,10 +184,10 @@ export default function HoldingModal({ isOpen, onClose, holding, onSave }) {
               const ret = cur - inv;
               const isPos = ret >= 0;
               return (
-                <div className="flex justify-between text-sm pt-1 border-t border-[#E5E5E5] dark:border-[#262626]">
-                  <span className="text-[#8E9192]">P&L</span>
+                <div className="flex justify-between text-sm pt-1 border-t border-[var(--color-border)] dark:border-[var(--color-border)]">
+                  <span className="text-[var(--color-text-tertiary)]">P&L</span>
                   <span
-                    className={`mono font-bold font-mono tabular-nums ${isPos ? 'text-[#00a383] dark:text-[#00b894]' : 'text-[#e84118] dark:text-[#ff6b6b]'}`}
+                    className={`mono font-bold font-mono tabular-nums ${isPos ? 'text-[var(--color-positive)] dark:text-[var(--color-positive)]' : 'text-[var(--color-negative)] dark:text-[var(--color-negative)]'}`}
                   >
                     {isPos ? '+' : '−'}₹{Math.abs(ret).toLocaleString('en-IN')}
                   </span>
@@ -189,7 +197,7 @@ export default function HoldingModal({ isOpen, onClose, holding, onSave }) {
           </div>
         )}
 
-        <div className="pt-4 flex justify-end gap-3 border-t border-[#E5E5E5] dark:border-[#262626] mt-6">
+        <div className="pt-4 flex justify-end gap-3 border-t border-[var(--color-border)] dark:border-[var(--color-border)] mt-6">
           <Button type="button" variant="ghost" onClick={onClose}>
             Cancel
           </Button>

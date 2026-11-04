@@ -1,3 +1,4 @@
+import { workspace } from '../services/workspace';
 /**
  * Currency formatting utilities for Ledger.
  * INR-first, but currency-aware via settings (INR/USD/EUR).
@@ -7,7 +8,7 @@ import { CURRENCIES } from '../constants/finance.js';
 function readSettingsCurrency() {
   try {
     if (typeof localStorage !== 'undefined') {
-      const raw = localStorage.getItem('ledger_settings');
+      const raw = workspace.getItem('ledger_settings');
       if (raw) {
         const s = JSON.parse(raw);
         if (s && typeof s.currency === 'string' && CURRENCIES[s.currency]) return s.currency;
@@ -17,6 +18,14 @@ function readSettingsCurrency() {
     /* ignore — fall back to INR */
   }
   return 'INR';
+}
+
+function amountsHidden() {
+  try {
+    return !!JSON.parse(workspace.getItem('ledger_settings') || '{}').hideAmounts;
+  } catch {
+    return false;
+  }
 }
 
 export function resolveCurrency(explicit) {
@@ -40,6 +49,7 @@ export function getCurrencyLocale(currency) {
  * Pass { currency: 'USD' } to override settings.
  */
 export function formatMoney(amount, options = {}) {
+  if (amountsHidden()) return '••••';
   const currency = resolveCurrency(options.currency);
   const { showSymbol = true, maximumFractionDigits = 0 } = options;
 
@@ -77,6 +87,7 @@ export function formatINR(amount, options = {}) {
  * USD/EUR: uses Intl compact notation ($1.2M, €842K).
  */
 export function formatCompact(amount, options = {}) {
+  if (amountsHidden()) return '••••';
   const currency = resolveCurrency(options.currency);
   if (amount === undefined || amount === null || Number.isNaN(Number(amount))) {
     return `${CURRENCIES[currency].symbol}0`;

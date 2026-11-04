@@ -1,0 +1,12 @@
+name = "folio-v2"
+main = "src/worker.js"
+compatibility_date = "2026-11-04"
+
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+run_worker_first = ["/api/*"]
+
+# Set SUPABASE_URL, SUPABASE_ANON_KEY, OPENAI_API_KEY and OPENAI_MODEL
+# with Wrangler secrets for this V2 Worker. Never use VITE_ for secrets.

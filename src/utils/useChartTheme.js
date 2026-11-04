@@ -54,16 +54,16 @@ export default function useChartTheme() {
   return {
     isDark,
     /** Primary linework: white in dark, black in light. */
-    line: isDark ? '#FFFFFF' : '#0A0A0A',
+    line: isDark ? '#B9E6CA' : '#226143',
     /** Grid: #262626 in dark, #E5E5E5 in light. */
-    grid: isDark ? '#262626' : '#E5E5E5',
-    tick: '#8E9192',
+    grid: isDark ? '#34473B' : '#DFE7E1',
+    tick: isDark ? '#A6B9AD' : '#52675B',
     cursor: isDark ? 'rgba(255, 255, 255, 0.04)' : 'rgba(10, 10, 10, 0.04)',
     areaTop: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(10, 10, 10, 0.05)',
     areaBottom: 'rgba(255, 255, 255, 0)',
     activeDotFill: isDark ? '#0A0A0A' : '#FFFFFF',
-    income: FINANCE_IN,
-    expense: FINANCE_OUT,
+    income: isDark ? '#B9E6CA' : '#226143',
+    expense: isDark ? '#688D77' : '#9BB7A6',
     monoPalette: isDark ? MONO_DARK : MONO_LIGHT,
     mono: (index) => (isDark ? MONO_DARK : MONO_LIGHT)[index % 7],
     monoColor: (color) => themedMonoColor(color, isDark),

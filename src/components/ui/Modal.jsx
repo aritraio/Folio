@@ -101,8 +101,8 @@ export default function Modal({
         ref={contentRef}
         className={`
           w-full ${sizes[size]}
-          bg-white dark:bg-[#141414]
-          border border-[#E5E5E5] dark:border-[#262626]
+          bg-[var(--color-bg-secondary)] dark:bg-[var(--color-bg-secondary)]
+          border border-[var(--color-border)] dark:border-[var(--color-border)]
           overflow-y-auto
           md:rounded-md md:max-h-[90vh] md:animate-fade-in-scale motion-reduce:animate-none
           max-md:rounded-t-md max-md:rounded-b-none max-md:max-h-[95vh] max-md:animate-slide-up motion-reduce:animate-none
@@ -113,9 +113,12 @@ export default function Modal({
         aria-labelledby={title ? 'modal-title' : undefined}
       >
         {(title || showClose) && (
-          <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-[#E5E5E5] dark:border-[#262626]">
+          <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-[var(--color-border)] dark:border-[var(--color-border)]">
             {title && (
-              <h2 id="modal-title" className="heading-sm text-[#0A0A0A] dark:text-white">
+              <h2
+                id="modal-title"
+                className="heading-sm text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]"
+              >
                 {title}
               </h2>
             )}
@@ -124,8 +127,8 @@ export default function Modal({
                 onClick={onClose}
                 className="
                   p-1.5 rounded
-                  text-[#8E9192] hover:text-[#0A0A0A] hover:bg-[#F5F5F5]
-                  dark:hover:text-white dark:hover:bg-[#1E1E1E]
+                  text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-tertiary)]
+                  dark:hover:text-[var(--color-text-primary)] dark:hover:bg-[var(--color-bg-tertiary)]
                   transition-colors duration-150
                 "
                 aria-label="Close modal"

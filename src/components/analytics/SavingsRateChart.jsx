@@ -11,10 +11,10 @@ function SavingsRateTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null;
   const value = payload[0].value;
   return (
-    <div className="bg-[#141414] border border-[#262626] rounded px-4 py-3">
-      <p className="text-xs font-semibold text-[#8E9192] mb-1 font-mono">{label}</p>
+    <div className="bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded px-4 py-3">
+      <p className="text-xs font-semibold text-[var(--color-text-tertiary)] mb-1 font-mono">{label}</p>
       <p
-        className={`text-base font-bold font-mono tabular-nums ${value >= 0 ? 'text-[#00b894]' : 'text-[#ff6b6b]'}`}
+        className={`text-base font-bold font-mono tabular-nums ${value >= 0 ? 'text-[var(--color-positive)]' : 'text-[var(--color-negative)]'}`}
       >
         {formatPercent(value)}
       </p>
@@ -46,8 +46,10 @@ export default function SavingsRateChart({ transactions = [], months = [] }) {
       style={{ animationDelay: '0.25s' }}
     >
       <div className="mb-5">
-        <h2 className="heading-sm text-[#0A0A0A] dark:text-white">Savings Rate</h2>
-        <p className="text-xs text-[#8E9192] mt-0.5 font-mono uppercase tracking-widest">
+        <h2 className="heading-sm text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+          Savings Rate
+        </h2>
+        <p className="text-xs text-[var(--color-text-tertiary)] mt-0.5 font-mono uppercase tracking-widest">
           Percentage of income saved each month
         </p>
       </div>

@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
+import { formatMoney } from '../../utils/formatCurrency';
+import ConfirmDialog from '../ui/ConfirmDialog';
 import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react';
 import TransactionRow from './TransactionRow';
 import EmptyState from '../ui/EmptyState';
 
 export default function TransactionTable({ transactions, onEdit, onDelete, accounts }) {
+  const [pendingDelete, setPendingDelete] = useState(null);
   const [sortConfig, setSortConfig] = useState({ key: 'date', direction: 'desc' });
 
   // Account lookup helper for row
@@ -36,11 +39,11 @@ export default function TransactionTable({ transactions, onEdit, onDelete, accou
 
   const SortIcon = ({ columnKey }) => {
     if (sortConfig.key !== columnKey)
-      return <ArrowUpDown className="w-3 h-3 text-[#8E9192]" />;
+      return <ArrowUpDown className="w-3 h-3 text-[var(--color-text-tertiary)]" />;
     return sortConfig.direction === 'asc' ? (
-      <ArrowUp className="w-3 h-3 text-[#0A0A0A] dark:text-white" />
+      <ArrowUp className="w-3 h-3 text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]" />
     ) : (
-      <ArrowDown className="w-3 h-3 text-[#0A0A0A] dark:text-white" />
+      <ArrowDown className="w-3 h-3 text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]" />
     );
   };
 
@@ -57,12 +60,47 @@ export default function TransactionTable({ transactions, onEdit, onDelete, accou
 
   return (
     <div className="card overflow-hidden">
-      <div className="w-full overflow-x-auto">
+      <div className="v-mobile-transactions">
+        {sortedTransactions.map((tx) => (
+          <div className="v-transaction-mobile" key={tx.id}>
+            <div className="v-row">
+              <strong className="text-sm">{tx.merchant || tx.description}</strong>
+              <b>
+                {tx.type === 'expense' ? '−' : tx.type === 'income' ? '+' : ''}
+                {formatMoney(tx.amount)}
+              </b>
+            </div>
+            <p className="v-caption">
+              {tx.date} · {tx.type === 'transfer' ? 'Transfer' : tx.category} · {getAccountName(tx.accountId)}
+              {tx.person ? ` · ${tx.person}` : ''}
+            </p>
+            <div className="v-actions mt-3">
+              <button className="v-text-link" onClick={() => onEdit(tx)}>
+                Edit
+              </button>
+              <button className="v-text-link" onClick={() => setPendingDelete(tx.id)}>
+                Delete
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+      <ConfirmDialog
+        isOpen={!!pendingDelete}
+        onClose={() => setPendingDelete(null)}
+        onConfirm={() => {
+          onDelete(pendingDelete);
+          setPendingDelete(null);
+        }}
+        title="Delete transaction?"
+        message="This removes the transaction and reverses its balance impact, if any."
+      />
+      <div className="w-full overflow-x-auto v-desktop-transactions">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="bg-[#F5F5F5] dark:bg-[#0A0A0A] border-b border-[#E5E5E5] dark:border-[#262626] text-xs font-semibold text-[#8E9192] uppercase tracking-wider font-mono">
+            <tr className="bg-[var(--color-bg-tertiary)] dark:bg-[var(--color-bg-tertiary)] border-b border-[var(--color-border)] dark:border-[var(--color-border)] text-xs font-semibold text-[var(--color-text-tertiary)] uppercase tracking-wider font-mono">
               <th
-                className="py-3 pl-4 pr-3 cursor-pointer hover:text-[#0A0A0A] dark:hover:text-white transition-colors"
+                className="py-3 pl-4 pr-3 cursor-pointer hover:text-[var(--color-text-primary)] dark:hover:text-[var(--color-text-primary)] transition-colors"
                 onClick={() => handleSort('date')}
               >
                 <div className="flex items-center gap-1.5">
@@ -74,7 +112,7 @@ export default function TransactionTable({ transactions, onEdit, onDelete, accou
               <th className="py-3 px-3">Category</th>
               <th className="py-3 px-3">Account</th>
               <th
-                className="py-3 px-3 text-right cursor-pointer hover:text-[#0A0A0A] dark:hover:text-white transition-colors"
+                className="py-3 px-3 text-right cursor-pointer hover:text-[var(--color-text-primary)] dark:hover:text-[var(--color-text-primary)] transition-colors"
                 onClick={() => handleSort('amount')}
               >
                 <div className="flex items-center justify-end gap-1.5">

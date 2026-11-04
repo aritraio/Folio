@@ -1,111 +1,92 @@
-import React, { useState } from 'react';
-import { Landmark, Building2, CreditCard, Wallet, Pencil, Trash2, ChevronRight } from 'lucide-react';
-import { formatINR } from '../../utils/formatCurrency';
-import ConfirmDialog from '../ui/ConfirmDialog';
-import { useNavigate } from 'react-router-dom';
-
-const ICON_MAP = {
-  Landmark: Landmark,
-  Building2: Building2,
-  CreditCard: CreditCard,
-  Wallet: Wallet,
-};
-
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { Landmark, CreditCard, Wallet, Pencil, Trash2, ArrowUpRight } from 'lucide-react';
+import { formatMoney } from '../../utils/formatCurrency';
+import { Progress } from '../ui/WorkspaceUI';
 export default function AccountCard({ account, onEdit, onDelete }) {
-  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
-  const navigate = useNavigate();
-
-  const IconComponent = ICON_MAP[account.icon] || Landmark;
-
-  const isCredit = account.type === 'credit';
-
-  const handleCardClick = () => {
-    // Navigate to transactions page with this account pre-selected
-    navigate('/transactions', { state: { accountId: account.id } });
-  };
-
-  const handleEdit = (e) => {
-    e.stopPropagation();
-    onEdit(account);
-  };
-
-  const handleDelete = (e) => {
-    e.stopPropagation();
-    setShowConfirmDelete(true);
-  };
-
+  const credit = account.type === 'credit',
+    Icon = credit ? CreditCard : account.type === 'cash' ? Wallet : Landmark;
   return (
-    <>
-      <div
-        className="card p-5 group cursor-pointer hover:border-[#CCCCCC] dark:hover:border-[#404040] transition-colors duration-150 relative overflow-hidden"
-        onClick={handleCardClick}
-      >
-        <div className="flex justify-between items-start mb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded border border-[#E5E5E5] dark:border-[#262626] bg-[#F5F5F5] dark:bg-[#1E1E1E] flex items-center justify-center">
-              <IconComponent className="w-5 h-5 text-[#0A0A0A] dark:text-white" />
-            </div>
-            <div>
-              <h3 className="text-sm font-medium text-[#0A0A0A] dark:text-white">
-                {account.name}
-              </h3>
-              <p className="text-xs text-[#8E9192] capitalize font-mono">
-                {account.type} {account.accountNumber ? `• ${account.accountNumber.slice(-4)}` : ''}
-              </p>
-            </div>
+    <article className="v-panel">
+      <div className="v-row">
+        <span className="v-tag">
+          {credit
+            ? 'Credit card'
+            : account.type === 'cash'
+              ? 'Cash'
+              : account.type === 'investment'
+                ? 'Investment balance'
+                : account.type + ' account'}
+        </span>
+        <Icon size={19} />
+      </div>
+      <h3 className="mt-5 font-semibold">{account.name}</h3>
+      <p className="v-caption">
+        {account.bank || 'Manually tracked'}{' '}
+        {account.accountNumber && account.accountNumber !== 'N/A'
+          ? `· •••• ${account.accountNumber.slice(-4)}`
+          : ''}
+      </p>
+      <p className="v-large-money">{formatMoney(account.balance)}</p>
+      <small className="v-muted">
+        {credit ? (account.balance < 0 ? 'Credit on your card' : 'Total outstanding') : 'Tracked balance'}
+      </small>
+      {credit && (
+        <div className="v-bank-detail">
+          <div className="v-row">
+            <span>Statement amount</span>
+            <strong>
+              {account.statementBalance != null ? formatMoney(account.statementBalance) : 'Not recorded'}
+            </strong>
           </div>
-
-          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-            <button
-              onClick={handleEdit}
-              className="p-1.5 text-[#8E9192] hover:text-[#0A0A0A] hover:bg-[#F5F5F5] dark:hover:text-white dark:hover:bg-[#1E1E1E] rounded transition-colors"
-              aria-label="Edit account"
-            >
-              <Pencil className="w-4 h-4" />
-            </button>
-            <button
-              onClick={handleDelete}
-              className="p-1.5 text-[#8E9192] hover:text-[#ff6b6b] hover:bg-[rgba(255,107,107,0.12)] rounded transition-colors"
-              aria-label="Delete account"
-            >
-              <Trash2 className="w-4 h-4" />
-            </button>
+          <div className="v-row mt-3">
+            <span>Minimum due</span>
+            <strong>{account.minimumDue != null ? formatMoney(account.minimumDue) : 'Not recorded'}</strong>
           </div>
+          <div className="v-row mt-3">
+            <span>Pay by</span>
+            <strong>{account.dueDate || 'Set a due date'}</strong>
+          </div>
+          {account.creditLimit > 0 && (
+            <>
+              <Progress
+                value={(Math.max(0, account.balance) / account.creditLimit) * 100}
+                label="Credit utilization"
+              />
+              <small className="v-caption">
+                {Math.round((Math.max(0, account.balance) / account.creditLimit) * 100)}% of{' '}
+                {formatMoney(account.creditLimit)} limit
+              </small>
+            </>
+          )}
         </div>
-
-        <div className="mt-2 flex items-end justify-between">
-          <div>
-            <p className="text-[10px] text-[#8E9192] mb-0.5 font-mono uppercase tracking-[0.15em]">
-              {isCredit ? 'Current Outstanding' : 'Available Balance'}
-            </p>
-            <p
-              className={`text-xl font-mono tabular-nums font-bold ${
-                isCredit
-                  ? 'text-[#e84118] dark:text-[#ff6b6b]'
-                  : 'text-[#0A0A0A] dark:text-white'
-              }`}
-            >
-              {isCredit ? '−' : ''}
-              {formatINR(account.balance, { showSymbol: true })}
-            </p>
-          </div>
-          <ChevronRight className="w-5 h-5 text-[#8E9192] group-hover:text-[#0A0A0A] dark:group-hover:text-white transition-colors transform group-hover:translate-x-1" />
+      )}
+      <p className="v-caption">
+        {account.updatedAt
+          ? `Updated ${account.updatedAt.slice(0, 10)}`
+          : 'Manual balance · update when reconciled'}
+      </p>
+      <div className="v-row mt-5">
+        <Link className="v-text-link" to={`/transactions?accountId=${encodeURIComponent(account.id)}`}>
+          Activity <ArrowUpRight size={14} />
+        </Link>
+        <div className="v-actions">
+          <button
+            className="v-icon-button"
+            onClick={() => onEdit(account)}
+            aria-label={`Edit ${account.name}`}
+          >
+            <Pencil size={16} />
+          </button>
+          <button
+            className="v-icon-button"
+            onClick={() => onDelete(account.id)}
+            aria-label={`Delete ${account.name}`}
+          >
+            <Trash2 size={16} />
+          </button>
         </div>
       </div>
-
-      <ConfirmDialog
-        isOpen={showConfirmDelete}
-        title="Delete Account"
-        message="Are you sure you want to delete this account? This will also remove all associated transactions."
-        confirmLabel="Delete"
-        cancelLabel="Cancel"
-        onConfirm={() => {
-          onDelete(account.id);
-          setShowConfirmDelete(false);
-        }}
-        onCancel={() => setShowConfirmDelete(false)}
-        variant="destructive"
-      />
-    </>
+    </article>
   );
 }

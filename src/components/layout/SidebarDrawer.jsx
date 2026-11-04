@@ -114,8 +114,8 @@ export default function SidebarDrawer({ isOpen, onClose }) {
           drawer-panel motion-reduce:animate-none
           absolute top-0 left-0 bottom-0
           w-[280px] max-w-[85vw] sm:w-[320px]
-          bg-white dark:bg-[#0A0A0A]
-          border-r border-[#E5E5E5] dark:border-[#262626]
+          bg-[var(--color-bg-secondary)] dark:bg-[var(--color-bg-tertiary)]
+          border-r border-[var(--color-border)] dark:border-[var(--color-border)]
           flex flex-col
         "
         role="dialog"
@@ -124,17 +124,17 @@ export default function SidebarDrawer({ isOpen, onClose }) {
       >
         {/* Header */}
         <div
-          className="drawer-item flex items-center justify-between px-5 h-16 border-b border-[#E5E5E5] dark:border-[#262626] shrink-0"
+          className="drawer-item flex items-center justify-between px-5 h-16 border-b border-[var(--color-border)] dark:border-[var(--color-border)] shrink-0"
           style={{ '--stagger-delay': '25ms' }}
         >
           <div className="flex items-center gap-2.5">
-            <div className="p-1.5 rounded bg-[#0A0A0A] text-white dark:bg-white dark:text-[#0A0A0A]">
+            <div className="p-1.5 rounded bg-[var(--color-bg-tertiary)] text-[var(--color-text-primary)] dark:bg-[var(--color-bg-secondary)] dark:text-[var(--color-text-primary)]">
               <Terminal className="w-5 h-5" />
             </div>
-            <span className="font-sans text-base font-semibold tracking-tight text-[#0A0A0A] dark:text-white">
+            <span className="font-sans text-base font-semibold tracking-tight text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
               FOLIO
             </span>
-            <span className="font-mono text-[10px] font-medium text-[#8E9192] border border-[#E5E5E5] dark:border-[#262626] rounded px-1.5 py-0.5">
+            <span className="font-mono text-[10px] font-medium text-[var(--color-text-tertiary)] border border-[var(--color-border)] dark:border-[var(--color-border)] rounded px-1.5 py-0.5">
               v1.0
             </span>
           </div>
@@ -142,8 +142,8 @@ export default function SidebarDrawer({ isOpen, onClose }) {
             onClick={close}
             className="
               p-2 rounded
-              text-[#8E9192] hover:text-[#0A0A0A] dark:hover:text-white
-              hover:bg-[#F5F5F5] dark:hover:bg-[#1E1E1E]
+              text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] dark:hover:text-[var(--color-text-primary)]
+              hover:bg-[var(--color-bg-tertiary)] dark:hover:bg-[var(--color-bg-tertiary)]
               transition-all duration-150 ease-out
               active:scale-[0.97]
             "
@@ -156,7 +156,7 @@ export default function SidebarDrawer({ isOpen, onClose }) {
         {/* Navigation list */}
         <nav className="flex-1 overflow-y-auto py-4 px-3" aria-label="Primary">
           <p
-            className="drawer-item px-3 pb-2 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8E9192]"
+            className="drawer-item px-3 pb-2 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--color-text-tertiary)]"
             style={{ '--stagger-delay': '40ms' }}
           >
             Menu
@@ -176,8 +176,8 @@ export default function SidebarDrawer({ isOpen, onClose }) {
                     active:scale-[0.97]
                     ${
                       isActive
-                        ? 'bg-[#0A0A0A] text-white border-[#0A0A0A] dark:bg-white dark:text-[#0A0A0A] dark:border-white'
-                        : 'border-transparent text-[#404040] dark:text-[#C4C7C8] hover:bg-[#F5F5F5] dark:hover:bg-[#1E1E1E] hover:text-[#0A0A0A] dark:hover:text-white hover:translate-x-1'
+                        ? 'bg-[var(--color-bg-tertiary)] text-[var(--color-text-primary)] border-[#0A0A0A] dark:bg-[var(--color-bg-secondary)] dark:text-[var(--color-text-primary)] dark:border-white'
+                        : 'border-transparent text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-tertiary)] dark:hover:bg-[var(--color-bg-tertiary)] hover:text-[var(--color-text-primary)] dark:hover:text-[var(--color-text-primary)] hover:translate-x-1'
                     }
                   `}
                 >
@@ -185,7 +185,7 @@ export default function SidebarDrawer({ isOpen, onClose }) {
                     <>
                       {isActive && (
                         <span
-                          className="absolute left-0 top-1/2 -translate-y-1/2 w-[2px] h-5 rounded-full bg-white dark:bg-[#0A0A0A]"
+                          className="absolute left-0 top-1/2 -translate-y-1/2 w-[2px] h-5 rounded-full bg-[var(--color-bg-secondary)] dark:bg-[var(--color-bg-tertiary)]"
                           aria-hidden="true"
                         />
                       )}
@@ -201,7 +201,7 @@ export default function SidebarDrawer({ isOpen, onClose }) {
 
         {/* Footer */}
         <div
-          className="drawer-item px-5 py-4 border-t border-[#E5E5E5] dark:border-[#262626] shrink-0"
+          className="drawer-item px-5 py-4 border-t border-[var(--color-border)] dark:border-[var(--color-border)] shrink-0"
           style={{ '--stagger-delay': '225ms' }}
         >
           <button
@@ -211,22 +211,26 @@ export default function SidebarDrawer({ isOpen, onClose }) {
             }}
             className="
               w-full flex items-center gap-3 p-1.5 -m-1.5 rounded
-              hover:bg-[#F5F5F5] dark:hover:bg-[#1E1E1E]
+              hover:bg-[var(--color-bg-tertiary)] dark:hover:bg-[var(--color-bg-tertiary)]
               transition-all duration-150 ease-out
               active:scale-[0.97]
               text-left
             "
             aria-label="Open settings"
           >
-            <div className="w-8 h-8 rounded bg-[#0A0A0A] text-white dark:bg-white dark:text-[#0A0A0A] flex items-center justify-center text-xs font-bold font-mono shrink-0">
+            <div className="w-8 h-8 rounded bg-[var(--color-bg-tertiary)] text-[var(--color-text-primary)] dark:bg-[var(--color-bg-secondary)] dark:text-[var(--color-text-primary)] flex items-center justify-center text-xs font-bold font-mono shrink-0">
               {initials}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-[#0A0A0A] dark:text-white truncate">{userName}</p>
-              {userEmail && <p className="text-xs text-[#8E9192] truncate font-mono">{userEmail}</p>}
+              <p className="text-sm font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] truncate">
+                {userName}
+              </p>
+              {userEmail && (
+                <p className="text-xs text-[var(--color-text-tertiary)] truncate font-mono">{userEmail}</p>
+              )}
             </div>
           </button>
-          <p className="mt-3 text-center font-mono text-[10px] tracking-wider text-[#8E9192]">
+          <p className="mt-3 text-center font-mono text-[10px] tracking-wider text-[var(--color-text-tertiary)]">
             Made by Aritra with ❤️
           </p>
         </div>

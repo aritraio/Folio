@@ -9,13 +9,13 @@ import useChartTheme from '@/utils/useChartTheme';
 function ExpensesTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-[#141414] border border-[#262626] rounded px-4 py-3 space-y-1">
-      <p className="text-xs font-semibold text-[#8E9192] font-mono">{label}</p>
+    <div className="bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded px-4 py-3 space-y-1">
+      <p className="text-xs font-semibold text-[var(--color-text-tertiary)] font-mono">{label}</p>
       {payload.map((entry) => (
         <div key={entry.name} className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-[#ff6b6b]" />
-          <span className="text-xs text-[#8E9192]">{entry.name}:</span>
-          <span className="text-sm font-semibold font-mono tabular-nums text-white">
+          <span className="text-xs text-[var(--color-text-tertiary)]">{entry.name}:</span>
+          <span className="text-sm font-semibold font-mono tabular-nums text-[var(--color-text-primary)]">
             {formatINR(entry.value)}
           </span>
         </div>
@@ -41,8 +41,10 @@ export default function MonthlyExpensesChart({ data = [] }) {
       style={{ animationDelay: '0.1s' }}
     >
       <div className="mb-5">
-        <h2 className="heading-sm text-[#0A0A0A] dark:text-white">Monthly Expenses</h2>
-        <p className="text-xs text-[#8E9192] mt-0.5 font-mono uppercase tracking-widest">
+        <h2 className="heading-sm text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+          Monthly Expenses
+        </h2>
+        <p className="text-xs text-[var(--color-text-tertiary)] mt-0.5 font-mono uppercase tracking-widest">
           Expense trend over recent months
         </p>
       </div>

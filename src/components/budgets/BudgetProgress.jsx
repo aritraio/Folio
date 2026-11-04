@@ -9,8 +9,8 @@ export default function BudgetProgress({ percentage, status }) {
   // Cap percentage for the bar width at 100% so it doesn't overflow visually
   const widthPercent = Math.min(percentage, 100);
 
-  let barColor = 'bg-[#0A0A0A] dark:bg-white';
-  if (status === 'warning') barColor = 'bg-[#0A0A0A] dark:bg-white';
+  let barColor = 'bg-[var(--color-bg-tertiary)] dark:bg-[var(--color-bg-secondary)]';
+  if (status === 'warning') barColor = 'bg-[var(--color-bg-tertiary)] dark:bg-[var(--color-bg-secondary)]';
   if (status === 'exceeded') barColor = 'bg-[#ff6b6b]';
 
   return (

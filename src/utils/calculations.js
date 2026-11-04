@@ -33,6 +33,7 @@ function filterTransactionsByMonth(transactions = [], targetMonthKey = null) {
 export function calcTotalAssets(accounts = []) {
   return accounts.reduce((total, acc) => {
     const bal = Number(acc.balance) || 0;
+    if (acc.type === 'credit' && bal < 0) return total + Math.abs(bal);
     if (acc.type !== 'credit' && bal > 0) {
       return total + bal;
     }
@@ -49,7 +50,7 @@ export function calcTotalLiabilities(accounts = []) {
   return accounts.reduce((total, acc) => {
     const bal = Number(acc.balance) || 0;
     if (acc.type === 'credit') {
-      return total + Math.abs(bal);
+      return total + Math.max(0, bal);
     }
     if (bal < 0) {
       return total + Math.abs(bal);
@@ -88,7 +89,7 @@ export function calcMonthlyIncome(transactions = [], targetMonthKey = null) {
 export function calcMonthlyExpenses(transactions = [], targetMonthKey = null) {
   const filtered = filterTransactionsByMonth(transactions, targetMonthKey);
   return filtered
-    .filter((tx) => tx.type === 'expense')
+    .filter((tx) => tx.type === 'expense' && tx.category !== 'Investment')
     .reduce((sum, tx) => sum + Math.abs(Number(tx.amount) || 0), 0);
 }
 
@@ -126,7 +127,7 @@ export function calcSavingsRate(income = 0, expenses = 0) {
  */
 export function calcCategoryBreakdown(transactions = [], targetMonthKey = null) {
   const filtered = filterTransactionsByMonth(transactions, targetMonthKey);
-  const expenseTxs = filtered.filter((t) => t.type === 'expense');
+  const expenseTxs = filtered.filter((t) => t.type === 'expense' && t.category !== 'Investment');
 
   const totalsByCategory = {};
   let totalExpenses = 0;
@@ -159,7 +160,7 @@ export function calcCategoryBreakdown(transactions = [], targetMonthKey = null) 
  */
 export function calcBudgetUtilization(budgets = [], transactions = [], targetMonthKey = null) {
   const filtered = filterTransactionsByMonth(transactions, targetMonthKey);
-  const expenses = filtered.filter((t) => t.type === 'expense');
+  const expenses = filtered.filter((t) => t.type === 'expense' && t.category !== 'Investment');
 
   const spentByCategory = {};
   expenses.forEach((tx) => {
@@ -220,8 +221,12 @@ export function calcInvestmentReturn(holdings = []) {
   let totalCurrent = 0;
 
   holdings.forEach((h) => {
-    const invested = Number(h.investedValue) || (Number(h.units) || 0) * (Number(h.avgPrice) || 0);
-    const current = Number(h.currentValue) || (Number(h.units) || 0) * (Number(h.currentPrice) || 0);
+    const invested =
+      h.investedValue != null ? Number(h.investedValue) : (Number(h.units) || 0) * (Number(h.avgPrice) || 0);
+    const current =
+      h.currentValue != null
+        ? Number(h.currentValue)
+        : (Number(h.units) || 0) * (Number(h.currentPrice) || 0);
     totalInvested += invested;
     totalCurrent += current;
   });
@@ -304,7 +309,7 @@ export function calcTopSpendingCategory(transactions = [], targetMonthKey = null
  * @param {number} nMonths
  * @returns {Array}
  */
-export function calcNetWorthHistory(historyData = [], transactions = [], accounts = [], nMonths = 6) {
+export function calcNetWorthHistory(historyData = [], transactions = [], accounts = [], _nMonths = 6) {
   if (historyData && historyData.length > 0) {
     return [...historyData].sort((a, b) => String(a.monthKey).localeCompare(String(b.monthKey)));
   }
@@ -314,23 +319,14 @@ export function calcNetWorthHistory(historyData = [], transactions = [], account
   const hasTx = Array.isArray(transactions) && transactions.length > 0;
   if (!hasAccounts && !hasTx) return [];
 
-  const months = getLastNMonths(nMonths);
-  // Monthly net = income - expenses (transfers excluded by construction).
-  const nets = months.map(
-    (m) => calcMonthlyIncome(transactions, m.monthKey) - calcMonthlyExpenses(transactions, m.monthKey)
-  );
-
-  // Walk backwards from current net worth.
-  let running = currentNW;
-  const out = [];
-  for (let i = months.length - 1; i >= 0; i--) {
-    out.unshift({
-      monthKey: months[i].monthKey,
-      label: months[i].shortLabel,
-      shortLabel: months[i].shortLabel,
-      netWorth: Math.round(running),
-    });
-    running -= nets[i] || 0;
-  }
-  return out;
+  // Without snapshots only the current account valuation is known.
+  const now = new Date();
+  return [
+    {
+      monthKey: format(now, 'yyyy-MM'),
+      label: format(now, 'MMM yyyy'),
+      shortLabel: format(now, 'MMM'),
+      netWorth: currentNW,
+    },
+  ];
 }

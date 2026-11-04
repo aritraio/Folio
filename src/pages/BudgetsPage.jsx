@@ -89,7 +89,9 @@ export default function BudgetsPage() {
         <div>
           <p className="label mb-1 font-mono">Planning</p>
           <div className="flex items-center gap-4 mb-6">
-            <h1 className="heading-lg text-[#0A0A0A] dark:text-white">Budgets</h1>
+            <h1 className="heading-lg text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+              Budgets
+            </h1>
             {monthOptions.length > 0 && (
               <div className="w-40">
                 <Select
@@ -105,25 +107,27 @@ export default function BudgetsPage() {
 
           <div className="flex flex-wrap gap-x-8 gap-y-4">
             <div>
-              <p className="text-xs text-[#8E9192] mb-1 font-medium tracking-wide font-mono uppercase">
+              <p className="text-xs text-[var(--color-text-tertiary)] mb-1 font-medium tracking-wide font-mono uppercase">
                 TOTAL BUDGET
               </p>
-              <p className="text-2xl font-mono tabular-nums font-bold text-[#0A0A0A] dark:text-white">
+              <p className="text-2xl font-mono tabular-nums font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                 {formatMoney(totalBudget)}
               </p>
             </div>
             <div>
-              <p className="text-xs text-[#8E9192] mb-1 font-medium tracking-wide font-mono uppercase">SPENT</p>
-              <p className="text-2xl font-mono tabular-nums font-bold text-[#0A0A0A] dark:text-white">
+              <p className="text-xs text-[var(--color-text-tertiary)] mb-1 font-medium tracking-wide font-mono uppercase">
+                SPENT
+              </p>
+              <p className="text-2xl font-mono tabular-nums font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                 {formatMoney(totalSpent)}
               </p>
             </div>
-            <div className="pl-6 border-l border-[#E5E5E5] dark:border-[#262626]">
-              <p className="text-xs text-[#8E9192] mb-1 font-medium tracking-wide font-mono uppercase">
+            <div className="pl-6 border-l border-[var(--color-border)] dark:border-[var(--color-border)]">
+              <p className="text-xs text-[var(--color-text-tertiary)] mb-1 font-medium tracking-wide font-mono uppercase">
                 REMAINING
               </p>
               <p
-                className={`text-2xl font-mono tabular-nums font-bold ${totalRemaining < 0 ? 'text-[#e84118] dark:text-[#ff6b6b]' : 'text-[#00a383] dark:text-[#00b894]'}`}
+                className={`text-2xl font-mono tabular-nums font-bold ${totalRemaining < 0 ? 'text-[var(--color-negative)] dark:text-[var(--color-negative)]' : 'text-[var(--color-positive)] dark:text-[var(--color-positive)]'}`}
               >
                 {formatMoney(totalRemaining)}
               </p>

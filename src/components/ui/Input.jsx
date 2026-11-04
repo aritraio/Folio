@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useId } from 'react';
 
 /**
  * Input — Terminal text/number/date input.
@@ -8,14 +8,15 @@ const Input = forwardRef(function Input(
   { label, error, hint, type = 'text', icon, fullWidth = true, className = '', id, ...props },
   ref
 ) {
-  const inputId = id || `input-${label?.toLowerCase().replace(/\s+/g, '-') || 'field'}`;
+  const generatedId = useId();
+  const inputId = id || generatedId;
 
   return (
     <div className={`${fullWidth ? 'w-full' : ''}`}>
       {label && (
         <label
           htmlFor={inputId}
-          className="block text-sm font-medium text-[#404040] dark:text-[#C4C7C8] mb-1.5"
+          className="block text-sm font-medium text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary)] mb-1.5"
         >
           {label}
         </label>
@@ -23,7 +24,7 @@ const Input = forwardRef(function Input(
 
       <div className="relative">
         {icon && (
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#8E9192]">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[var(--color-text-tertiary)]">
             {icon}
           </div>
         )}
@@ -35,18 +36,18 @@ const Input = forwardRef(function Input(
           className={`
             w-full px-3.5 py-2.5
             ${icon ? 'pl-10' : ''}
-            text-sm font-sans text-[#0A0A0A] dark:text-white
-            bg-white dark:bg-[#0A0A0A]
+            text-sm font-sans text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]
+            bg-[var(--color-bg-secondary)] dark:bg-[var(--color-bg-tertiary)]
             border rounded max-md:min-h-[44px]
             ${
               error
                 ? 'border-[#ff6b6b] focus:ring-[#ff6b6b]/20 focus:border-[#ff6b6b]'
-                : 'border-[#E5E5E5] dark:border-[#262626] focus:ring-white/20 focus:border-[#0A0A0A] dark:focus:border-white'
+                : 'border-[var(--color-border)] dark:border-[var(--color-border)] focus:ring-white/20 focus:border-[#0A0A0A] dark:focus:border-white'
             }
-            placeholder:text-[#8E9192]
+            placeholder:text-[var(--color-text-tertiary)]
             transition-colors duration-150
             focus:outline-none focus:ring-2
-            disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-[#F5F5F5] dark:disabled:bg-[#1E1E1E]
+            disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-[var(--color-bg-tertiary)] dark:disabled:bg-[var(--color-bg-tertiary)]
             ${className}
           `}
           aria-invalid={error ? 'true' : undefined}
@@ -56,12 +57,16 @@ const Input = forwardRef(function Input(
       </div>
 
       {error && (
-        <p id={`${inputId}-error`} className="mt-1.5 text-xs text-[#ff6b6b] font-medium" role="alert">
+        <p
+          id={`${inputId}-error`}
+          className="mt-1.5 text-xs text-[var(--color-negative)] font-medium"
+          role="alert"
+        >
           {error}
         </p>
       )}
       {hint && !error && (
-        <p id={`${inputId}-hint`} className="mt-1.5 text-xs text-[#8E9192]">
+        <p id={`${inputId}-hint`} className="mt-1.5 text-xs text-[var(--color-text-tertiary)]">
           {hint}
         </p>
       )}

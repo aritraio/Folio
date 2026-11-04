@@ -26,10 +26,10 @@ export default function TransactionsPage() {
 
   const [filters, setFilters] = useState({
     search: urlSearch,
-    month: 'all',
-    type: 'all',
-    category: 'all',
-    accountId: initialAccountId,
+    month: searchParams.get('month') || 'all',
+    type: searchParams.get('type') || 'all',
+    category: searchParams.get('category') || 'all',
+    accountId: searchParams.get('accountId') || initialAccountId,
   });
 
   // Keep search box in sync when arriving from GlobalSearch (?search=...).
@@ -50,7 +50,7 @@ export default function TransactionsPage() {
         const searchLower = filters.search.toLowerCase();
         const matchesMerchant = (tx.merchant || tx.description || '').toLowerCase().includes(searchLower);
         const matchesCategory = (tx.category || '').toLowerCase().includes(searchLower);
-        const matchesNotes = (tx.notes || '').toLowerCase().includes(searchLower);
+        const matchesNotes = `${tx.notes || ''} ${tx.person || ''}`.toLowerCase().includes(searchLower);
         if (!matchesMerchant && !matchesCategory && !matchesNotes) return false;
       }
       if (filters.month !== 'all') {
@@ -96,10 +96,10 @@ export default function TransactionsPage() {
 
   const handleFilterChange = (key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
-    if (key === 'search') {
-      if (value) setSearchParams({ search: value }, { replace: true });
-      else setSearchParams({}, { replace: true });
-    }
+    const next = { ...filters, [key]: value };
+    setSearchParams(Object.fromEntries(Object.entries(next).filter(([, v]) => v && v !== 'all')), {
+      replace: true,
+    });
   };
 
   const handleClearFilters = () => {
@@ -130,8 +130,8 @@ export default function TransactionsPage() {
         saveTransaction(data);
       }
       refresh();
-    } catch {
-      refresh();
+    } catch (error) {
+      throw error;
     }
   };
 
@@ -140,7 +140,9 @@ export default function TransactionsPage() {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <p className="label mb-1 font-mono">{formatMoney(spentThisMonth)} spent this month</p>
-          <h1 className="heading-lg text-[#0A0A0A] dark:text-white">Transactions</h1>
+          <h1 className="heading-lg text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+            Transactions
+          </h1>
         </div>
         <Button variant="primary" icon={<Plus className="w-4 h-4" />} onClick={handleAddClick}>
           Add Transaction
@@ -165,7 +167,7 @@ export default function TransactionsPage() {
 
       {filteredTransactions.length > PAGE_SIZE && (
         <nav className="flex items-center justify-between pt-2" aria-label="Transaction pages">
-          <p className="text-xs text-[#8E9192] font-mono tabular-nums">
+          <p className="text-xs text-[var(--color-text-tertiary)] font-mono tabular-nums">
             Showing {(safePage - 1) * PAGE_SIZE + 1}–
             {Math.min(safePage * PAGE_SIZE, filteredTransactions.length)} of {filteredTransactions.length}
           </p>
@@ -177,7 +179,10 @@ export default function TransactionsPage() {
             >
               Previous
             </Button>
-            <span className="px-3 py-2 text-sm font-medium tabular-nums font-mono text-[#0A0A0A] dark:text-white" aria-current="page">
+            <span
+              className="px-3 py-2 text-sm font-medium tabular-nums font-mono text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]"
+              aria-current="page"
+            >
               {safePage} / {totalPages}
             </span>
             <Button

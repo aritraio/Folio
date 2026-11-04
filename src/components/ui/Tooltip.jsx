@@ -60,8 +60,8 @@ export default function Tooltip({ children, content, position = 'top', delay = 2
           <div
             className="
               px-2.5 py-1.5 rounded
-              bg-[#141414] text-white
-              border border-[#262626]
+              bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)]
+              border border-[var(--color-border)]
               text-xs font-medium leading-tight
               whitespace-nowrap
             "

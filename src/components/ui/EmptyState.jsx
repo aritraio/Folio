@@ -25,17 +25,19 @@ export default function EmptyState({
       <div
         className="
           w-16 h-16 rounded
-          bg-[#F5F5F5] dark:bg-[#1E1E1E]
-          border border-[#E5E5E5] dark:border-[#262626]
+          bg-[var(--color-bg-tertiary)] dark:bg-[var(--color-bg-tertiary)]
+          border border-[var(--color-border)] dark:border-[var(--color-border)]
           flex items-center justify-center
           mb-5
         "
       >
-        {icon || <Inbox className="w-7 h-7 text-[#8E9192]" />}
+        {icon || <Inbox className="w-7 h-7 text-[var(--color-text-tertiary)]" />}
       </div>
 
       {/* Title */}
-      <h3 className="heading-sm text-[#0A0A0A] dark:text-white mb-2">{title}</h3>
+      <h3 className="heading-sm text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] mb-2">
+        {title}
+      </h3>
 
       {/* Description */}
       <p className="body-sm max-w-sm mb-6">{description}</p>

@@ -21,7 +21,9 @@
     "cap:build": "npm run build && npx cap copy android",
     "cap:sync": "npm run build && npx cap sync android",
     "cap:open": "npx cap open android",
-    "cap:run": "npm run build && npx cap run android"
+    "cap:run": "npm run build && npx cap run android",
+    "dev:cloud": "npm run build && wrangler dev --config wrangler.v2.toml",
+    "deploy:v2": "npm run build && wrangler deploy --config wrangler.v2.toml"
   },
   "dependencies": {
     "@capacitor/android": "^8.5.2",

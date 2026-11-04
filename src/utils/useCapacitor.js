@@ -26,7 +26,7 @@ export function useCapacitor() {
     }).catch(() => {});
 
     StatusBar.setBackgroundColor({
-      color: isDark ? '#0A0A0A' : '#FAFAFA',
+      color: isDark ? '#101714' : '#F5F7F6',
     }).catch(() => {});
   }, [theme]);
 
@@ -41,14 +41,18 @@ export function useCapacitor() {
         // Priority 1: If an open modal/dialog exists, dismiss it
         const openDialog = document.querySelector('[role="dialog"], [aria-modal="true"]');
         if (openDialog) {
-          const closeButton = openDialog.querySelector('button[aria-label*="close" i], button[title*="close" i]');
+          const closeButton = openDialog.querySelector(
+            'button[aria-label*="close" i], button[title*="close" i]'
+          );
           if (closeButton) {
             closeButton.click();
             return;
           }
           // Dispatch Escape key event as fallback
           if (typeof window !== 'undefined' && window.KeyboardEvent) {
-            document.dispatchEvent(new window.KeyboardEvent('keydown', { key: 'Escape', code: 'Escape', bubbles: true }));
+            document.dispatchEvent(
+              new window.KeyboardEvent('keydown', { key: 'Escape', code: 'Escape', bubbles: true })
+            );
           }
           return;
         }
